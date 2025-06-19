@@ -1,0 +1,32 @@
+{
+  "name": "pdf-ocr-extractor",
+  "version": "1.0.0",
+  "description": "Application web d'extraction de texte à partir de fichiers PDF utilisant l'OCR",
+  "private": true,
+  "scripts": {
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm run preview",
+    "build:frontend": "cd frontend && npm run build",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up",
+    "docker:down": "docker-compose down"
+  },
+  "keywords": [
+    "pdf",
+    "ocr",
+    "tesseract",
+    "react",
+    "nodejs",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.1.10"
+  }
+}
