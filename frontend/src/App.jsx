@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import PDFViewer from './components/PDFViewer';
 import OCRProcessor from './components/OCRProcessor';
