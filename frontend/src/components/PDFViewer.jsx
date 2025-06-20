@@ -139,7 +139,22 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
       const context = canvas.getContext('2d');
       // Utiliser le zoom pour le rendu - échelle de base plus zoom
       const baseScale = 1.5; // Échelle de base pour une bonne qualité
-      const viewport = page.getViewport({ scale: baseScale * zoom });
+      
+      // Auto-détection d'orientation et correction
+      let viewport = page.getViewport({ scale: baseScale * zoom });
+      
+      // Détecter si la page est en mode paysage ou portrait
+      const isLandscape = viewport.width > viewport.height;
+      const rotation = viewport.rotation || 0;
+      
+      // Correction automatique pour les PDF mal orientés
+      if (rotation !== 0 || (viewport.width / viewport.height > 2)) {
+        console.log(`🔄 Correction orientation détectée - rotation: ${rotation}°, ratio: ${(viewport.width/viewport.height).toFixed(2)}`);
+        viewport = page.getViewport({ 
+          scale: baseScale * zoom,
+          rotation: rotation === 0 ? 0 : -rotation // Contre-rotation si nécessaire
+        });
+      }
 
       canvas.height = viewport.height;
       canvas.width = viewport.width;
@@ -159,7 +174,7 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
       };
 
       await page.render(renderContext).promise;
-      console.log(`Page rendue avec zoom ${zoom}x - Canvas: ${canvas.width}x${canvas.height}, Display: ${canvas.style.width}x${canvas.style.height}`);
+      console.log(`Page rendue avec zoom ${zoom}x - Canvas: ${canvas.width}x${canvas.height}, Display: ${canvas.style.width}x${canvas.style.height}, Rotation: ${rotation}°`);
     } finally {
       setIsRendering(false);
     }

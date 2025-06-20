@@ -16,7 +16,7 @@ module.exports = async function handler(req, res) {
 
     console.log('🔍 Démarrage OCR via OCR.space API...');
 
-    // Utiliser OCR.space API (gratuite)
+    // Utiliser OCR.space API avec paramètres optimisés pour la précision
     const ocrSpaceApiKey = 'K87899142988957'; // Clé publique de démo
     
     try {
@@ -28,11 +28,14 @@ module.exports = async function handler(req, res) {
         body: new URLSearchParams({
           'apikey': ocrSpaceApiKey,
           'base64Image': imageData,
-          'language': 'fre',
+          'language': 'fre', // Français en priorité
           'isOverlayRequired': 'false',
-          'detectOrientation': 'false',
-          'scale': 'true',
-          'isTable': 'false'
+          'detectOrientation': 'true', // ✅ Activer détection orientation
+          'scale': 'true', // ✅ Mise à l'échelle automatique
+          'isTable': 'false',
+          'OCREngine': '2', // ✅ Moteur OCR v2 (plus précis)
+          'filetype': 'PNG',
+          'isSearchablePdfHideTextLayer': 'false'
         })
       });
 

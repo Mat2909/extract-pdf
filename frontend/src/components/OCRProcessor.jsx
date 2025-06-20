@@ -370,9 +370,10 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
     const pdf = await pdfjsLib.getDocument(pdfFile.path).promise;
     const page = await pdf.getPage(pageNumber);
     
-    // IMPORTANT: Utiliser le même viewport que dans PDFViewer
-    const viewport = page.getViewport({ scale: 3.0 });
-    console.log('OCR Viewport dimensions:', viewport.width, 'x', viewport.height);
+    // AMÉLIORATION: Scale plus élevée pour OCR (meilleure qualité)
+    const ocrScale = 4.0; // ✅ Augmenter pour plus de précision OCR
+    const viewport = page.getViewport({ scale: ocrScale });
+    console.log('OCR Viewport dimensions (scale 4x):', viewport.width, 'x', viewport.height);
     
     // Obtenir les dimensions du canvas affiché dans PDFViewer pour comparaison
     const pdfCanvas = document.querySelector('.pdf-canvas');
@@ -409,31 +410,35 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
       throw new Error('Zone sélectionnée trop petite');
     }
 
-    // Créer un canvas pour la zone avec une taille minimale plus généreuse
-    const minWidth = Math.max(width, 300);
-    const minHeight = Math.max(height, 150);
+    // ✅ AMÉLIORATION: Taille optimale pour OCR (plus grande = plus précise)
+    const minWidth = Math.max(width, 600); // ✅ Double la taille minimale
+    const minHeight = Math.max(height, 300);
     
     const zoneCanvas = document.createElement('canvas');
     const zoneContext = zoneCanvas.getContext('2d');
     zoneCanvas.width = minWidth;
     zoneCanvas.height = minHeight;
 
-    // Fond blanc pour l'OCR
-    zoneContext.fillStyle = 'white';
+    // ✅ Fond blanc pur pour contraste maximal
+    zoneContext.fillStyle = '#FFFFFF';
     zoneContext.fillRect(0, 0, minWidth, minHeight);
 
-    // Copier la zone avec mise à l'échelle si nécessaire
+    // ✅ Amélioration qualité avec antialiasing
+    zoneContext.imageSmoothingEnabled = true;
+    zoneContext.imageSmoothingQuality = 'high';
+
+    // Copier la zone avec mise à l'échelle optimisée
     zoneContext.drawImage(
       canvas, 
       x, y, width, height,  // source
-      0, 0, minWidth, minHeight  // destination
+      0, 0, minWidth, minHeight  // destination - agrandie pour OCR
     );
 
     console.log('Canvas zone créé:', minWidth, 'x', minHeight);
 
-    // Afficher l'image extraite pour debug
-    const dataURL = zoneCanvas.toDataURL('image/png', 1.0);
-    console.log('Image base64 générée, taille:', dataURL.length);
+    // ✅ AMÉLIORATION: Format PNG haute qualité pour OCR
+    const dataURL = zoneCanvas.toDataURL('image/png', 1.0); // PNG sans compression
+    console.log('Image OCR haute qualité générée, taille:', dataURL.length, 'dimensions:', minWidth, 'x', minHeight);
     
     // Stocker l'image pour l'affichage dans la modal de validation
     window.currentOCRImage = dataURL;
