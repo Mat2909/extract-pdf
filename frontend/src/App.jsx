@@ -141,24 +141,39 @@ function App() {
     setMessage('PDF uploadé avec succès !');
     
     try {
+      console.log('🔍 Processing uploaded PDF result:', result);
+      
       // Toujours traiter en base64
       const base64Data = result.file.data;
+      console.log('📊 Base64 data length:', base64Data ? base64Data.length : 'undefined');
+      
+      if (!base64Data) {
+        throw new Error('Aucune donnée base64 reçue du serveur');
+      }
+      
       const binaryString = atob(base64Data);
+      console.log('📊 Binary string length:', binaryString.length);
+      
       const bytes = new Uint8Array(binaryString.length);
       for (let i = 0; i < binaryString.length; i++) {
         bytes[i] = binaryString.charCodeAt(i);
       }
+      
       const blob = new Blob([bytes], { type: 'application/pdf' });
+      console.log('📊 Blob created, size:', blob.size);
+      
       const pdfUrl = URL.createObjectURL(blob);
+      console.log('📊 PDF URL created:', pdfUrl);
       
       setUploadedPDF({
         ...result.file,
         path: pdfUrl
       });
       setCurrentStep(2);
+      console.log('✅ PDF ready for display');
     } catch (error) {
-      console.error('Erreur conversion PDF:', error);
-      setMessage('Erreur lors du traitement du PDF');
+      console.error('❌ Erreur conversion PDF:', error);
+      setMessage('Erreur lors du traitement du PDF: ' + error.message);
     }
   };
   
