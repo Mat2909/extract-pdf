@@ -2,8 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import './PDFViewer.css';
 
-// Worker depuis jsDelivr CDN (stable et CORS-friendly)
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+// Désactiver complètement le worker - utilise le thread principal
+// Solution la plus stable pour Vercel (plus lent mais fonctionne toujours)
+pdfjsLib.GlobalWorkerOptions.workerSrc = '';
 
 const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepChange, onTotalPagesChange, selectedPages = [] }) => {
   const canvasRef = useRef(null);
