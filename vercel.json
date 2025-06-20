@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install && npm run build && cp ../public/pdf.worker.js dist/",
+  "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
   "functions": {
     "api/upload.js": {
