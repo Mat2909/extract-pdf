@@ -116,13 +116,8 @@ function App() {
   const handleFileUploadSuccess = (result) => {
     setMessage('PDF uploadé avec succès !');
     
-    let pdfUrl;
-    
-    if (result.file.path && result.file.path.startsWith('http')) {
-      // Cas file.io: utiliser l'URL directement
-      pdfUrl = result.file.path;
-    } else if (result.file.data) {
-      // Cas base64: convertir en blob URL
+    try {
+      // Toujours traiter en base64
       const base64Data = result.file.data;
       const binaryString = atob(base64Data);
       const bytes = new Uint8Array(binaryString.length);
@@ -130,17 +125,17 @@ function App() {
         bytes[i] = binaryString.charCodeAt(i);
       }
       const blob = new Blob([bytes], { type: 'application/pdf' });
-      pdfUrl = URL.createObjectURL(blob);
-    } else {
-      setMessage('Erreur: Format de PDF non supporté');
-      return;
+      const pdfUrl = URL.createObjectURL(blob);
+      
+      setUploadedPDF({
+        ...result.file,
+        path: pdfUrl
+      });
+      setCurrentStep(2);
+    } catch (error) {
+      console.error('Erreur conversion PDF:', error);
+      setMessage('Erreur lors du traitement du PDF');
     }
-    
-    setUploadedPDF({
-      ...result.file,
-      path: pdfUrl
-    });
-    setCurrentStep(2);
   };
   
   const handleAreaSelected = (area) => {

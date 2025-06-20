@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import './PDFViewer.css';
 
-// Worker via data URL pour éviter tous les problèmes de chargement
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'data:application/javascript,importScripts("https://unpkg.com/pdfjs-dist@' + pdfjsLib.version + '/build/pdf.worker.min.js");';
+// Configuration worker simple et stable
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
 
 const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepChange, onTotalPagesChange, selectedPages = [] }) => {
   const canvasRef = useRef(null);
