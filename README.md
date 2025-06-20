@@ -1,5 +1,7 @@
 # 🚀 Outil d'Extraction PDF OCR
 
+✅ Connected to GitHub & Vercel
+
 Outil web pour extraire automatiquement les coordonnées Lambert depuis les documents PDF et les exporter en format Excel.
 
 ## Architecture
