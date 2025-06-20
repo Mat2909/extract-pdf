@@ -38,24 +38,12 @@ export default defineConfig({
   worker: {
     format: 'es'
   },
-  assetsInclude: ['**/*.worker.min.js'],
   define: {
     'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL)
   },
   build: {
     outDir: 'dist',
     target: 'esnext',
-    emptyOutDir: true,
-    rollupOptions: {
-      output: {
-        assetFileNames: (assetInfo) => {
-          // Garder le nom original pour les workers PDF.js
-          if (assetInfo.name && assetInfo.name.includes('pdf.worker')) {
-            return 'assets/[name][extname]';
-          }
-          return 'assets/[name]-[hash][extname]';
-        }
-      }
-    }
+    emptyOutDir: true
   }
 })
