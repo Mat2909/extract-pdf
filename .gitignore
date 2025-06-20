@@ -33,6 +33,7 @@ dist-ssr
 
 # Upload directories
 backend/uploads/
+uploads/
 *.pdf
 *.png
 *.jpg
@@ -112,3 +113,4 @@ coverage
 
 # Mac
 .DS_Store
+.vercel
