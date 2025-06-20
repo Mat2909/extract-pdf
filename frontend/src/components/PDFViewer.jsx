@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import './PDFViewer.css';
 
-// Configuration du worker local
-pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.js';
+// Configuration du worker depuis CDN (évite les problèmes Vercel)
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
 
 const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepChange, onTotalPagesChange }) => {
   const canvasRef = useRef(null);
