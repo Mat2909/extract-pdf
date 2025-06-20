@@ -2,11 +2,18 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import './PDFViewer.css';
 
-// Worker intégré via Vite - solution stable pour Vercel
-pdfjsLib.GlobalWorkerOptions.workerSrc = /* @vite-ignore */ new URL(
-  'pdfjs-dist/build/pdf.worker.min.js',
-  import.meta.url
-).toString();
+// Configuration worker avec fallback pour Vercel
+try {
+  // Essayer d'utiliser le worker local
+  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+    'pdfjs-dist/build/pdf.worker.min.js',
+    import.meta.url
+  ).toString();
+} catch (error) {
+  // Fallback vers CDN si échec
+  console.warn('Worker local échoué, utilisation CDN:', error);
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+}
 
 const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepChange, onTotalPagesChange, selectedPages = [] }) => {
   const canvasRef = useRef(null);
