@@ -38,6 +38,7 @@ export default defineConfig({
   worker: {
     format: 'es'
   },
+  assetsInclude: ['**/*.worker.min.js'],
   define: {
     'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL)
   },
