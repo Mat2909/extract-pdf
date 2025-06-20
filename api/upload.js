@@ -1,6 +1,5 @@
 import formidable from 'formidable';
 import fs from 'fs';
-import path from 'path';
 
 export const config = {
   api: {
@@ -14,18 +13,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Utiliser /tmp sur Vercel (système de fichiers en lecture seule)
-    const uploadDir = '/tmp';
-    // Pas besoin de créer /tmp, il existe déjà sur Vercel
-
     const form = formidable({
-      uploadDir: uploadDir,
-      keepExtensions: true,
       maxFileSize: 10 * 1024 * 1024, // 10MB
-      filename: (name, ext, part) => {
-        const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}-${part.originalFilename}`;
-        return uniqueName;
-      }
     });
 
     const [fields, files] = await form.parse(req);
@@ -40,30 +29,32 @@ export default async function handler(req, res) {
 
     // Vérifier que c'est un PDF
     if (!pdfFile.mimetype?.includes('pdf')) {
-      // Supprimer le fichier uploadé
-      fs.unlinkSync(pdfFile.filepath);
       return res.status(400).json({ 
         success: false,
         error: 'Seuls les fichiers PDF sont acceptés' 
       });
     }
 
+    // Lire le fichier en mémoire
+    const pdfBuffer = fs.readFileSync(pdfFile.filepath);
+    const base64Data = pdfBuffer.toString('base64');
+
     console.log('Fichier PDF reçu:', {
       originalName: pdfFile.originalFilename,
-      filename: path.basename(pdfFile.filepath),
-      size: pdfFile.size,
-      path: pdfFile.filepath
+      size: pdfFile.size
     });
+
+    // Nettoyer le fichier temporaire
+    fs.unlinkSync(pdfFile.filepath);
 
     res.json({
       success: true,
       message: 'PDF uploadé avec succès',
       file: {
         originalName: pdfFile.originalFilename,
-        filename: path.basename(pdfFile.filepath),
         size: pdfFile.size,
         sizeFormatted: `${(pdfFile.size / 1024 / 1024).toFixed(2)} MB`,
-        path: `/api/pdf/${path.basename(pdfFile.filepath)}`
+        data: base64Data
       }
     });
 

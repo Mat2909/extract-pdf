@@ -115,7 +115,20 @@ function App() {
   
   const handleFileUploadSuccess = (result) => {
     setMessage('PDF uploadé avec succès !');
-    setUploadedPDF(result.file);
+    // Convertir les données base64 en URL blob pour PDF.js
+    const base64Data = result.file.data;
+    const binaryString = atob(base64Data);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    
+    setUploadedPDF({
+      ...result.file,
+      path: url
+    });
     setCurrentStep(2);
   };
   
