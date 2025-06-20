@@ -4,16 +4,16 @@ import './PDFViewer.css';
 
 // Configuration worker avec fallback robuste pour Vercel
 const configurePDFWorker = () => {
-  // Try local worker first (for Vercel build)
+  // Utiliser toujours le worker local en production
   const localWorkerPath = '/pdf.worker.js';
-  const cdnWorkerPath = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+  const cdnWorkerPath = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
   
   // En production, utiliser le worker local copyé dans public/
   if (import.meta.env.PROD) {
-    console.log('🔧 Production: Using local PDF worker');
+    console.log('🔧 Production: Using local PDF worker v3.11.174');
     pdfjsLib.GlobalWorkerOptions.workerSrc = localWorkerPath;
   } else {
-    console.log('🔧 Development: Using CDN PDF worker');
+    console.log('🔧 Development: Using CDN PDF worker v3.11.174');
     pdfjsLib.GlobalWorkerOptions.workerSrc = cdnWorkerPath;
   }
 };
