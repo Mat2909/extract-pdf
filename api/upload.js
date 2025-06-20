@@ -37,26 +37,65 @@ export default async function handler(req, res) {
 
     // Lire le fichier en mémoire
     const pdfBuffer = fs.readFileSync(pdfFile.filepath);
-    const base64Data = pdfBuffer.toString('base64');
 
-    console.log('Fichier PDF reçu:', {
-      originalName: pdfFile.originalFilename,
-      size: pdfFile.size
-    });
+    // Upload vers file.io pour résoudre les problèmes Vercel
+    const fileioFormData = new FormData();
+    const blob = new Blob([pdfBuffer], { type: 'application/pdf' });
+    fileioFormData.append('file', blob, pdfFile.originalFilename);
 
-    // Nettoyer le fichier temporaire
-    fs.unlinkSync(pdfFile.filepath);
+    try {
+      const fileioResponse = await fetch('https://file.io/', {
+        method: 'POST',
+        body: fileioFormData
+      });
 
-    res.json({
-      success: true,
-      message: 'PDF uploadé avec succès',
-      file: {
+      if (!fileioResponse.ok) {
+        throw new Error('Upload file.io échoué');
+      }
+
+      const fileioResult = await fileioResponse.json();
+
+      console.log('Fichier PDF uploadé vers file.io:', {
         originalName: pdfFile.originalFilename,
         size: pdfFile.size,
-        sizeFormatted: `${(pdfFile.size / 1024 / 1024).toFixed(2)} MB`,
-        data: base64Data
-      }
-    });
+        fileioUrl: fileioResult.link
+      });
+
+      // Nettoyer le fichier temporaire
+      fs.unlinkSync(pdfFile.filepath);
+
+      res.json({
+        success: true,
+        message: 'PDF uploadé avec succès',
+        file: {
+          originalName: pdfFile.originalFilename,
+          size: pdfFile.size,
+          sizeFormatted: `${(pdfFile.size / 1024 / 1024).toFixed(2)} MB`,
+          path: fileioResult.link, // URL file.io pour visualisation
+          fileioKey: fileioResult.key
+        }
+      });
+
+    } catch (fileioError) {
+      console.warn('File.io échoué, fallback vers base64:', fileioError.message);
+      
+      // Fallback: base64 si file.io échoue
+      const base64Data = pdfBuffer.toString('base64');
+      
+      // Nettoyer le fichier temporaire
+      fs.unlinkSync(pdfFile.filepath);
+
+      res.json({
+        success: true,
+        message: 'PDF uploadé avec succès (mode base64)',
+        file: {
+          originalName: pdfFile.originalFilename,
+          size: pdfFile.size,
+          sizeFormatted: `${(pdfFile.size / 1024 / 1024).toFixed(2)} MB`,
+          data: base64Data
+        }
+      });
+    }
 
   } catch (error) {
     console.error('Erreur upload:', error);

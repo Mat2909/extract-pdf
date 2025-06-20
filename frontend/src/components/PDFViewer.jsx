@@ -8,7 +8,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString();
 
-const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepChange, onTotalPagesChange }) => {
+const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepChange, onTotalPagesChange, selectedPages = [] }) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,6 +32,17 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
       loadPDF();
     }
   }, [pdfUrl]);
+
+  // Effet pour afficher la première page sélectionnée à l'étape 3
+  useEffect(() => {
+    if (currentStep === 3 && selectedPages.length > 0 && pdfDocument) {
+      const firstSelectedPage = Math.min(...selectedPages);
+      if (firstSelectedPage !== currentPageNum) {
+        setCurrentPageNum(firstSelectedPage);
+        goToPage(firstSelectedPage);
+      }
+    }
+  }, [currentStep, selectedPages, pdfDocument]);
 
   const loadPDF = async () => {
     try {

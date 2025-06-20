@@ -115,19 +115,30 @@ function App() {
   
   const handleFileUploadSuccess = (result) => {
     setMessage('PDF uploadé avec succès !');
-    // Convertir les données base64 en URL blob pour PDF.js
-    const base64Data = result.file.data;
-    const binaryString = atob(base64Data);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
+    
+    let pdfUrl;
+    
+    if (result.file.path && result.file.path.startsWith('http')) {
+      // Cas file.io: utiliser l'URL directement
+      pdfUrl = result.file.path;
+    } else if (result.file.data) {
+      // Cas base64: convertir en blob URL
+      const base64Data = result.file.data;
+      const binaryString = atob(base64Data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      pdfUrl = URL.createObjectURL(blob);
+    } else {
+      setMessage('Erreur: Format de PDF non supporté');
+      return;
     }
-    const blob = new Blob([bytes], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
     
     setUploadedPDF({
       ...result.file,
-      path: url
+      path: pdfUrl
     });
     setCurrentStep(2);
   };
@@ -417,6 +428,7 @@ function App() {
                 currentStep={currentStep}
                 onStepChange={setCurrentStep}
                 onTotalPagesChange={setTotalPDFPages}
+                selectedPages={selectedPages}
               />
               
               {/* Bouton continuer si des pages sont sélectionnées manuellement */}
@@ -459,6 +471,7 @@ function App() {
                 currentStep={currentStep}
                 onStepChange={setCurrentStep}
                 onTotalPagesChange={setTotalPDFPages}
+                selectedPages={selectedPages}
               />
               
               {/* Bouton de validation de zone */}
