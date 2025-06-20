@@ -2,8 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import './PDFViewer.css';
 
-// Configuration du worker embarqué (évite CORS et 404)
-import 'pdfjs-dist/build/pdf.worker.entry';
+// Configuration du worker avec URL données (évite fichiers externes)
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.js',
+  import.meta.url
+).toString();
 
 const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepChange, onTotalPagesChange }) => {
   const canvasRef = useRef(null);
