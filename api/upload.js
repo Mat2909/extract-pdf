@@ -14,11 +14,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Créer le dossier uploads s'il n'existe pas
-    const uploadDir = path.join(process.cwd(), 'uploads');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
+    // Utiliser /tmp sur Vercel (système de fichiers en lecture seule)
+    const uploadDir = '/tmp';
+    // Pas besoin de créer /tmp, il existe déjà sur Vercel
 
     const form = formidable({
       uploadDir: uploadDir,

@@ -7,7 +7,7 @@ export default function handler(req, res) {
   }
 
   const { filename } = req.query;
-  const uploadsDir = path.join(process.cwd(), 'uploads');
+  const uploadsDir = '/tmp';
   const pdfPath = path.join(uploadsDir, filename);
   
   if (fs.existsSync(pdfPath)) {
