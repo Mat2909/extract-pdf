@@ -2,8 +2,24 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import './PDFViewer.css';
 
-// Configuration worker simple et stable
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+// Configuration worker avec fallback robuste pour Vercel
+const configurePDFWorker = () => {
+  // Try local worker first (for Vercel build)
+  const localWorkerPath = '/pdf.worker.js';
+  const cdnWorkerPath = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+  
+  // En production, utiliser le worker local copyé dans public/
+  if (import.meta.env.PROD) {
+    console.log('🔧 Production: Using local PDF worker');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = localWorkerPath;
+  } else {
+    console.log('🔧 Development: Using CDN PDF worker');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = cdnWorkerPath;
+  }
+};
+
+// Configurer le worker au chargement
+configurePDFWorker();
 
 const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepChange, onTotalPagesChange, selectedPages = [] }) => {
   const canvasRef = useRef(null);
@@ -46,6 +62,9 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
       setIsLoading(true);
       setError(null);
 
+      console.log('🔍 Loading PDF from:', pdfUrl);
+      console.log('🔧 PDF Worker configured at:', pdfjsLib.GlobalWorkerOptions.workerSrc);
+
       const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
       setPdfDocument(pdf);
       setTotalPages(pdf.numPages);
@@ -65,8 +84,39 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
       const page = await pdf.getPage(1);
       renderPage(page);
     } catch (err) {
-      console.error('Erreur chargement PDF:', err);
-      setError('Impossible de charger le PDF');
+      console.error('❌ Erreur chargement PDF:', err);
+      console.error('❌ Worker path:', pdfjsLib.GlobalWorkerOptions.workerSrc);
+      
+      // Tentative de fallback avec CDN si le worker local échoue
+      if (import.meta.env.PROD && err.message?.includes('worker')) {
+        console.log('🔄 Tentative fallback CDN worker...');
+        try {
+          pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+          const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+          setPdfDocument(pdf);
+          setTotalPages(pdf.numPages);
+          
+          if (onTotalPagesChange) {
+            onTotalPagesChange(pdf.numPages);
+          }
+          
+          const allPages = new Set();
+          for (let i = 1; i <= pdf.numPages; i++) {
+            allPages.add(i);
+          }
+          setPagesToKeep(allPages);
+          
+          const page = await pdf.getPage(1);
+          renderPage(page);
+          
+          console.log('✅ Fallback CDN réussi');
+          return;
+        } catch (fallbackErr) {
+          console.error('❌ Fallback CDN échec:', fallbackErr);
+        }
+      }
+      
+      setError(`Impossible de charger le PDF: ${err.message}`);
     } finally {
       setIsLoading(false);
     }

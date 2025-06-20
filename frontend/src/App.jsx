@@ -16,6 +16,19 @@ function App() {
   const [pagesValidated, setPagesValidated] = useState(false);
   const [totalPDFPages, setTotalPDFPages] = useState(0);
   
+  // Activer le debug panel avec Ctrl+D
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.key === 'd') {
+        e.preventDefault();
+        window.showDebugPanel = !window.showDebugPanel;
+        window.location.reload(); // Force re-render
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+  
   // Définition des étapes
   const steps = [
     { number: 1, title: 'Sélection du PDF', description: 'Choisir le fichier PDF à traiter' },
@@ -46,23 +59,34 @@ function App() {
     formData.append('pdf', selectedFile);
 
     try {
+      console.log('🚀 Tentative upload vers /api/upload');
+      console.log('📄 Fichier:', selectedFile.name, selectedFile.size, 'bytes');
+      console.log('🌍 Environment:', import.meta.env.MODE);
+      
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
 
+      console.log('📡 Réponse upload:', response.status, response.statusText);
+
       if (response.ok) {
         const result = await response.json();
+        console.log('✅ Upload réussi:', result);
         handleFileUploadSuccess(result);
-        console.log('Résultat:', result);
       } else {
         const errorText = await response.text();
+        console.error('❌ Erreur upload:', response.status, errorText);
         setMessage(`Erreur ${response.status}: ${errorText || 'Erreur lors de l\'upload'}`);
-        console.error('Erreur détaillée:', response.status, errorText);
+        
+        // Debug supplémentaire pour Vercel
+        if (response.status === 404) {
+          setMessage(`Erreur 404: L'API d'upload n'est pas accessible. Vérifiez la configuration Vercel.`);
+        }
       }
     } catch (error) {
-      setMessage('Erreur de connexion');
-      console.error('Erreur:', error);
+      console.error('❌ Erreur réseau upload:', error);
+      setMessage(`Erreur de connexion: ${error.message}`);
     } finally {
       setUploading(false);
     }
@@ -228,6 +252,69 @@ function App() {
 
   return (
     <div className="App">
+      {/* Debug Panel - Affiché seulement en développement ou si CTRL+D pressé */}
+      {(import.meta.env.DEV || window.showDebugPanel) && (
+        <div style={{
+          position: 'fixed',
+          top: '10px',
+          right: '10px',
+          backgroundColor: '#f8f9fa',
+          border: '1px solid #dee2e6',
+          borderRadius: '4px',
+          padding: '10px',
+          zIndex: 9999,
+          fontSize: '12px',
+          minWidth: '200px'
+        }}>
+          <h4 style={{ margin: '0 0 10px 0' }}>🔧 Debug Panel</h4>
+          <button
+            onClick={async () => {
+              try {
+                const response = await fetch('/api/test');
+                const result = await response.json();
+                alert(`Test API: ${JSON.stringify(result, null, 2)}`);
+              } catch (error) {
+                alert(`Erreur test API: ${error.message}`);
+              }
+            }}
+            style={{
+              backgroundColor: '#17a2b8',
+              color: 'white',
+              border: 'none',
+              padding: '5px 10px',
+              borderRadius: '3px',
+              cursor: 'pointer',
+              marginBottom: '5px',
+              width: '100%'
+            }}
+          >
+            Test API
+          </button>
+          <button
+            onClick={async () => {
+              try {
+                const response = await fetch('/api/health');
+                const result = await response.json();
+                alert(`Health: ${JSON.stringify(result, null, 2)}`);
+              } catch (error) {
+                alert(`Erreur health: ${error.message}`);
+              }
+            }}
+            style={{
+              backgroundColor: '#28a745',
+              color: 'white',
+              border: 'none',
+              padding: '5px 10px',
+              borderRadius: '3px',
+              cursor: 'pointer',
+              width: '100%'
+            }}
+          >
+            Health Check
+          </button>
+        </div>
+      )}
+
       {/* Header fixe avec titre et bouton nouveau */}
       <div className="app-header" style={{
         position: 'sticky',

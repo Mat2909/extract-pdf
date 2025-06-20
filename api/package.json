@@ -1,0 +1,14 @@
+{
+  "name": "api-functions",
+  "version": "1.0.0",
+  "description": "Vercel API functions for PDF OCR extractor",
+  "main": "upload.js",
+  "dependencies": {
+    "formidable": "^3.5.1",
+    "tesseract.js": "^5.1.1",
+    "proj4": "^2.17.0"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
