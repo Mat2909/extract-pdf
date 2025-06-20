@@ -1,4 +1,4 @@
-// OCR simplifiée pour Vercel - API externe
+// OCR avec API externe OCR.space pour Vercel
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -14,23 +14,59 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    console.log('🔍 OCR simplifiée - simulation réponse...');
+    console.log('🔍 Démarrage OCR via OCR.space API...');
 
-    // SIMULATION : Extraire des patterns numériques basiques depuis l'image
-    // En production, ici on utiliserait une API OCR externe comme OCR.space
+    // Utiliser OCR.space API (gratuite)
+    const ocrSpaceApiKey = 'K87899142988957'; // Clé publique de démo
     
-    // Pour l'instant, simuler une extraction réussie
-    const simulatedText = "Lambert II étendu : 654321.456 - 6789012.789";
-    
-    console.log('✅ OCR simulée terminée');
-    console.log('📄 Texte simulé:', simulatedText);
+    try {
+      const response = await fetch('https://api.ocr.space/parse/image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          'apikey': ocrSpaceApiKey,
+          'base64Image': imageData,
+          'language': 'fre',
+          'isOverlayRequired': 'false',
+          'detectOrientation': 'false',
+          'scale': 'true',
+          'isTable': 'false'
+        })
+      });
 
-    res.json({
-      success: true,
-      text: simulatedText,
-      confidence: 85,
-      note: "OCR simplifiée pour Vercel"
-    });
+      const result = await response.json();
+      console.log('📡 Réponse OCR.space:', result);
+
+      if (result.IsErroredOnProcessing) {
+        throw new Error('Erreur OCR.space: ' + result.ErrorMessage);
+      }
+
+      const extractedText = result.ParsedResults?.[0]?.ParsedText || '';
+      console.log('✅ OCR terminée');
+      console.log('📄 Texte extrait:', extractedText.substring(0, 200));
+
+      res.json({
+        success: true,
+        text: extractedText.trim(),
+        confidence: 90,
+        source: 'OCR.space API'
+      });
+
+    } catch (ocrError) {
+      console.warn('⚠️ OCR.space échec, fallback simulation:', ocrError.message);
+      
+      // Fallback vers simulation en cas d'échec API
+      const simulatedText = `Coordonnées non détectées - Vérifiez la zone sélectionnée`;
+      
+      res.json({
+        success: true,
+        text: simulatedText,
+        confidence: 0,
+        note: "Fallback - OCR.space indisponible"
+      });
+    }
 
   } catch (error) {
     console.error('❌ Erreur OCR:', error);

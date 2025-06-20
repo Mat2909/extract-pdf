@@ -82,7 +82,15 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
       setPagesToKeep(allPages);
       
       const page = await pdf.getPage(1);
-      renderPage(page);
+      await renderPage(page);
+      
+      // Force un petit délai puis re-render pour assurer l'affichage
+      setTimeout(async () => {
+        if (page && canvasRef.current) {
+          console.log('🔄 Force re-render pour affichage initial');
+          await renderPage(page);
+        }
+      }, 100);
     } catch (err) {
       console.error('❌ Erreur chargement PDF:', err);
       console.error('❌ Worker path:', pdfjsLib.GlobalWorkerOptions.workerSrc);
