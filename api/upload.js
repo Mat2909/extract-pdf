@@ -1,4 +1,4 @@
-const formidable = require('formidable');
+const { IncomingForm } = require('formidable');
 const fs = require('fs');
 
 exports.config = {
@@ -13,7 +13,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const form = formidable({
+    const form = new IncomingForm({
       maxFileSize: 10 * 1024 * 1024, // 10MB
     });
 
