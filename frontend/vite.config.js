@@ -45,6 +45,17 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     target: 'esnext',
-    emptyOutDir: true
+    emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        assetFileNames: (assetInfo) => {
+          // Garder le nom original pour les workers PDF.js
+          if (assetInfo.name && assetInfo.name.includes('pdf.worker')) {
+            return 'assets/[name][extname]';
+          }
+          return 'assets/[name]-[hash][extname]';
+        }
+      }
+    }
   }
 })

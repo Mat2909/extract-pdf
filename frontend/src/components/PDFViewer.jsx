@@ -2,8 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import './PDFViewer.css';
 
-// Désactiver le worker - PDF.js utilisera le mode legacy (plus lent mais stable)
-pdfjsLib.GlobalWorkerOptions.workerSrc = false;
+// Worker intégré via Vite - solution stable pour Vercel
+pdfjsLib.GlobalWorkerOptions.workerSrc = /* @vite-ignore */ new URL(
+  'pdfjs-dist/build/pdf.worker.min.js',
+  import.meta.url
+).toString();
 
 const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepChange, onTotalPagesChange, selectedPages = [] }) => {
   const canvasRef = useRef(null);
