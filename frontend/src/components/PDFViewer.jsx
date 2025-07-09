@@ -515,135 +515,137 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
         </div>
       )}
       
-      {/* Contrôles de gestion des pages */}
-      <div className="pdf-header">
-        <div className="page-manager-controls">
-          <button 
-            onClick={() => setShowPageManager(!showPageManager)}
-            className="toggle-manager-btn"
-            style={{ 
-              backgroundColor: showPageManager ? '#dc3545' : '#007bff',
-              color: 'white',
-              padding: '8px 12px',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              marginRight: '10px'
-            }}
-          >
-            {showPageManager ? '✖ Fermer gestionnaire' : '📄 Gérer les pages'}
-          </button>
-          
-          {pagesToKeep.size < totalPages && (
-            <span className="pages-info" style={{ color: '#dc3545', fontWeight: 'bold' }}>
-              {pagesToKeep.size}/{totalPages} pages sélectionnées
-            </span>
-          )}
-          
-          {pagesValidated && (
-            <span className="pages-validated" style={{ 
-              color: '#28a745', 
-              fontWeight: 'bold',
-              marginLeft: '10px',
-              padding: '4px 8px',
-              backgroundColor: '#d4edda',
-              borderRadius: '3px',
-              border: '1px solid #c3e6cb'
-            }}>
-              ✓ Pages validées
-            </span>
+      {/* Contrôles de gestion des pages - Masqué à l'étape 3 */}
+      {currentStep !== 3 && (
+        <div className="pdf-header">
+          <div className="page-manager-controls">
+            <button 
+              onClick={() => setShowPageManager(!showPageManager)}
+              className="toggle-manager-btn"
+              style={{ 
+                backgroundColor: showPageManager ? '#dc3545' : '#007bff',
+                color: 'white',
+                padding: '8px 12px',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                marginRight: '10px'
+              }}
+            >
+              {showPageManager ? '✖ Fermer gestionnaire' : '📄 Gérer les pages'}
+            </button>
+            
+            {pagesToKeep.size < totalPages && (
+              <span className="pages-info" style={{ color: '#dc3545', fontWeight: 'bold' }}>
+                {pagesToKeep.size}/{totalPages} pages sélectionnées
+              </span>
+            )}
+            
+            {pagesValidated && (
+              <span className="pages-validated" style={{ 
+                color: '#28a745', 
+                fontWeight: 'bold',
+                marginLeft: '10px',
+                padding: '4px 8px',
+                backgroundColor: '#d4edda',
+                borderRadius: '3px',
+                border: '1px solid #c3e6cb'
+              }}>
+                ✓ Pages validées
+              </span>
+            )}
+          </div>
+
+            {showPageManager && (
+              <div className="page-manager" style={{
+                backgroundColor: '#f8f9fa',
+                border: '1px solid #dee2e6',
+                borderRadius: '4px',
+                padding: '15px',
+                marginTop: '10px'
+              }}>
+              <h4>Sélection des pages à traiter</h4>
+              <p>Décochez les pages qui ne contiennent pas de plans :</p>
+              
+              <div className="pages-grid" style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))',
+                gap: '8px',
+                marginTop: '10px'
+              }}>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => (
+                  <label key={pageNum} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '5px',
+                    backgroundColor: pagesToKeep.has(pageNum) ? '#d4edda' : '#f8d7da',
+                    borderRadius: '3px',
+                    cursor: 'pointer'
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={pagesToKeep.has(pageNum)}
+                      onChange={() => togglePageSelection(pageNum)}
+                      style={{ marginRight: '5px' }}
+                    />
+                    Page {pageNum}
+                  </label>
+                ))}
+              </div>
+
+              <div className="page-manager-actions" style={{ marginTop: '15px' }}>
+                <button 
+                  onClick={() => {
+                    const allPages = new Set();
+                    for (let i = 1; i <= totalPages; i++) allPages.add(i);
+                    setPagesToKeep(allPages);
+                    if (onPagesChange) onPagesChange(Array.from(allPages));
+                  }}
+                  style={{ marginRight: '10px', padding: '5px 10px' }}
+                >
+                  Tout sélectionner
+                </button>
+                <button 
+                  onClick={() => {
+                    setPagesToKeep(new Set());
+                    if (onPagesChange) onPagesChange([]);
+                  }}
+                  style={{ marginRight: '10px', padding: '5px 10px' }}
+                >
+                  Tout désélectionner
+                </button>
+                <button 
+                  onClick={() => {
+                    const selectedPagesArray = Array.from(pagesToKeep).sort((a, b) => a - b);
+                    setPagesValidated(true);
+                    setValidatedPages(selectedPagesArray);
+                    setShowPageManager(false);
+                    // Aller à la première page sélectionnée
+                    if (selectedPagesArray.length > 0) {
+                      goToPage(selectedPagesArray[0]);
+                    }
+                    if (onPagesChange) onPagesChange(selectedPagesArray);
+                    // Passer à l'étape suivante
+                    if (onStepChange) onStepChange(3);
+                  }}
+                  style={{ 
+                    backgroundColor: '#28a745', 
+                    color: 'white', 
+                    padding: '8px 15px',
+                    border: 'none',
+                    borderRadius: '4px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
+                  disabled={pagesToKeep.size === 0}
+                >
+                  ✓ Valider pages sélectionnées
+                </button>
+              </div>
+            </div>
           )}
         </div>
-
-        {showPageManager && (
-          <div className="page-manager" style={{
-            backgroundColor: '#f8f9fa',
-            border: '1px solid #dee2e6',
-            borderRadius: '4px',
-            padding: '15px',
-            marginTop: '10px'
-          }}>
-            <h4>Sélection des pages à traiter</h4>
-            <p>Décochez les pages qui ne contiennent pas de plans :</p>
-            
-            <div className="pages-grid" style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))',
-              gap: '8px',
-              marginTop: '10px'
-            }}>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => (
-                <label key={pageNum} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '5px',
-                  backgroundColor: pagesToKeep.has(pageNum) ? '#d4edda' : '#f8d7da',
-                  borderRadius: '3px',
-                  cursor: 'pointer'
-                }}>
-                  <input
-                    type="checkbox"
-                    checked={pagesToKeep.has(pageNum)}
-                    onChange={() => togglePageSelection(pageNum)}
-                    style={{ marginRight: '5px' }}
-                  />
-                  Page {pageNum}
-                </label>
-              ))}
-            </div>
-
-            <div className="page-manager-actions" style={{ marginTop: '15px' }}>
-              <button 
-                onClick={() => {
-                  const allPages = new Set();
-                  for (let i = 1; i <= totalPages; i++) allPages.add(i);
-                  setPagesToKeep(allPages);
-                  if (onPagesChange) onPagesChange(Array.from(allPages));
-                }}
-                style={{ marginRight: '10px', padding: '5px 10px' }}
-              >
-                Tout sélectionner
-              </button>
-              <button 
-                onClick={() => {
-                  setPagesToKeep(new Set());
-                  if (onPagesChange) onPagesChange([]);
-                }}
-                style={{ marginRight: '10px', padding: '5px 10px' }}
-              >
-                Tout désélectionner
-              </button>
-              <button 
-                onClick={() => {
-                  const selectedPagesArray = Array.from(pagesToKeep).sort((a, b) => a - b);
-                  setPagesValidated(true);
-                  setValidatedPages(selectedPagesArray);
-                  setShowPageManager(false);
-                  // Aller à la première page sélectionnée
-                  if (selectedPagesArray.length > 0) {
-                    goToPage(selectedPagesArray[0]);
-                  }
-                  if (onPagesChange) onPagesChange(selectedPagesArray);
-                  // Passer à l'étape suivante
-                  if (onStepChange) onStepChange(3);
-                }}
-                style={{ 
-                  backgroundColor: '#28a745', 
-                  color: 'white', 
-                  padding: '8px 15px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  fontWeight: 'bold',
-                  cursor: 'pointer'
-                }}
-                disabled={pagesToKeep.size === 0}
-              >
-                ✓ Valider pages sélectionnées
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Contrôles de navigation et zoom */}
       <div className="pdf-navigation">
