@@ -443,6 +443,13 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
                   alt={`Page ${thumb.pageNum}`}
                   className="w-full h-auto rounded-md"
                 />
+                {/* TEST - Indicateur TRÈS visible */}
+                <div className="absolute top-0 right-0 w-8 h-8 bg-red-500 border-4 border-yellow-300 z-50 flex items-center justify-center">
+                  <span className="text-white font-bold text-xs">
+                    {selectedPages.includes(thumb.pageNum) ? '✓' : 'X'}
+                  </span>
+                </div>
+                
                 {/* Checkbox de sélection en bas à droite - plus visible */}
                 <div className="absolute bottom-2 right-2 z-20">
                   <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 shadow-lg ${
