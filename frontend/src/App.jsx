@@ -571,54 +571,25 @@ function App() {
                 selectedPages={selectedPages}
               />
               
-              {/* Bouton de validation de zone */}
+              {/* Info zone sélectionnée (sans bouton de validation) */}
               {selectedArea && (
                 <div style={{ textAlign: 'center', marginTop: '20px' }}>
                   <div style={{
-                    backgroundColor: '#d1ecf1',
-                    border: '1px solid #bee5eb',
+                    backgroundColor: '#d4edda',
+                    border: '1px solid #c3e6cb',
                     borderRadius: '4px',
                     padding: '15px',
                     marginBottom: '15px',
                     maxWidth: '600px',
                     margin: '0 auto 15px'
                   }}>
-                    <h4>Zone sélectionnée</h4>
+                    <h4>✅ Zone validée</h4>
                     <p>Position : X: {(selectedArea.x * 100).toFixed(1)}%, Y: {(selectedArea.y * 100).toFixed(1)}%</p>
                     <p>Dimensions : {(selectedArea.width * 100).toFixed(1)}% × {(selectedArea.height * 100).toFixed(1)}%</p>
+                    <p style={{ color: '#155724', fontWeight: 'bold', marginTop: '10px' }}>
+                      Passez à l'étape suivante pour démarrer l'OCR
+                    </p>
                   </div>
-                  
-                  <button
-                    onClick={() => setCurrentStep(4)}
-                    style={{
-                      backgroundColor: '#28a745',
-                      color: 'white',
-                      border: 'none',
-                      padding: '15px 30px',
-                      borderRadius: '5px',
-                      cursor: 'pointer',
-                      fontSize: '18px',
-                      fontWeight: 'bold',
-                      marginRight: '15px'
-                    }}
-                  >
-                    ✓ Valider cette zone
-                  </button>
-                  
-                  <button
-                    onClick={() => setSelectedArea(null)}
-                    style={{
-                      backgroundColor: '#6c757d',
-                      color: 'white',
-                      border: 'none',
-                      padding: '12px 20px',
-                      borderRadius: '5px',
-                      cursor: 'pointer',
-                      fontSize: '16px'
-                    }}
-                  >
-                    🔄 Refaire la sélection
-                  </button>
                 </div>
               )}
             </div>

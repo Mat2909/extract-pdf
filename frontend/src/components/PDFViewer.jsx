@@ -345,6 +345,10 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
     if (temporarySelection) {
       onAreaSelect(temporarySelection);
       console.log('Zone validée et transmise au parent:', temporarySelection);
+      // Passer automatiquement à l'étape 4 (OCR) après validation
+      if (onStepChange) {
+        onStepChange(4);
+      }
     }
   };
 
