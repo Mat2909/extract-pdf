@@ -14,8 +14,8 @@ module.exports = async function handler(req, res) {
 
   try {
     const form = new IncomingForm({
-      maxFileSize: 50 * 1024 * 1024, // ✅ 50MB (vs 10MB avant)
-      maxTotalFileSize: 50 * 1024 * 1024,
+      maxFileSize: 6 * 1024 * 1024, // ✅ 6MB (limite réelle Vercel Hobby)
+      maxTotalFileSize: 6 * 1024 * 1024,
       allowEmptyFiles: false,
     });
 

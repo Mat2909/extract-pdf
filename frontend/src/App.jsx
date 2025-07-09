@@ -41,10 +41,15 @@ function App() {
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
     if (file && file.type === 'application/pdf') {
-      // ✅ Validation taille fichier (50MB max)
-      const maxSize = 50 * 1024 * 1024; // 50MB
+      // ✅ Validation taille fichier (6MB max - limite Vercel)
+      const maxSize = 6 * 1024 * 1024; // 6MB
       if (file.size > maxSize) {
-        setMessage(`⚠️ Fichier trop volumineux : ${(file.size / 1024 / 1024).toFixed(1)} MB. Maximum autorisé : 50 MB`);
+        setMessage(`⚠️ Fichier trop volumineux : ${(file.size / 1024 / 1024).toFixed(1)} MB. Maximum autorisé : 6 MB (limite Vercel)
+        
+💡 Solutions pour les gros fichiers :
+• Compresser le PDF avec un outil en ligne
+• Sélectionner seulement quelques pages importantes
+• Utiliser un PDF plus léger si possible`);
         setSelectedFile(null);
         return;
       }
@@ -449,7 +454,7 @@ function App() {
                   }}>
                     <p><strong>Fichier sélectionné:</strong> {selectedFile.name}</p>
                     <p><strong>Taille:</strong> {(selectedFile.size / 1024 / 1024).toFixed(2)} MB 
-                      {selectedFile.size > 10 * 1024 * 1024 && (
+                      {selectedFile.size > 3 * 1024 * 1024 && (
                         <span style={{ color: '#856404', fontWeight: 'bold' }}> (Fichier volumineux)</span>
                       )}
                     </p>
