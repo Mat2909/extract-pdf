@@ -427,7 +427,7 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
             <div className="text-gray-600">Génération des vignettes...</div>
           </div>
         ) : (
-          <div className="grid grid-cols-5 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-10 gap-2">
+          <div className="grid grid-cols-10 gap-1">
             {thumbnails.map((thumb) => (
               <div
                 key={thumb.pageNum}
@@ -443,15 +443,15 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
                   alt={`Page ${thumb.pageNum}`}
                   className="w-full h-auto rounded-md"
                 />
-                {/* Checkbox de sélection */}
-                <div className="absolute top-2 right-2">
-                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200 ${
+                {/* Checkbox de sélection en bas à droite */}
+                <div className="absolute bottom-1 right-1">
+                  <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all duration-200 ${
                     selectedPages.includes(thumb.pageNum)
-                      ? 'bg-green-500 border-green-500 text-white shadow-md'
-                      : 'bg-white border-gray-300 hover:border-gray-400'
+                      ? 'bg-green-500 border-green-500 text-white shadow-sm'
+                      : 'bg-white border-gray-400 hover:border-gray-500'
                   }`}>
                     {selectedPages.includes(thumb.pageNum) && (
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     )}
