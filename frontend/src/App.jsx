@@ -44,11 +44,17 @@ function App() {
       // ✅ Validation taille fichier (6MB max - limite Vercel)
       const maxSize = 6 * 1024 * 1024; // 6MB
       if (file.size > maxSize) {
-        setMessage(`⚠️ Fichier trop volumineux : ${(file.size / 1024 / 1024).toFixed(1)} MB. Maximum autorisé : 6 MB (limite Vercel)
+        setMessage(`⚠️ Fichier trop volumineux : ${(file.size / 1024 / 1024).toFixed(1)} MB. 
+Maximum autorisé : 6 MB (limite Vercel)
         
 💡 Solutions pour les gros fichiers :
-• Compresser le PDF avec IlovePDF (https://www.ilovepdf.com/fr/compresser_pdf)
-• Diviser le PDF en plusieurs parties (https://www.ilovepdf.com/fr/diviser_pdf)
+
+• Compresser le PDF avec IlovePDF
+https://www.ilovepdf.com/fr/compresser_pdf
+
+• Diviser le PDF en plusieurs parties
+https://www.ilovepdf.com/fr/diviser_pdf
+
 • Sélectionner seulement quelques pages importantes
 • Utiliser un PDF plus léger si possible`);
         setSelectedFile(null);
