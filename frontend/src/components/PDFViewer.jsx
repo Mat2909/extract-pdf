@@ -445,18 +445,22 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
                     className="w-full h-auto rounded-md"
                   />
                   
-                  {/* Checkbox de sélection en bas à droite de l'image */}
-                  <div className="absolute bottom-1 right-1 z-30">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 shadow-lg ${
-                      selectedPages.includes(thumb.pageNum)
-                        ? 'bg-green-500 border-green-600 text-white'
-                        : 'bg-white border-gray-400 hover:border-gray-600'
-                    }`}>
-                      {selectedPages.includes(thumb.pageNum) && (
-                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
+                  {/* Test indicateur ultra-visible */}
+                  <div className="absolute bottom-1 right-1 z-50" style={{ backgroundColor: 'red', width: '20px', height: '20px', border: '3px solid yellow' }}>
+                    <div style={{ 
+                      backgroundColor: selectedPages.includes(thumb.pageNum) ? 'green' : 'white',
+                      width: '100%', 
+                      height: '100%',
+                      border: '2px solid black',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '10px',
+                      fontWeight: 'bold',
+                      color: selectedPages.includes(thumb.pageNum) ? 'white' : 'black'
+                    }}>
+                      {selectedPages.includes(thumb.pageNum) ? '✓' : 'O'}
                     </div>
                   </div>
                 </div>
