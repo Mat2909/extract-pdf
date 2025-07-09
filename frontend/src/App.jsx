@@ -7,6 +7,7 @@ function App() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState(null);
   const [uploadedPDF, setUploadedPDF] = useState(null);
   const [selectedArea, setSelectedArea] = useState(null);
   const [extractedText, setExtractedText] = useState('');
@@ -44,7 +45,7 @@ function App() {
       // ✅ Validation taille fichier (6MB max - limite Vercel)
       const maxSize = 6 * 1024 * 1024; // 6MB
       if (file.size > maxSize) {
-        setMessage(
+        setErrorMessage(
           <div style={{textAlign: 'left'}}>
             <div>Fichier trop volumineux :</div>
             <div>{(file.size / 1024 / 1024).toFixed(2)}MB / 6MB</div>
@@ -63,15 +64,18 @@ function App() {
             </a>
           </div>
         );
+        setMessage('');
         setSelectedFile(null);
         return;
       }
       
       setSelectedFile(file);
       setMessage('');
+      setErrorMessage(null);
       console.log(`📁 PDF sélectionné: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
     } else {
       setMessage('Veuillez sélectionner un fichier PDF valide');
+      setErrorMessage(null);
       setSelectedFile(null);
     }
   };
@@ -502,6 +506,19 @@ function App() {
                     border: `1px solid ${message.includes('succès') ? '#c3e6cb' : '#f5c6cb'}`
                   }}>
                     {message}
+                  </div>
+                )}
+                
+                {errorMessage && (
+                  <div style={{
+                    marginTop: '20px',
+                    padding: '10px',
+                    borderRadius: '4px',
+                    backgroundColor: '#f8d7da',
+                    color: '#721c24',
+                    border: '1px solid #f5c6cb'
+                  }}>
+                    {errorMessage}
                   </div>
                 )}
               </div>
