@@ -438,32 +438,29 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
                     : 'border-gray-200 hover:border-gray-400 hover:shadow-md'
                 }`}
               >
-                <img
-                  src={thumb.dataUrl}
-                  alt={`Page ${thumb.pageNum}`}
-                  className="w-full h-auto rounded-md"
-                />
-                {/* TEST - Indicateur TRÈS visible */}
-                <div className="absolute top-0 right-0 w-8 h-8 bg-red-500 border-4 border-yellow-300 z-50 flex items-center justify-center">
-                  <span className="text-white font-bold text-xs">
-                    {selectedPages.includes(thumb.pageNum) ? '✓' : 'X'}
-                  </span>
-                </div>
-                
-                {/* Checkbox de sélection en bas à droite - plus visible */}
-                <div className="absolute bottom-2 right-2 z-20">
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 shadow-lg ${
-                    selectedPages.includes(thumb.pageNum)
-                      ? 'bg-green-500 border-green-600 text-white'
-                      : 'bg-white border-gray-500 hover:border-gray-600'
-                  }`}>
-                    {selectedPages.includes(thumb.pageNum) && (
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    )}
+                <div className="relative">
+                  <img
+                    src={thumb.dataUrl}
+                    alt={`Page ${thumb.pageNum}`}
+                    className="w-full h-auto rounded-md"
+                  />
+                  
+                  {/* Checkbox de sélection en bas à droite de l'image */}
+                  <div className="absolute bottom-1 right-1 z-30">
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 shadow-lg ${
+                      selectedPages.includes(thumb.pageNum)
+                        ? 'bg-green-500 border-green-600 text-white'
+                        : 'bg-white border-gray-400 hover:border-gray-600'
+                    }`}>
+                      {selectedPages.includes(thumb.pageNum) && (
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </div>
                   </div>
                 </div>
+                
                 <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs text-center py-1 rounded-b-md">
                   Page {thumb.pageNum}
                 </div>
