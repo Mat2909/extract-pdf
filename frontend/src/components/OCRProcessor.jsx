@@ -321,6 +321,12 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
         })
       });
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Erreur API OCR:', errorText);
+        throw new Error(`Erreur API OCR: ${response.status} - ${errorText}`);
+      }
+
       const result = await response.json();
       console.log('Réponse OCR:', result);
       
