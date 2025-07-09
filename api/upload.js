@@ -14,7 +14,9 @@ module.exports = async function handler(req, res) {
 
   try {
     const form = new IncomingForm({
-      maxFileSize: 10 * 1024 * 1024, // 10MB
+      maxFileSize: 50 * 1024 * 1024, // ✅ 50MB (vs 10MB avant)
+      maxTotalFileSize: 50 * 1024 * 1024,
+      allowEmptyFiles: false,
     });
 
     const [fields, files] = await form.parse(req);

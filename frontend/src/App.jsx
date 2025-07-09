@@ -41,8 +41,17 @@ function App() {
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
     if (file && file.type === 'application/pdf') {
+      // ✅ Validation taille fichier (50MB max)
+      const maxSize = 50 * 1024 * 1024; // 50MB
+      if (file.size > maxSize) {
+        setMessage(`⚠️ Fichier trop volumineux : ${(file.size / 1024 / 1024).toFixed(1)} MB. Maximum autorisé : 50 MB`);
+        setSelectedFile(null);
+        return;
+      }
+      
       setSelectedFile(file);
       setMessage('');
+      console.log(`📁 PDF sélectionné: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
     } else {
       setMessage('Veuillez sélectionner un fichier PDF valide');
       setSelectedFile(null);
@@ -439,7 +448,11 @@ function App() {
                     border: '1px solid #28a745'
                   }}>
                     <p><strong>Fichier sélectionné:</strong> {selectedFile.name}</p>
-                    <p><strong>Taille:</strong> {(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                    <p><strong>Taille:</strong> {(selectedFile.size / 1024 / 1024).toFixed(2)} MB 
+                      {selectedFile.size > 10 * 1024 * 1024 && (
+                        <span style={{ color: '#856404', fontWeight: 'bold' }}> (Fichier volumineux)</span>
+                      )}
+                    </p>
                   </div>
                 )}
                 
