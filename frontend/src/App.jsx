@@ -404,34 +404,15 @@ function App() {
       )}
 
       {/* Header fixe avec titre et bouton nouveau */}
-      <div className="app-header" style={{
-        position: 'sticky',
-        top: 0,
-        backgroundColor: 'white',
-        zIndex: 1000,
-        borderBottom: '2px solid #dee2e6',
-        paddingBottom: '10px'
-      }}>
+      <div className="app-header sticky top-0 bg-white z-50 border-b-2 border-gray-200 pb-2.5">
         <button 
           onClick={resetApp} 
-          className="new-extraction-btn"
-          style={{
-            position: 'absolute',
-            top: '20px',
-            left: '20px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            padding: '10px 15px',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
+          className="absolute top-5 left-5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-md transition-colors duration-200"
         >
           🔄 Nouvelle extraction
         </button>
         
-        <h1 style={{ textAlign: 'center', margin: '20px 0' }}>Extraction de coordonnées PDF</h1>
+        <h1 className="text-center text-3xl font-bold text-gray-800 my-5">Extraction de coordonnées PDF</h1>
         
         {/* Bouton précédent */}
         {currentStep > 0 && (
@@ -458,18 +439,7 @@ function App() {
                 // Pas de réinitialisation nécessaire
               }
             }} 
-            style={{
-              position: 'absolute',
-              top: '20px',
-              right: '20px',
-              backgroundColor: '#6c757d',
-              color: 'white',
-              border: 'none',
-              padding: '10px 15px',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            }}
+            className="absolute top-5 right-5 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2.5 px-4 rounded-md transition-colors duration-200"
           >
             ← Précédent
           </button>
@@ -479,63 +449,38 @@ function App() {
       </div>
       
       {/* Contenu des pages par étapes */}
-      <div className="page-content" style={{ padding: '20px', minHeight: 'calc(100vh - 200px)' }}>
+      <div className="page-content p-5 min-h-[calc(100vh-200px)]">
         
         {/* Étape 0 : Sélection du concessionnaire */}
         {currentStep === 0 && (
           <div className="step-page">
-            <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
-              <h2>Étape 0 : Sélection du concessionnaire réseau</h2>
-              <p>Choisissez le type de concessionnaire pour adapter l'extraction</p>
+            <div className="text-center max-w-4xl mx-auto">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Étape 0 : Sélection du concessionnaire réseau</h2>
+              <p className="text-gray-600 mb-10">Choisissez le type de concessionnaire pour adapter l'extraction</p>
               
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-                gap: '20px', 
-                margin: '40px 0' 
-              }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 my-10">
                 {concessionaires.map((concessionaire) => (
                   <div
                     key={concessionaire.id}
                     onClick={() => handleConcessionaireSelect(concessionaire)}
+                    className="p-8 bg-gray-50 rounded-xl border-2 border-gray-200 cursor-pointer transition-all duration-300 text-center hover:bg-white hover:shadow-lg hover:-translate-y-1"
                     style={{
-                      padding: '30px',
-                      backgroundColor: '#f8f9fa',
-                      borderRadius: '12px',
-                      border: '2px solid #dee2e6',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      textAlign: 'center'
+                      borderColor: concessionaire.color
                     }}
                     onMouseEnter={(e) => {
                       e.target.style.borderColor = concessionaire.color;
-                      e.target.style.backgroundColor = '#ffffff';
-                      e.target.style.transform = 'translateY(-2px)';
-                      e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.borderColor = '#dee2e6';
-                      e.target.style.backgroundColor = '#f8f9fa';
-                      e.target.style.transform = 'translateY(0)';
-                      e.target.style.boxShadow = 'none';
+                      e.target.style.borderColor = concessionaire.color;
                     }}
                   >
-                    <div style={{ fontSize: '48px', marginBottom: '15px' }}>
+                    <div className="text-5xl mb-4">
                       {concessionaire.logo}
                     </div>
-                    <h3 style={{ 
-                      color: concessionaire.color, 
-                      marginBottom: '10px',
-                      fontSize: '24px',
-                      fontWeight: 'bold'
-                    }}>
+                    <h3 className="text-2xl font-bold mb-2.5" style={{ color: concessionaire.color }}>
                       {concessionaire.name}
                     </h3>
-                    <p style={{ 
-                      color: '#6c757d', 
-                      fontSize: '14px',
-                      lineHeight: '1.5'
-                    }}>
+                    <p className="text-gray-500 text-sm leading-relaxed">
                       {concessionaire.description}
                     </p>
                   </div>
@@ -548,16 +493,10 @@ function App() {
         {/* Étape 1 : Sélection du PDF */}
         {currentStep === 1 && (
           <div className="step-page">
-            <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
+            <div className="text-center max-w-2xl mx-auto">
               {selectedConcessionaire && (
-                <div style={{ 
-                  marginBottom: '20px', 
-                  padding: '10px', 
-                  backgroundColor: '#f8f9fa', 
-                  borderRadius: '8px',
-                  border: `2px solid ${selectedConcessionaire.color}`
-                }}>
-                  <span style={{ fontSize: '20px', marginRight: '10px' }}>
+                <div className="mb-5 p-2.5 bg-gray-50 rounded-lg border-2" style={{ borderColor: selectedConcessionaire.color }}>
+                  <span className="text-xl mr-2.5">
                     {selectedConcessionaire.logo}
                   </span>
                   <strong style={{ color: selectedConcessionaire.color }}>
@@ -565,42 +504,24 @@ function App() {
                   </strong>
                 </div>
               )}
-              <h2>Étape 1 : Sélection du fichier PDF</h2>
-              <p>Choisissez le fichier PDF contenant les coordonnées à extraire</p>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Étape 1 : Sélection du fichier PDF</h2>
+              <p className="text-gray-600 mb-5">Choisissez le fichier PDF contenant les coordonnées à extraire</p>
               
-              <div className="upload-section" style={{
-                padding: '40px',
-                backgroundColor: '#f8f9fa',
-                borderRadius: '8px',
-                border: '2px dashed #dee2e6',
-                margin: '20px 0'
-              }}>
+              <div className="upload-section p-10 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 my-5">
                 <input
                   type="file"
                   accept=".pdf"
                   onChange={handleFileSelect}
                   disabled={uploading}
-                  style={{
-                    margin: '20px 0',
-                    padding: '10px',
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    fontSize: '16px'
-                  }}
+                  className="my-5 p-2.5 border border-gray-300 rounded text-base disabled:opacity-50"
                 />
                 
                 {selectedFile && (
-                  <div className="file-info" style={{
-                    margin: '20px 0',
-                    padding: '15px',
-                    backgroundColor: 'white',
-                    borderRadius: '4px',
-                    border: '1px solid #28a745'
-                  }}>
+                  <div className="file-info my-5 p-4 bg-white rounded border border-green-600">
                     <p><strong>Fichier sélectionné:</strong> {selectedFile.name}</p>
                     <p><strong>Taille:</strong> {(selectedFile.size / 1024 / 1024).toFixed(2)} MB 
                       {selectedFile.size > 3 * 1024 * 1024 && (
-                        <span style={{ color: '#856404', fontWeight: 'bold' }}> (Fichier volumineux)</span>
+                        <span className="text-yellow-600 font-bold"> (Fichier volumineux)</span>
                       )}
                     </p>
                   </div>
@@ -609,43 +530,27 @@ function App() {
                 <button
                   onClick={handleUpload}
                   disabled={!selectedFile || uploading}
-                  style={{
-                    backgroundColor: !selectedFile || uploading ? '#6c757d' : '#28a745',
-                    color: 'white',
-                    border: 'none',
-                    padding: '15px 30px',
-                    borderRadius: '5px',
-                    fontSize: '18px',
-                    fontWeight: 'bold',
-                    cursor: !selectedFile || uploading ? 'not-allowed' : 'pointer',
-                    marginTop: '20px'
-                  }}
+                  className={`mt-5 px-8 py-4 rounded-md text-lg font-bold transition-colors duration-200 ${
+                    !selectedFile || uploading 
+                      ? 'bg-gray-600 text-white cursor-not-allowed' 
+                      : 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
+                  }`}
                 >
                   {uploading ? 'Upload en cours...' : 'Valider et continuer'}
                 </button>
                 
                 {message && (
-                  <div style={{
-                    marginTop: '20px',
-                    padding: '10px',
-                    borderRadius: '4px',
-                    backgroundColor: message.includes('succès') ? '#d4edda' : '#f8d7da',
-                    color: message.includes('succès') ? '#155724' : '#721c24',
-                    border: `1px solid ${message.includes('succès') ? '#c3e6cb' : '#f5c6cb'}`
-                  }}>
+                  <div className={`mt-5 p-2.5 rounded ${
+                    message.includes('succès') 
+                      ? 'bg-green-100 text-green-800 border border-green-200' 
+                      : 'bg-red-100 text-red-800 border border-red-200'
+                  }`}>
                     {message}
                   </div>
                 )}
                 
                 {errorMessage && (
-                  <div style={{
-                    marginTop: '20px',
-                    padding: '10px',
-                    borderRadius: '4px',
-                    backgroundColor: '#f8d7da',
-                    color: '#721c24',
-                    border: '1px solid #f5c6cb'
-                  }}>
+                  <div className="mt-5 p-2.5 rounded bg-red-100 text-red-800 border border-red-200">
                     {errorMessage}
                   </div>
                 )}
