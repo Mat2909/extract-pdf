@@ -432,21 +432,32 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
               <div
                 key={thumb.pageNum}
                 onClick={() => togglePageSelection(thumb.pageNum)}
-                className={`relative cursor-pointer rounded-lg border-2 transition-all duration-200 ${
+                className={`relative cursor-pointer rounded-lg border-2 transition-all duration-200 overflow-hidden ${
                   selectedPages.includes(thumb.pageNum)
                     ? 'border-green-500 bg-green-50 shadow-md'
                     : 'border-gray-200 hover:border-gray-400 hover:shadow-md'
                 }`}
+                style={{ position: 'relative' }}
               >
-                <div className="relative">
+                <div className="relative" style={{ position: 'relative' }}>
                   <img
                     src={thumb.dataUrl}
                     alt={`Page ${thumb.pageNum}`}
                     className="w-full h-auto rounded-md"
+                    style={{ display: 'block' }}
                   />
                   
-                  {/* Test indicateur ultra-visible */}
-                  <div className="absolute bottom-1 right-1 z-50" style={{ backgroundColor: 'red', width: '20px', height: '20px', border: '3px solid yellow' }}>
+                  {/* Test indicateur ultra-visible - positionné par rapport à l'image */}
+                  <div style={{ 
+                    position: 'absolute',
+                    bottom: '4px',
+                    right: '4px',
+                    backgroundColor: 'red',
+                    width: '20px',
+                    height: '20px',
+                    border: '3px solid yellow',
+                    zIndex: 100
+                  }}>
                     <div style={{ 
                       backgroundColor: selectedPages.includes(thumb.pageNum) ? 'green' : 'white',
                       width: '100%', 
