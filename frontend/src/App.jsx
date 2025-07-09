@@ -4,6 +4,7 @@ import PDFViewer from './components/PDFViewer';
 import OCRProcessor from './components/OCRProcessor';
 
 function App() {
+  const [selectedConcessionaire, setSelectedConcessionaire] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
@@ -13,7 +14,7 @@ function App() {
   const [extractedText, setExtractedText] = useState('');
   const [ocrResults, setOcrResults] = useState([]);
   const [selectedPages, setSelectedPages] = useState([]);
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0);
   const [pagesValidated, setPagesValidated] = useState(false);
   const [totalPDFPages, setTotalPDFPages] = useState(0);
   
@@ -30,14 +31,55 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
   
-  // Définition des étapes
-  const steps = [
-    { number: 1, title: 'Sélection du PDF', description: 'Choisir le fichier PDF à traiter' },
-    { number: 2, title: 'Sélection des pages', description: 'Choisir les pages à analyser' },
-    { number: 3, title: 'Zone d\'extraction', description: 'Définir la zone de coordonnées' },
-    { number: 4, title: 'Validation des données', description: 'Contrôler les valeurs extraites' },
-    { number: 5, title: 'Extraction Excel', description: 'Génération du fichier final' }
+  // Définition des concessionnaires réseau
+  const concessionaires = [
+    {
+      id: 'grdf',
+      name: 'GrDF',
+      description: 'Gestionnaire du Réseau de Distribution de gaz France',
+      logo: '🔥',
+      color: '#0066cc'
+    },
+    {
+      id: 'sfr',
+      name: 'SFR',
+      description: 'Société Française du Radiotéléphone',
+      logo: '📡',
+      color: '#cc0000'
+    }
   ];
+  
+  // Définition des étapes selon le concessionnaire
+  const getStepsForConcessionaire = (concessionaireId) => {
+    const baseSteps = [
+      { number: 0, title: 'Sélection du concessionnaire', description: 'Choisir le type de réseau' },
+      { number: 1, title: 'Sélection du PDF', description: 'Choisir le fichier PDF à traiter' },
+      { number: 2, title: 'Sélection des pages', description: 'Choisir les pages à analyser' },
+      { number: 3, title: 'Zone d\'extraction', description: 'Définir la zone de coordonnées' },
+      { number: 4, title: 'Validation des données', description: 'Contrôler les valeurs extraites' },
+      { number: 5, title: 'Extraction Excel', description: 'Génération du fichier final' }
+    ];
+    
+    // Personnalisation selon le concessionnaire
+    if (concessionaireId === 'grdf') {
+      baseSteps[3].description = 'Définir la zone de coordonnées GrDF';
+    } else if (concessionaireId === 'sfr') {
+      baseSteps[3].description = 'Définir la zone de lecture SFR';
+    }
+    
+    return baseSteps;
+  };
+  
+  const steps = selectedConcessionaire ? getStepsForConcessionaire(selectedConcessionaire.id) : [
+    { number: 0, title: 'Sélection du concessionnaire', description: 'Choisir le type de réseau' }
+  ];
+
+  const handleConcessionaireSelect = (concessionaire) => {
+    setSelectedConcessionaire(concessionaire);
+    setCurrentStep(1);
+    setMessage('');
+    setErrorMessage(null);
+  };
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
@@ -392,14 +434,20 @@ function App() {
         <h1 style={{ textAlign: 'center', margin: '20px 0' }}>Extraction de coordonnées PDF</h1>
         
         {/* Bouton précédent */}
-        {currentStep > 1 && (
+        {currentStep > 0 && (
           <button 
             onClick={() => {
               const prevStep = currentStep - 1;
               setCurrentStep(prevStep);
               
               // Réinitialiser certains états selon l'étape précédente
-              if (prevStep === 1) {
+              if (prevStep === 0) {
+                // Retour à l'étape 0 : réinitialiser le concessionnaire
+                setSelectedConcessionaire(null);
+                setSelectedFile(null);
+                setMessage('');
+                setErrorMessage(null);
+              } else if (prevStep === 1) {
                 // Retour à l'étape 1 : garder le PDF mais permettre d'en changer
                 setMessage('');
               } else if (prevStep === 2) {
@@ -433,10 +481,90 @@ function App() {
       {/* Contenu des pages par étapes */}
       <div className="page-content" style={{ padding: '20px', minHeight: 'calc(100vh - 200px)' }}>
         
+        {/* Étape 0 : Sélection du concessionnaire */}
+        {currentStep === 0 && (
+          <div className="step-page">
+            <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
+              <h2>Étape 0 : Sélection du concessionnaire réseau</h2>
+              <p>Choisissez le type de concessionnaire pour adapter l'extraction</p>
+              
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+                gap: '20px', 
+                margin: '40px 0' 
+              }}>
+                {concessionaires.map((concessionaire) => (
+                  <div
+                    key={concessionaire.id}
+                    onClick={() => handleConcessionaireSelect(concessionaire)}
+                    style={{
+                      padding: '30px',
+                      backgroundColor: '#f8f9fa',
+                      borderRadius: '12px',
+                      border: '2px solid #dee2e6',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      textAlign: 'center'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.borderColor = concessionaire.color;
+                      e.target.style.backgroundColor = '#ffffff';
+                      e.target.style.transform = 'translateY(-2px)';
+                      e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.borderColor = '#dee2e6';
+                      e.target.style.backgroundColor = '#f8f9fa';
+                      e.target.style.transform = 'translateY(0)';
+                      e.target.style.boxShadow = 'none';
+                    }}
+                  >
+                    <div style={{ fontSize: '48px', marginBottom: '15px' }}>
+                      {concessionaire.logo}
+                    </div>
+                    <h3 style={{ 
+                      color: concessionaire.color, 
+                      marginBottom: '10px',
+                      fontSize: '24px',
+                      fontWeight: 'bold'
+                    }}>
+                      {concessionaire.name}
+                    </h3>
+                    <p style={{ 
+                      color: '#6c757d', 
+                      fontSize: '14px',
+                      lineHeight: '1.5'
+                    }}>
+                      {concessionaire.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Étape 1 : Sélection du PDF */}
         {currentStep === 1 && (
           <div className="step-page">
             <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
+              {selectedConcessionaire && (
+                <div style={{ 
+                  marginBottom: '20px', 
+                  padding: '10px', 
+                  backgroundColor: '#f8f9fa', 
+                  borderRadius: '8px',
+                  border: `2px solid ${selectedConcessionaire.color}`
+                }}>
+                  <span style={{ fontSize: '20px', marginRight: '10px' }}>
+                    {selectedConcessionaire.logo}
+                  </span>
+                  <strong style={{ color: selectedConcessionaire.color }}>
+                    Concessionnaire sélectionné : {selectedConcessionaire.name}
+                  </strong>
+                </div>
+              )}
               <h2>Étape 1 : Sélection du fichier PDF</h2>
               <p>Choisissez le fichier PDF contenant les coordonnées à extraire</p>
               
