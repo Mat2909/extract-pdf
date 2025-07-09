@@ -414,38 +414,40 @@ function App() {
         
         <h1 className="text-center text-3xl font-bold text-gray-800 my-5">Extraction de coordonnées PDF</h1>
         
-        {/* Bouton précédent */}
-        {currentStep > 0 && (
-          <button 
-            onClick={() => {
-              const prevStep = currentStep - 1;
-              setCurrentStep(prevStep);
-              
-              // Réinitialiser certains états selon l'étape précédente
-              if (prevStep === 0) {
-                // Retour à l'étape 0 : réinitialiser le concessionnaire
-                setSelectedConcessionaire(null);
-                setSelectedFile(null);
-                setMessage('');
-                setErrorMessage(null);
-              } else if (prevStep === 1) {
-                // Retour à l'étape 1 : garder le PDF mais permettre d'en changer
-                setMessage('');
-              } else if (prevStep === 2) {
-                // Retour à l'étape 2 : effacer la zone sélectionnée
-                setSelectedArea(null);
-              } else if (prevStep === 3) {
-                // Retour à l'étape 3 : rester avec la zone mais permettre de la modifier
-                // Pas de réinitialisation nécessaire
-              }
-            }} 
-            className="absolute top-5 right-5 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2.5 px-4 rounded-md transition-colors duration-200"
-          >
-            ← Précédent
-          </button>
-        )}
-        
-        <ProgressBar />
+        {/* Barre de progression avec bouton précédent */}
+        <div className="flex items-center justify-center gap-4 mt-4">
+          {currentStep > 0 && (
+            <button 
+              onClick={() => {
+                const prevStep = currentStep - 1;
+                setCurrentStep(prevStep);
+                
+                // Réinitialiser certains états selon l'étape précédente
+                if (prevStep === 0) {
+                  // Retour à l'étape 0 : réinitialiser le concessionnaire
+                  setSelectedConcessionaire(null);
+                  setSelectedFile(null);
+                  setMessage('');
+                  setErrorMessage(null);
+                } else if (prevStep === 1) {
+                  // Retour à l'étape 1 : garder le PDF mais permettre d'en changer
+                  setMessage('');
+                } else if (prevStep === 2) {
+                  // Retour à l'étape 2 : effacer la zone sélectionnée
+                  setSelectedArea(null);
+                } else if (prevStep === 3) {
+                  // Retour à l'étape 3 : rester avec la zone mais permettre de la modifier
+                  // Pas de réinitialisation nécessaire
+                }
+              }} 
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200"
+            >
+              ← Précédent
+            </button>
+          )}
+          
+          <ProgressBar />
+        </div>
       </div>
       
       {/* Contenu des pages par étapes */}
@@ -562,17 +564,11 @@ function App() {
         {/* Étape 2 : Sélection des pages */}
         {currentStep === 2 && uploadedPDF && (
           <div className="step-page">
-            <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
-              <h2>Étape 2 : Sélection des pages à traiter</h2>
-              <p>Choisissez les pages contenant les coordonnées à extraire</p>
+            <div className="text-center max-w-6xl mx-auto">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Étape 2 : Sélection des pages à traiter</h2>
+              <p className="text-gray-600 mb-8">Cliquez sur les pages contenant les coordonnées à extraire</p>
               
-              <div style={{
-                padding: '30px',
-                backgroundColor: '#f8f9fa',
-                borderRadius: '8px',
-                border: '1px solid #dee2e6',
-                margin: '20px 0'
-              }}>
+              <div className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
                 <button
                   onClick={() => {
                     const allPages = totalPDFPages > 0 ? 
@@ -581,22 +577,12 @@ function App() {
                     setSelectedPages(allPages);
                     setCurrentStep(3);
                   }}
-                  style={{
-                    backgroundColor: '#28a745',
-                    color: 'white',
-                    border: 'none',
-                    padding: '15px 30px',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    fontSize: '18px',
-                    fontWeight: 'bold',
-                    marginRight: '15px'
-                  }}
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-md text-lg transition-colors duration-200 mb-4"
                 >
                   ✓ Sélectionner toutes les pages ({totalPDFPages} pages)
                 </button>
-                <br /><br />
-                <span style={{ color: '#6c757d', fontSize: '16px' }}>ou gérez manuellement ci-dessous</span>
+                <br />
+                <span className="text-gray-500 text-base">ou sélectionnez manuellement les pages ci-dessous</span>
               </div>
               
               <PDFViewer
@@ -607,23 +593,15 @@ function App() {
                 onStepChange={setCurrentStep}
                 onTotalPagesChange={setTotalPDFPages}
                 selectedPages={selectedPages}
+                thumbnailMode={true}
               />
               
               {/* Bouton continuer si des pages sont sélectionnées manuellement */}
               {selectedPages.length > 0 && (
-                <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                <div className="text-center mt-5">
                   <button
                     onClick={() => setCurrentStep(3)}
-                    style={{
-                      backgroundColor: '#007bff',
-                      color: 'white',
-                      border: 'none',
-                      padding: '12px 24px',
-                      borderRadius: '5px',
-                      cursor: 'pointer',
-                      fontSize: '16px',
-                      fontWeight: 'bold'
-                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-md text-base transition-colors duration-200"
                   >
                     Continuer avec {selectedPages.length} page{selectedPages.length > 1 ? 's' : ''} →
                   </button>

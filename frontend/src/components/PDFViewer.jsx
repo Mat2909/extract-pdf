@@ -21,7 +21,7 @@ const configurePDFWorker = () => {
 // Configurer le worker au chargement
 configurePDFWorker();
 
-const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepChange, onTotalPagesChange, selectedPages = [] }) => {
+const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepChange, onTotalPagesChange, selectedPages = [], thumbnailMode = false }) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,6 +39,8 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
   const [isRendering, setIsRendering] = useState(false);
   const [validatedPages, setValidatedPages] = useState([]);
   const [temporarySelection, setTemporarySelection] = useState(null);
+  const [thumbnails, setThumbnails] = useState([]);
+  const [thumbnailsLoading, setThumbnailsLoading] = useState(false);
 
   useEffect(() => {
     if (pdfUrl) {
@@ -352,12 +354,108 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
     }
   };
 
+  // Fonction pour générer les vignettes
+  const generateThumbnails = async () => {
+    if (!pdfDocument || thumbnailsLoading) return;
+    
+    setThumbnailsLoading(true);
+    const thumbs = [];
+    
+    try {
+      for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+        const page = await pdfDocument.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 0.5 });
+        
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        
+        await page.render({
+          canvasContext: context,
+          viewport: viewport
+        }).promise;
+        
+        thumbs.push({
+          pageNum,
+          dataUrl: canvas.toDataURL(),
+          width: viewport.width,
+          height: viewport.height
+        });
+      }
+      setThumbnails(thumbs);
+    } catch (error) {
+      console.error('Erreur génération vignettes:', error);
+    } finally {
+      setThumbnailsLoading(false);
+    }
+  };
+
+  const togglePageSelection = (pageNum) => {
+    const newSelectedPages = selectedPages.includes(pageNum)
+      ? selectedPages.filter(p => p !== pageNum)
+      : [...selectedPages, pageNum].sort((a, b) => a - b);
+    
+    if (onPagesChange) onPagesChange(newSelectedPages);
+  };
+
+  // Générer les vignettes quand le PDF est chargé et en mode thumbnail
+  useEffect(() => {
+    if (pdfDocument && thumbnailMode && currentStep === 2) {
+      generateThumbnails();
+    }
+  }, [pdfDocument, thumbnailMode, currentStep]);
+
   if (isLoading) {
     return <div className="pdf-loading">Chargement du PDF...</div>;
   }
 
   if (error) {
     return <div className="pdf-error">Erreur: {error}</div>;
+  }
+
+
+  // Mode thumbnail pour l'étape 2
+  if (thumbnailMode && currentStep === 2) {
+    return (
+      <div className="pdf-thumbnails-viewer">
+        {thumbnailsLoading ? (
+          <div className="text-center py-8">
+            <div className="text-gray-600">Génération des vignettes...</div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {thumbnails.map((thumb) => (
+              <div
+                key={thumb.pageNum}
+                onClick={() => togglePageSelection(thumb.pageNum)}
+                className={`relative cursor-pointer rounded-lg border-2 transition-all duration-200 ${
+                  selectedPages.includes(thumb.pageNum)
+                    ? 'border-blue-500 bg-blue-50 transform scale-105 shadow-lg'
+                    : 'border-gray-200 hover:border-gray-400 hover:shadow-md'
+                }`}
+              >
+                <img
+                  src={thumb.dataUrl}
+                  alt={`Page ${thumb.pageNum}`}
+                  className="w-full h-auto rounded-md"
+                />
+                <div className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                  selectedPages.includes(thumb.pageNum)
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-600'
+                }`}>
+                  {selectedPages.includes(thumb.pageNum) ? '✓' : thumb.pageNum}
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs text-center py-1 rounded-b-md">
+                  Page {thumb.pageNum}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
   }
 
   return (
