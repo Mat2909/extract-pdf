@@ -427,7 +427,7 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
             <div className="text-gray-600">Génération des vignettes...</div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
             {thumbnails.map((thumb) => (
               <div
                 key={thumb.pageNum}
@@ -443,12 +443,19 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
                   alt={`Page ${thumb.pageNum}`}
                   className="w-full h-auto rounded-md"
                 />
-                <div className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                  selectedPages.includes(thumb.pageNum)
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 text-gray-600'
-                }`}>
-                  {selectedPages.includes(thumb.pageNum) ? '✓' : thumb.pageNum}
+                {/* Checkbox de sélection */}
+                <div className="absolute top-2 right-2">
+                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200 ${
+                    selectedPages.includes(thumb.pageNum)
+                      ? 'bg-blue-500 border-blue-500 text-white shadow-md'
+                      : 'bg-white border-gray-300 hover:border-gray-400'
+                  }`}>
+                    {selectedPages.includes(thumb.pageNum) && (
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs text-center py-1 rounded-b-md">
                   Page {thumb.pageNum}

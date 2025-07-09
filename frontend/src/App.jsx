@@ -407,9 +407,12 @@ function App() {
       <div className="app-header sticky top-0 bg-white z-50 border-b-2 border-gray-200 pb-2.5">
         <button 
           onClick={resetApp} 
-          className="absolute top-5 left-5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-md transition-colors duration-200"
+          className="absolute top-5 left-5 flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-2.5 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
         >
-          🔄 Nouvelle extraction
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Nouvelle extraction
         </button>
         
         <h1 className="text-center text-3xl font-bold text-gray-800 my-5">Extraction de coordonnées PDF</h1>
@@ -440,9 +443,12 @@ function App() {
                   // Pas de réinitialisation nécessaire
                 }
               }} 
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200"
+              className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-2.5 px-5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
             >
-              ← Précédent
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Précédent
             </button>
           )}
           
