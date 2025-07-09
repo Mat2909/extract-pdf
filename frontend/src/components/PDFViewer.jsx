@@ -444,7 +444,7 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
                   className="w-full h-auto rounded-md"
                 />
                 {/* Checkbox de sélection en bas à droite */}
-                <div className="absolute bottom-1 right-1">
+                <div className="absolute bottom-1 right-1 z-10">
                   <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all duration-200 ${
                     selectedPages.includes(thumb.pageNum)
                       ? 'bg-green-500 border-green-500 text-white shadow-sm'
