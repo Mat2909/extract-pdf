@@ -208,6 +208,17 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
   };
 
   const togglePageSelection = (pageNum) => {
+    // Pour le mode thumbnail (étape 2), utiliser selectedPages array
+    if (thumbnailMode && currentStep === 2) {
+      const newSelectedPages = selectedPages.includes(pageNum)
+        ? selectedPages.filter(p => p !== pageNum)
+        : [...selectedPages, pageNum].sort((a, b) => a - b);
+      
+      if (onPagesChange) onPagesChange(newSelectedPages);
+      return;
+    }
+    
+    // Pour l'ancien système (étape > 2), utiliser pagesToKeep Set
     const newPages = new Set(pagesToKeep);
     if (newPages.has(pageNum)) {
       newPages.delete(pageNum);
@@ -389,14 +400,6 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
     } finally {
       setThumbnailsLoading(false);
     }
-  };
-
-  const togglePageSelection = (pageNum) => {
-    const newSelectedPages = selectedPages.includes(pageNum)
-      ? selectedPages.filter(p => p !== pageNum)
-      : [...selectedPages, pageNum].sort((a, b) => a - b);
-    
-    if (onPagesChange) onPagesChange(newSelectedPages);
   };
 
   // Générer les vignettes quand le PDF est chargé et en mode thumbnail
