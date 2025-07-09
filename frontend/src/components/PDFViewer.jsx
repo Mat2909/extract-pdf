@@ -437,42 +437,53 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
                     ? 'border-green-500 bg-green-50 shadow-md'
                     : 'border-gray-200 hover:border-gray-400 hover:shadow-md'
                 }`}
-                style={{ position: 'relative' }}
+                style={{ 
+                  position: 'relative',
+                  aspectRatio: '3/4', // Ratio uniforme pour toutes les vignettes
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
               >
-                <div className="relative" style={{ position: 'relative' }}>
+                <div className="relative" style={{ 
+                  position: 'relative',
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
                   <img
                     src={thumb.dataUrl}
                     alt={`Page ${thumb.pageNum}`}
-                    className="w-full h-auto rounded-md"
-                    style={{ display: 'block' }}
+                    className="rounded-md"
+                    style={{ 
+                      maxWidth: '90%',
+                      maxHeight: '80%',
+                      objectFit: 'contain'
+                    }}
                   />
                   
-                  {/* Test indicateur ultra-visible - positionné par rapport à l'image */}
+                  {/* Checkbox de sélection - design final */}
                   <div style={{ 
                     position: 'absolute',
                     bottom: '4px',
                     right: '4px',
-                    backgroundColor: 'red',
-                    width: '20px',
-                    height: '20px',
-                    border: '3px solid yellow',
-                    zIndex: 100
+                    width: '18px',
+                    height: '18px',
+                    backgroundColor: selectedPages.includes(thumb.pageNum) ? '#22c55e' : 'white',
+                    border: `2px solid ${selectedPages.includes(thumb.pageNum) ? '#16a34a' : '#9ca3af'}`,
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '10px',
+                    fontWeight: 'bold',
+                    color: selectedPages.includes(thumb.pageNum) ? 'white' : '#6b7280',
+                    zIndex: 100,
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                   }}>
-                    <div style={{ 
-                      backgroundColor: selectedPages.includes(thumb.pageNum) ? 'green' : 'white',
-                      width: '100%', 
-                      height: '100%',
-                      border: '2px solid black',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '10px',
-                      fontWeight: 'bold',
-                      color: selectedPages.includes(thumb.pageNum) ? 'white' : 'black'
-                    }}>
-                      {selectedPages.includes(thumb.pageNum) ? '✓' : 'O'}
-                    </div>
+                    {selectedPages.includes(thumb.pageNum) ? '✓' : ''}
                   </div>
                 </div>
                 
