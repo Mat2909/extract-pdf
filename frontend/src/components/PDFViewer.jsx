@@ -56,9 +56,18 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
       if (firstSelectedPage !== currentPageNum) {
         console.log(`📄 Changement de page: ${currentPageNum} → ${firstSelectedPage}`);
         setCurrentPageNum(firstSelectedPage);
+        // Réinitialiser le zoom à 1.0 pour éviter les problèmes d'affichage
+        setZoom(1.0);
         // Petit délai pour s'assurer que le changement d'étape est terminé
-        setTimeout(() => {
-          goToPage(firstSelectedPage);
+        setTimeout(async () => {
+          await goToPage(firstSelectedPage);
+          // Force un re-rendu après un délai pour corriger l'affichage
+          setTimeout(async () => {
+            if (pdfDocument) {
+              const page = await pdfDocument.getPage(firstSelectedPage);
+              await renderPage(page);
+            }
+          }, 100);
         }, 50);
       }
     }
@@ -629,15 +638,11 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
                     // Notifier le parent des pages sélectionnées
                     if (onPagesChange) onPagesChange(selectedPagesArray);
                     
-                    // Passer à l'étape suivante
-                    if (onStepChange) onStepChange(3);
+                    // Réinitialiser le zoom pour éviter les problèmes d'affichage
+                    setZoom(1.0);
                     
-                    // Forcer l'affichage de la première page après un petit délai
-                    setTimeout(async () => {
-                      if (selectedPagesArray.length > 0) {
-                        await goToPage(selectedPagesArray[0]);
-                      }
-                    }, 100);
+                    // Passer à l'étape suivante - l'useEffect se chargera du changement de page
+                    if (onStepChange) onStepChange(3);
                   }}
                   style={{ 
                     backgroundColor: '#28a745', 
