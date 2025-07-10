@@ -52,9 +52,14 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
   useEffect(() => {
     if (currentStep === 3 && selectedPages.length > 0 && pdfDocument) {
       const firstSelectedPage = Math.min(...selectedPages);
+      console.log(`🎯 Étape 3: Affichage de la première page sélectionnée: ${firstSelectedPage}`);
       if (firstSelectedPage !== currentPageNum) {
+        console.log(`📄 Changement de page: ${currentPageNum} → ${firstSelectedPage}`);
         setCurrentPageNum(firstSelectedPage);
-        goToPage(firstSelectedPage);
+        // Petit délai pour s'assurer que le changement d'étape est terminé
+        setTimeout(() => {
+          goToPage(firstSelectedPage);
+        }, 50);
       }
     }
   }, [currentStep, selectedPages, pdfDocument]);
@@ -615,18 +620,24 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
                   Tout désélectionner
                 </button>
                 <button 
-                  onClick={() => {
+                  onClick={async () => {
                     const selectedPagesArray = Array.from(pagesToKeep).sort((a, b) => a - b);
                     setPagesValidated(true);
                     setValidatedPages(selectedPagesArray);
                     setShowPageManager(false);
-                    // Aller à la première page sélectionnée
-                    if (selectedPagesArray.length > 0) {
-                      goToPage(selectedPagesArray[0]);
-                    }
+                    
+                    // Notifier le parent des pages sélectionnées
                     if (onPagesChange) onPagesChange(selectedPagesArray);
+                    
                     // Passer à l'étape suivante
                     if (onStepChange) onStepChange(3);
+                    
+                    // Forcer l'affichage de la première page après un petit délai
+                    setTimeout(async () => {
+                      if (selectedPagesArray.length > 0) {
+                        await goToPage(selectedPagesArray[0]);
+                      }
+                    }, 100);
                   }}
                   style={{ 
                     backgroundColor: '#28a745', 
