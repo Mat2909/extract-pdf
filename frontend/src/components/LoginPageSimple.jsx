@@ -53,88 +53,111 @@ function LoginPageSimple({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      {/* Fenêtre style MsgBox Excel */}
-      <div className="bg-white border border-gray-400 shadow-lg w-96">
-        {/* Barre de titre style Windows */}
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-3 py-2 border-b border-gray-400">
-          <h1 className="text-white text-sm font-medium">PDF Extract - Authentification</h1>
-        </div>
-
-        {/* Contenu principal */}
-        <div className="p-6">
-          {/* Icône et titre */}
-          <div className="flex items-center mb-4">
-            <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center mr-3">
-              <span className="text-white text-sm font-bold">P</span>
-            </div>
-            <div>
-              <h2 className="text-sm font-medium text-gray-800">Connexion requise</h2>
-              <p className="text-xs text-gray-600">Veuillez vous identifier pour continuer</p>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="text-center">
+        {/* Titre de l'app en dehors de la fenêtre */}
+        <h1 className="text-3xl font-bold text-slate-700 mb-8">PDF Extract</h1>
+        
+        {/* Fenêtre d'authentification */}
+        <div className="bg-white border-2 border-slate-300 shadow-xl rounded-lg w-96 overflow-hidden">
+          {/* Barre de titre colorée */}
+          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-3">
+            <h2 className="text-white text-sm font-medium">Authentification</h2>
           </div>
 
-          {/* Message d'erreur */}
-          {error && (
-            <div className="bg-red-50 border border-red-200 p-2 mb-4 text-xs text-red-700">
-              {error}
-            </div>
-          )}
-
-          {/* Formulaire compact */}
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
-                Nom d'utilisateur :
-              </label>
-              <input
-                name="username"
-                type="text"
-                required
-                value={credentials.username}
-                onChange={handleInputChange}
-                className="w-full px-2 py-1 text-xs border border-gray-400 focus:border-blue-500 focus:outline-none"
-              />
+          {/* Contenu principal */}
+          <div className="p-6">
+            {/* En-tête avec icône */}
+            <div className="text-center mb-6">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-slate-700">Connexion requise</h3>
+              <p className="text-sm text-slate-500 mt-1">Veuillez vous identifier pour continuer</p>
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
-                Mot de passe :
-              </label>
-              <input
-                name="password"
-                type="password"
-                required
-                value={credentials.password}
-                onChange={handleInputChange}
-                className="w-full px-2 py-1 text-xs border border-gray-400 focus:border-blue-500 focus:outline-none"
-              />
-            </div>
+            {/* Message d'erreur */}
+            {error && (
+              <div className="bg-red-50 border-l-4 border-red-400 p-3 mb-4 rounded-r">
+                <p className="text-red-700 text-sm">{error}</p>
+              </div>
+            )}
 
-            {/* Boutons style Windows */}
-            <div className="flex justify-end space-x-2 mt-6">
-              <button
-                type="submit"
-                disabled={isLoading || !credentials.username || !credentials.password}
-                className="px-4 py-1 text-xs bg-gray-200 border border-gray-400 hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-300"
-              >
-                {isLoading ? 'Connexion...' : 'OK'}
-              </button>
-              <button
-                type="button"
-                className="px-4 py-1 text-xs bg-gray-200 border border-gray-400 hover:bg-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-300"
-              >
-                Annuler
-              </button>
-            </div>
-          </form>
+            {/* Formulaire */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Nom d'utilisateur
+                </label>
+                <input
+                  name="username"
+                  type="text"
+                  required
+                  value={credentials.username}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 text-sm border-2 border-slate-300 rounded-md focus:border-blue-500 focus:outline-none transition-colors"
+                  placeholder="Votre nom d'utilisateur"
+                />
+              </div>
 
-          {/* Comptes de test en bas */}
-          <div className="mt-4 pt-3 border-t border-gray-200">
-            <p className="text-xs text-gray-500 mb-2">Comptes de test :</p>
-            <div className="text-xs text-gray-600 space-y-1">
-              <div>• Admin / Admin (Administrateur)</div>
-              <div>• Mathieu / Mathieu (Utilisateur)</div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Mot de passe
+                </label>
+                <input
+                  name="password"
+                  type="password"
+                  required
+                  value={credentials.password}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 text-sm border-2 border-slate-300 rounded-md focus:border-blue-500 focus:outline-none transition-colors"
+                  placeholder="Votre mot de passe"
+                />
+              </div>
+
+              {/* Boutons améliorés */}
+              <div className="flex justify-end space-x-3 mt-8">
+                <button
+                  type="button"
+                  className="px-4 py-2 text-sm text-slate-600 bg-slate-100 border border-slate-300 rounded-md hover:bg-slate-200 transition-colors"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  disabled={isLoading || !credentials.username || !credentials.password}
+                  className="px-6 py-2 text-sm bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-md hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md"
+                >
+                  {isLoading ? (
+                    <span className="flex items-center">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Connexion...
+                    </span>
+                  ) : (
+                    'Se connecter'
+                  )}
+                </button>
+              </div>
+            </form>
+
+            {/* Comptes de test avec style amélioré */}
+            <div className="mt-6 pt-4 border-t border-slate-200">
+              <p className="text-sm text-slate-500 mb-3 text-center">Comptes de démonstration</p>
+              <div className="space-y-2">
+                <div className="bg-blue-50 border border-blue-200 rounded-md px-3 py-2 text-sm">
+                  <span className="font-medium text-blue-700">Admin</span> / <span className="font-medium text-blue-700">Admin</span> 
+                  <span className="text-blue-600 ml-2">(Administrateur)</span>
+                </div>
+                <div className="bg-green-50 border border-green-200 rounded-md px-3 py-2 text-sm">
+                  <span className="font-medium text-green-700">Mathieu</span> / <span className="font-medium text-green-700">Mathieu</span> 
+                  <span className="text-green-600 ml-2">(Utilisateur)</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
