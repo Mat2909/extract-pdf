@@ -78,10 +78,11 @@ class CoordinateFormatModule extends BaseModule {
       errors.push('Aucune page sélectionnée');
     }
 
-    const areaSelectionData = workflowData?.['area-selection'];
-    if (!areaSelectionData?.selectedArea) {
-      errors.push('Aucune zone OCR sélectionnée');
-    }
+    // Temporaire: Zone par défaut si pas de sélection de zone
+    // const areaSelectionData = workflowData?.['area-selection'];
+    // if (!areaSelectionData?.selectedArea) {
+    //   errors.push('Aucune zone OCR sélectionnée');
+    // }
 
     return {
       valid: errors.length === 0,
@@ -100,7 +101,16 @@ class CoordinateFormatModule extends BaseModule {
     try {
       this.setLoading(true);
 
-      const areaSelectionData = workflowData['area-selection'];
+      // Temporaire: zone par défaut pour test
+      const defaultArea = {
+        x: 10,
+        y: 10, 
+        width: 80,
+        height: 20,
+        pageNumber: 1
+      };
+      
+      const areaSelectionData = workflowData['area-selection'] || { selectedArea: defaultArea };
       const uploadData = workflowData.upload;
       
       this.setState({ 

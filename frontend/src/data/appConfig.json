@@ -36,17 +36,52 @@
         "previewMode": true
       }
     },
+    "COORDINATE_FORMAT": {
+      "id": "coordinate-format",
+      "name": "Format des coordonnées",
+      "description": "Configuration du format attendu pour les coordonnées X/Y",
+      "component": "CoordinateFormatModule",
+      "required": false,
+      "config": {
+        "showPreview": true,
+        "allowCustomFormat": true,
+        "presetFormats": [
+          {
+            "name": "Lambert II étendu",
+            "type": "lambert",
+            "x": { "integers": 7, "decimals": 3 },
+            "y": { "integers": 7, "decimals": 3 },
+            "examples": { "x": "1234567.890", "y": "1234567.648" }
+          },
+          {
+            "name": "GPS Décimal", 
+            "type": "gps",
+            "x": { "integers": 2, "decimals": 6 },
+            "y": { "integers": 2, "decimals": 6 },
+            "examples": { "x": "48.123456", "y": "2.654321" }
+          },
+          {
+            "name": "UTM",
+            "type": "utm", 
+            "x": { "integers": 6, "decimals": 3 },
+            "y": { "integers": 7, "decimals": 3 },
+            "examples": { "x": "654321.123", "y": "5432167.890" }
+          }
+        ]
+      }
+    },
     "OCR_PROCESSING": {
       "id": "ocr-processing",
       "name": "Traitement OCR",
-      "description": "Reconnaissance optique de caractères",
+      "description": "Reconnaissance optique de caractères avec intelligence artificielle",
       "component": "OCRProcessingModule", 
       "required": true,
       "config": {
-        "engine": "ocr.space",
-        "language": "fre",
-        "scale": 4.0,
-        "validationRequired": true
+        "engine": "tesseract.js",
+        "language": "fra+eng",
+        "scale": 3.0,
+        "validationRequired": true,
+        "smartDecimalDetection": true
       }
     },
     "COORDINATE_EXTRACTION": {
@@ -97,10 +132,8 @@
       "modules": [
         "UPLOAD",
         "PAGE_SELECTION", 
-        "ZONE_SELECTION",
+        "COORDINATE_FORMAT",
         "OCR_PROCESSING",
-        "COORDINATE_EXTRACTION",
-        "VALIDATION",
         "EXPORT"
       ],
       "config": {

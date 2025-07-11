@@ -3,6 +3,7 @@ import profileManager from './profileManager';
 // Import des modules
 import UploadModule from '../modules/UploadModule';
 import PageSelectionModule from '../modules/PageSelectionModule';
+import CoordinateFormatModule from '../modules/CoordinateFormatModule';
 import OCRProcessingModule from '../modules/OCRProcessingModule';
 import ExportModule from '../modules/ExportModule';
 
@@ -20,6 +21,7 @@ class WorkflowEngine {
     // Enregistrer les modules disponibles
     this.registerModule('UploadModule', UploadModule);
     this.registerModule('PageSelectionModule', PageSelectionModule);
+    this.registerModule('CoordinateFormatModule', CoordinateFormatModule);
     this.registerModule('OCRProcessingModule', OCRProcessingModule);
     this.registerModule('ExportModule', ExportModule);
   }
