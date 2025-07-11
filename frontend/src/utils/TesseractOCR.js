@@ -237,6 +237,146 @@ export class TesseractOCR {
     
     return correctedText;
   }
+
+  /**
+   * Post-traitement ULTRA-INTELLIGENT avec format de coordonnées spécifique
+   * @param {string} text - Texte OCR brut
+   * @param {Object} coordinateFormat - Format configuré { x: {integers, decimals}, y: {integers, decimals} }
+   * @returns {string} - Texte corrigé selon le format exact
+   */
+  static fixDecimalPointsWithFormat(text, coordinateFormat) {
+    console.log('🧠 Correction ULTRA-INTELLIGENTE avec format spécifique...');
+    console.log('📝 Texte avant correction:', text);
+    console.log('⚙️ Format configuré:', coordinateFormat);
+    
+    let correctedText = text;
+    
+    // Étape 1: Corrections de base (sûres)
+    correctedText = correctedText.replace(/(\d),(\d)/g, '$1.$2'); // Virgules → points
+    correctedText = correctedText.replace(/(\d)[°·•‧⋅](\d)/g, '$1.$2'); // Caractères spéciaux
+    correctedText = correctedText.replace(/(\d)[Oo](\d)/g, '$1' + '0' + '$2'); // O → 0
+    correctedText = correctedText.replace(/\.{2,}/g, '.'); // Doubles points
+    
+    // Étape 2: ANALYSE ULTRA-PRÉCISE selon format configuré
+    const patterns = this.analyzeWithExactFormat(correctedText, coordinateFormat);
+    
+    // Étape 3: Application des corrections formatées
+    correctedText = this.applyFormatSpecificCorrections(correctedText, patterns, coordinateFormat);
+    
+    if (correctedText !== text) {
+      console.log('✅ Texte après correction ULTRA-INTELLIGENTE:', correctedText);
+      console.log('🎯 Corrections format-spécifiques appliquées');
+    } else {
+      console.log('ℹ️ Aucune correction format-spécifique nécessaire');
+    }
+    
+    return correctedText;
+  }
+  
+  /**
+   * Analyse les patterns selon le format exact configuré
+   * @param {string} text - Texte à analyser
+   * @param {Object} coordinateFormat - Format configuré
+   * @returns {Array} - Patterns détectés avec corrections spécifiques
+   */
+  static analyzeWithExactFormat(text, coordinateFormat) {
+    const patterns = [];
+    
+    // Générer les patterns dynamiquement selon la configuration
+    const xTotalLength = coordinateFormat.x.integers + coordinateFormat.x.decimals;
+    const yTotalLength = coordinateFormat.y.integers + coordinateFormat.y.decimals;
+    
+    console.log(`🔍 Recherche patterns X: ${coordinateFormat.x.integers}+${coordinateFormat.x.decimals}, Y: ${coordinateFormat.y.integers}+${coordinateFormat.y.decimals}`);
+    
+    // Pattern 1: Coordonnée X avec espace au lieu du point
+    const xSpacePattern = new RegExp(`(\\d{${coordinateFormat.x.integers}})\\s+(\\d{${coordinateFormat.x.decimals}})`, 'g');
+    let match;
+    while ((match = xSpacePattern.exec(text)) !== null) {
+      patterns.push({
+        type: 'x_space_separated',
+        original: match[0],
+        start: match.index,
+        end: match.index + match[0].length,
+        integers: match[1],
+        decimals: match[2],
+        corrected: `${match[1]}.${match[2]}`,
+        axis: 'x'
+      });
+    }
+    
+    // Pattern 2: Coordonnée Y avec espace au lieu du point
+    const ySpacePattern = new RegExp(`(\\d{${coordinateFormat.y.integers}})\\s+(\\d{${coordinateFormat.y.decimals}})`, 'g');
+    while ((match = ySpacePattern.exec(text)) !== null) {
+      patterns.push({
+        type: 'y_space_separated',
+        original: match[0],
+        start: match.index,
+        end: match.index + match[0].length,
+        integers: match[1],
+        decimals: match[2],
+        corrected: `${match[1]}.${match[2]}`,
+        axis: 'y'
+      });
+    }
+    
+    // Pattern 3: Coordonnée X collée (point absent)
+    const xNoSepPattern = new RegExp(`(\\d{${coordinateFormat.x.integers}})(\\d{${coordinateFormat.x.decimals}})(?![\\d\\.])`, 'g');
+    while ((match = xNoSepPattern.exec(text)) !== null) {
+      patterns.push({
+        type: 'x_no_separator',
+        original: match[0],
+        start: match.index,
+        end: match.index + match[0].length,
+        integers: match[1],
+        decimals: match[2],
+        corrected: `${match[1]}.${match[2]}`,
+        axis: 'x'
+      });
+    }
+    
+    // Pattern 4: Coordonnée Y collée (point absent)  
+    const yNoSepPattern = new RegExp(`(\\d{${coordinateFormat.y.integers}})(\\d{${coordinateFormat.y.decimals}})(?![\\d\\.])`, 'g');
+    while ((match = yNoSepPattern.exec(text)) !== null) {
+      patterns.push({
+        type: 'y_no_separator',
+        original: match[0],
+        start: match.index,
+        end: match.index + match[0].length,
+        integers: match[1],
+        decimals: match[2],
+        corrected: `${match[1]}.${match[2]}`,
+        axis: 'y'
+      });
+    }
+    
+    console.log(`🎯 ${patterns.length} patterns format-spécifiques détectés:`, patterns);
+    return patterns;
+  }
+  
+  /**
+   * Applique les corrections selon le format spécifique
+   * @param {string} text - Texte original
+   * @param {Array} patterns - Patterns détectés
+   * @param {Object} coordinateFormat - Format configuré
+   * @returns {string} - Texte corrigé
+   */
+  static applyFormatSpecificCorrections(text, patterns, coordinateFormat) {
+    let correctedText = text;
+    
+    // Trier les patterns par position (de la fin vers le début pour éviter les décalages)
+    patterns.sort((a, b) => b.start - a.start);
+    
+    patterns.forEach(pattern => {
+      console.log(`🔧 Correction ${pattern.axis}: "${pattern.original}" → "${pattern.corrected}"`);
+      
+      // Appliquer la correction
+      correctedText = correctedText.substring(0, pattern.start) + 
+                    pattern.corrected + 
+                    correctedText.substring(pattern.end);
+    });
+    
+    return correctedText;
+  }
   
   /**
    * Analyse les patterns numériques pour détecter les coordonnées malformées
@@ -374,9 +514,13 @@ export class TesseractOCR {
       // OCR avec image optimisée
       const { data: { text, confidence } } = await this.worker.recognize(enhancedImage);
       
-      // Post-traitement INTELLIGENT avec configuration
-      const ocrConfig = window.currentOCRConfig || { decimals: 3, coordinateType: 'lambert' };
-      const correctedText = this.fixDecimalPoints(text, ocrConfig);
+      // Post-traitement INTELLIGENT avec format coordonnées configuré
+      const coordinateFormat = window.currentCoordinateFormat || {
+        x: { integers: 7, decimals: 3 },
+        y: { integers: 7, decimals: 3 },
+        coordinateType: 'lambert'
+      };
+      const correctedText = this.fixDecimalPointsWithFormat(text, coordinateFormat);
       
       const processingTime = Date.now() - startTime;
       console.log(`✅ OCR terminé en ${processingTime}ms`);
