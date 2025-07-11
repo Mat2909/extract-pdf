@@ -33,38 +33,50 @@ export class TesseractOCR {
         load_bigram_dawg: false
       });
       
-      // Configuration ÉQUILIBRÉE (sans paramètres sensibles)
+      // Configuration ULTRA-SPÉCIALISÉE pour POINTS DÉCIMAUX
       await this.worker.setParameters({
-        // Caractères complets pour reconnaissance parfaite
-        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,+-:éèàùç() \n\t',
-        tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
+        // WHITELIST ULTRA-RESTRICTIVE: seulement chiffres + points
+        tessedit_char_whitelist: '0123456789.,',
         
-        // OPTIMISATIONS SÛRES pour images vectorielles
-        preserve_interword_spaces: '1',
-        tessedit_do_invert: '0',
-        tessedit_write_images: '0',
+        // MODE SINGLE_CHAR pour traiter chaque caractère individuellement
+        tessedit_pageseg_mode: Tesseract.PSM.SINGLE_CHAR,
         
-        // Paramètres de base pour précision
-        classify_enable_learning: '0',
-        classify_enable_adaptive_matcher: '1',
-        classify_use_pre_adapted_templates: '1',
+        // DÉSACTIVER TOUS LES FILTRES DE BRUIT
+        textord_noise_rejwords: '0',           // Pas de rejet mots "bruyants"
+        textord_noise_rejrows: '0',            // Pas de rejet lignes "bruyantes"
+        textord_noise_area_ratio: '0',         // Accepter toutes les zones
+        textord_noise_cert_factor: '0',        // Pas de certification bruit
+        textord_noise_rowratio: '0',           // Accepter toutes les lignes
         
-        // Paramètres MODÉRÉS (éviter divide by zero)
-        textord_min_xheight: '6',              // Sécurisé (pas trop bas)
-        textord_noise_rejwords: '0',           // Désactivé pour éviter erreurs
-        textord_noise_rejrows: '0',            // Désactivé pour éviter erreurs
+        // SEUILS DE QUALITÉ À ZÉRO (accepter même points "douteux")
+        tessedit_good_quality_unrej: '0.0',    // Accepter toute qualité
+        tessedit_quality_rej: '0.0',           // Pas de rejet qualité
+        tessedit_ok_mode: '0',                 // Mode permissif
         
-        // Seuils MODÉRÉS (éviter erreurs de calcul)
-        tessedit_good_quality_unrej: '1.0',    // Valeur sûre
-        tessedit_quality_rej: '0.0',           // Pas de rejet
+        // DÉSACTIVER CORRECTIONS ORTHOGRAPHIQUES
+        load_system_dawg: '0',                 // Pas de dictionnaire système
+        load_freq_dawg: '0',                   // Pas de fréquences
+        load_unambig_dawg: '0',                // Pas de désambiguïsation
+        load_punc_dawg: '1',                   // GARDER ponctuation (points!)
+        load_number_dawg: '1',                 // GARDER chiffres
+        load_bigram_dawg: '0',                 // Pas de bigrammes
         
-        // Paramètres sûrs pour contraste
-        classify_norm_adj_midpoint: '96',      // Valeur standard sûre
-        classify_norm_adj_curl: '2',           // Valeur sûre
+        // PARAMÈTRES ULTRA-PERMISSIFS
+        tessedit_zero_rejection: '1',          // Accepter TOUT
+        tessedit_minimal_rejection: '1',       // Rejet minimal
+        suspect_level: '99',                   // Niveau suspect maximal
+        suspect_short_words: '0',              // Pas de suspicion mots courts
         
-        // Espacement standard
-        tosp_old_to_method: '0',
-        tosp_old_to_bug_fix: '1'
+        // OPTIMISATIONS pour petits caractères
+        textord_min_xheight: '1',              // Accepter très petits caractères
+        textord_min_linesize: '0.25',          // Lignes très fines OK
+        classify_norm_adj_midpoint: '32',      // Plus sensible
+        classify_norm_adj_curl: '1',           // Très sensible
+        
+        // ESPACEMENT ultra-permissif
+        preserve_interword_spaces: '0',        // Pas d'espacement forcé
+        tosp_old_to_method: '1',              // Méthode permissive
+        tosp_old_to_bug_fix: '0'              // Pas de "correction"
       });
       
       this.isInitialized = true;
