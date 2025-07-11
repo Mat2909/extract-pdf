@@ -173,6 +173,7 @@
       "modules": [
         "UPLOAD",
         "PAGE_SELECTION",
+        "COORDINATE_FORMAT",
         "OCR_PROCESSING",
         "EXPORT"
       ],
