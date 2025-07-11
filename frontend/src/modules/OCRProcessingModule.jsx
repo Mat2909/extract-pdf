@@ -231,9 +231,10 @@ class OCRProcessingModule extends BaseModule {
     });
   }
 
-  // Gestionnaires d'événements
+  // Gestionnaires d'événements - BYPASS popup cassé
   handleStartProcessing = () => {
-    this.setState({ showConfigDialog: true });
+    // BYPASS: popup cassé, démarrage direct OCR
+    this.process(this.props.workflowData);
   };
 
   handleConfigConfirm = (config) => {
@@ -272,18 +273,19 @@ class OCRProcessingModule extends BaseModule {
   renderContent() {
     const { isProcessing, currentPage, totalPages, results, showValidation, showConfigDialog } = this.state;
 
-    if (showConfigDialog) {
-      return (
-        <>
-          {this.renderStartView()}
-          <OCRConfigDialog
-            isOpen={showConfigDialog}
-            onClose={this.handleConfigCancel}
-            onConfirm={this.handleConfigConfirm}
-          />
-        </>
-      );
-    }
+    // POPUP DÉSACTIVÉ - trop de problèmes CSS
+    // if (showConfigDialog) {
+    //   return (
+    //     <>
+    //       {this.renderStartView()}
+    //       <OCRConfigDialog
+    //         isOpen={showConfigDialog}
+    //         onClose={this.handleConfigCancel}
+    //         onConfirm={this.handleConfigConfirm}
+    //       />
+    //     </>
+    //   );
+    // }
 
     if (showValidation) {
       return this.renderValidationModal();
