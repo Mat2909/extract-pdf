@@ -1,0 +1,165 @@
+{
+  "version": "2.0.0",
+  "modules": {
+    "UPLOAD": {
+      "id": "upload",
+      "name": "Upload PDF",
+      "description": "Téléchargement et validation de fichiers PDF",
+      "component": "UploadModule",
+      "required": true,
+      "config": {
+        "maxFileSize": "50MB",
+        "allowedTypes": [".pdf"],
+        "multipleFiles": false
+      }
+    },
+    "PAGE_SELECTION": {
+      "id": "page-selection",
+      "name": "Sélection de pages",
+      "description": "Choix des pages à traiter via vignettes",
+      "component": "PageSelectionModule",
+      "required": false,
+      "config": {
+        "thumbnailMode": true,
+        "selectAll": true,
+        "gridColumns": 10
+      }
+    },
+    "ZONE_SELECTION": {
+      "id": "zone-selection", 
+      "name": "Sélection de zone",
+      "description": "Définition de la zone d'extraction OCR",
+      "component": "ZoneSelectionModule",
+      "required": false,
+      "config": {
+        "allowMultipleZones": false,
+        "previewMode": true
+      }
+    },
+    "OCR_PROCESSING": {
+      "id": "ocr-processing",
+      "name": "Traitement OCR",
+      "description": "Reconnaissance optique de caractères",
+      "component": "OCRProcessingModule", 
+      "required": true,
+      "config": {
+        "engine": "ocr.space",
+        "language": "fre",
+        "scale": 4.0
+      }
+    },
+    "COORDINATE_EXTRACTION": {
+      "id": "coordinate-extraction",
+      "name": "Extraction de coordonnées",
+      "description": "Extraction et conversion de coordonnées géographiques",
+      "component": "CoordinateExtractionModule",
+      "required": false,
+      "config": {
+        "sourceSystem": "Lambert2E",
+        "targetSystem": "Lambert93",
+        "conversionEnabled": true
+      }
+    },
+    "EXPORT": {
+      "id": "export",
+      "name": "Export de données",
+      "description": "Export des résultats en différents formats",
+      "component": "ExportModule",
+      "required": true,
+      "config": {
+        "formats": ["xlsx", "csv", "json"],
+        "defaultFormat": "xlsx",
+        "includeMetadata": true
+      }
+    },
+    "VALIDATION": {
+      "id": "validation",
+      "name": "Validation manuelle",
+      "description": "Validation et correction manuelle des résultats",
+      "component": "ValidationModule",
+      "required": false,
+      "config": {
+        "allowEdit": true,
+        "showConfidence": true,
+        "batchMode": true
+      }
+    }
+  },
+  "profiles": {
+    "grdf": {
+      "id": "grdf",
+      "name": "GrDF",
+      "description": "Gestionnaire du Réseau de Distribution de gaz France",
+      "logo": "🔥",
+      "color": "#0066cc",
+      "active": true,
+      "modules": [
+        "UPLOAD",
+        "PAGE_SELECTION", 
+        "ZONE_SELECTION",
+        "OCR_PROCESSING",
+        "COORDINATE_EXTRACTION",
+        "VALIDATION",
+        "EXPORT"
+      ],
+      "config": {
+        "coordinateSystem": "Lambert2E",
+        "exportFormat": "xlsx",
+        "exportColumns": ["page_name", "x", "y"],
+        "skipZoneForSinglePage": false
+      }
+    },
+    "sfr": {
+      "id": "sfr",
+      "name": "SFR",
+      "description": "Société Française du Radiotéléphone",
+      "logo": "📡",
+      "color": "#cc0000", 
+      "active": true,
+      "modules": [
+        "UPLOAD",
+        "PAGE_SELECTION",
+        "OCR_PROCESSING", 
+        "COORDINATE_EXTRACTION",
+        "EXPORT"
+      ],
+      "config": {
+        "coordinateSystem": "WGS84",
+        "exportFormat": "csv",
+        "exportColumns": ["page", "latitude", "longitude"],
+        "autoProcessing": true
+      }
+    }
+  },
+  "users": {
+    "admin": {
+      "id": "admin",
+      "username": "admin",
+      "role": "administrator",
+      "permissions": [
+        "create_profiles",
+        "edit_profiles", 
+        "delete_profiles",
+        "manage_modules",
+        "view_all_data"
+      ]
+    },
+    "user": {
+      "id": "user", 
+      "username": "user",
+      "role": "user",
+      "permissions": [
+        "use_profiles",
+        "export_data",
+        "view_own_data"
+      ]
+    }
+  },
+  "settings": {
+    "defaultProfile": "grdf",
+    "allowProfileSelection": true,
+    "maxConcurrentUploads": 5,
+    "sessionTimeout": 3600,
+    "theme": "professional"
+  }
+}
