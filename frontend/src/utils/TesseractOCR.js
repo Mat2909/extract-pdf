@@ -26,49 +26,61 @@ export class TesseractOCR {
         }
       });
       
-      // Configuration ÉQUILIBRÉE pour points décimaux ET texte normal
+      // Configuration HAUTE PRÉCISION pour images vectorielles parfaites
       await this.worker.setParameters({
-        // Caractères complets pour reconnaissance normale + points décimaux
+        // Caractères complets pour reconnaissance parfaite
         tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,+-:éèàùç() \n\t',
         tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
         
-        // OPTIMISATIONS CRITIQUES pour les points décimaux
+        // OPTIMISATIONS pour images vectorielles PARFAITES
         preserve_interword_spaces: '1',
         tessedit_do_invert: '0',
         tessedit_write_images: '0',
         
-        // Désactiver tous les dictionnaires (focus chiffres + ponctuation)
-        load_system_dawg: '0',
-        load_freq_dawg: '0',
-        load_unambig_dawg: '0',
-        load_punc_dawg: '1',     // GARDER la ponctuation (points!)
-        load_number_dawg: '1',   // GARDER les chiffres
-        load_bigram_dawg: '0',
+        // Garder les dictionnaires pour meilleure précision sur images nettes
+        load_system_dawg: '0',     // Pas de dictionnaire général
+        load_freq_dawg: '0',       // Pas de fréquences
+        load_unambig_dawg: '1',    // GARDER les caractères non-ambigus (9 vs 3)
+        load_punc_dawg: '1',       // GARDER la ponctuation (points)
+        load_number_dawg: '1',     // GARDER les chiffres
+        load_bigram_dawg: '0',     // Pas de bigrammes
         
-        // Améliorer spécifiquement la détection des petits caractères (points)
+        // STRICTE précision pour images nettes (pas de tolérance)
         classify_enable_learning: '0',
         classify_enable_adaptive_matcher: '1',
         classify_use_pre_adapted_templates: '1',
         
-        // Paramètres CRITIQUES pour les points
-        textord_really_old_xheight: '0',      // Désactiver pour petits caractères
-        textord_min_xheight: '5',             // Hauteur minimum très basse
-        textord_noise_rejwords: '0',          // Ne pas rejeter les "mots" courts
-        textord_noise_rejrows: '0',           // Ne pas rejeter les lignes courtes
+        // Paramètres STRICTS pour images parfaites
+        textord_really_old_xheight: '0',
+        textord_min_xheight: '8',              // Plus strict que 5
+        textord_noise_rejwords: '1',           // Rejeter les mots douteux
+        textord_noise_rejrows: '1',            // Rejeter les lignes douteuses
         
-        // Seuils AJUSTÉS pour accepter les points (confidence plus basse)
-        tessedit_good_quality_unrej: '0.8',   // Plus permissif
-        tessedit_quality_rej: '0.0',          // Accepter même faible qualité
+        // Seuils STRICTS pour images parfaites (haute qualité exigée)
+        tessedit_good_quality_unrej: '1.2',    // Plus strict (vs 0.8)
+        tessedit_quality_rej: '0.2',           // Rejeter basse qualité
         
-        // Paramètres spéciaux pour ponctuation
-        classify_norm_adj_midpoint: '96',     // Ajuster pour petits caractères
-        classify_norm_adj_curl: '2',          // Réduire pour points
-        textord_noise_sizefraction: '0.5',    // Accepter petites formes
-        textord_noise_translimit: '16',       // Limite de translation
+        // Paramètres optimisés pour contraste parfait
+        classify_norm_adj_midpoint: '128',     // Valeur standard pour contraste parfait
+        classify_norm_adj_curl: '8',           // Valeur plus stricte
+        textord_noise_sizefraction: '0.25',    // Plus strict sur tailles
+        textord_noise_translimit: '8',         // Limite plus stricte
         
-        // Améliorer détection des espaces (important pour séparateurs)
-        tosp_old_to_method: '0',
-        tosp_old_to_bug_fix: '1'
+        // Optimisations spéciales pour images vectorielles
+        edges_use_new_outline_complexity: '1',
+        edges_debug: '0',
+        textord_debug_tabfind: '0',
+        
+        // Améliorer distinction 9/3, 6/5, etc.
+        classify_debug_level: '0',
+        classify_learning_debug_level: '0',
+        matcher_debug_level: '0',
+        
+        // Espacement optimisé pour texte vectoriel
+        tosp_old_to_method: '1',
+        tosp_old_to_bug_fix: '1',
+        tosp_enough_space_samples_for_median: '3',
+        tosp_redo_kern_limit: '10'
       });
       
       this.isInitialized = true;
@@ -81,7 +93,7 @@ export class TesseractOCR {
   }
 
   /**
-   * Pré-traitement SPÉCIALISÉ pour la détection des points décimaux
+   * Pré-traitement OPTIMISÉ pour images vectorielles haute qualité
    * @param {HTMLImageElement|HTMLCanvasElement} image 
    * @returns {HTMLCanvasElement}
    */
@@ -99,21 +111,24 @@ export class TesseractOCR {
       height = image.height;
     }
     
-    // AUGMENTATION MASSIVE pour les points décimaux (2x au lieu de 1.5x)
-    const scale = 2.0; // Augmentation de 100% pour mieux voir les points
+    // Augmentation modérée pour images vectorielles (déjà nettes)
+    const scale = 1.8; // Plus modéré car images déjà parfaites
     canvas.width = width * scale;
     canvas.height = height * scale;
     
-    // Rendu haute qualité pour préserver les détails
-    ctx.imageSmoothingEnabled = false;
+    // Rendu PARFAIT pour images vectorielles
+    ctx.imageSmoothingEnabled = false; // Pas de lissage sur du vectoriel
     ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
     
-    // Traitement SPÉCIALISÉ pour les points décimaux
+    // Traitement MINIMAL pour images vectorielles (déjà parfaites)
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
     
-    // Algorithme optimisé pour la détection des points
+    // Seuil PRÉCIS pour images vectorielles (contraste parfait)
+    const threshold = 128; // Seuil standard pour noir/blanc parfait
+    
+    // Traitement simple : juste nettoyer le seuil noir/blanc
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i];
       const g = data[i + 1];
@@ -122,56 +137,23 @@ export class TesseractOCR {
       // Calculer la luminosité
       const brightness = (r + g + b) / 3;
       
-      // CONTRASTE EXTRÊME pour faire ressortir les points
-      const threshold = 140; // Seuil plus élevé
-      
       if (brightness > threshold) {
-        // BLANC PUR pour le fond
+        // BLANC PUR
         data[i] = 255;
         data[i + 1] = 255;
         data[i + 2] = 255;
       } else {
-        // NOIR PUR pour le texte et les points
+        // NOIR PUR 
         data[i] = 0;
         data[i + 1] = 0;
         data[i + 2] = 0;
       }
     }
     
-    // Deuxième passe: améliorer la visibilité des petits éléments (points)
-    const processedData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const processed = processedData.data;
+    // PAS de post-traitement agressif car images vectorielles déjà parfaites
+    ctx.putImageData(imageData, 0, 0);
     
-    // Dilatation légère pour épaissir les points trop fins
-    for (let y = 1; y < canvas.height - 1; y++) {
-      for (let x = 1; x < canvas.width - 1; x++) {
-        const idx = (y * canvas.width + x) * 4;
-        
-        // Si le pixel actuel est noir (texte/point)
-        if (processed[idx] < 128) {
-          // Vérifier les pixels adjacents pour détecter des points isolés
-          const neighbors = [
-            processed[((y-1) * canvas.width + x) * 4],     // haut
-            processed[((y+1) * canvas.width + x) * 4],     // bas
-            processed[(y * canvas.width + (x-1)) * 4],     // gauche
-            processed[(y * canvas.width + (x+1)) * 4]      // droite
-          ];
-          
-          // Si c'est un point isolé entouré de blanc, le renforcer
-          const blackNeighbors = neighbors.filter(n => n < 128).length;
-          if (blackNeighbors <= 2) {
-            // Renforcer ce pixel (probablement un point décimal)
-            processed[idx] = 0;     // R
-            processed[idx + 1] = 0; // G
-            processed[idx + 2] = 0; // B
-          }
-        }
-      }
-    }
-    
-    ctx.putImageData(processedData, 0, 0);
-    
-    console.log(`🔍 Image optimisée pour points décimaux: ${width}x${height} → ${canvas.width}x${canvas.height}`);
+    console.log(`🎯 Image vectorielle optimisée: ${width}x${height} → ${canvas.width}x${canvas.height}`);
     return canvas;
   }
 
