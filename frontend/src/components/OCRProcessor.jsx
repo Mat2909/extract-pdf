@@ -376,10 +376,10 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
     const pdf = await pdfjsLib.getDocument(pdfFile.path).promise;
     const page = await pdf.getPage(pageNumber);
     
-    // AMÉLIORATION: Scale plus élevée pour OCR (meilleure qualité)
-    const ocrScale = 4.0; // ✅ Augmenter pour plus de précision OCR
+    // Scale équilibrée pour OCR (vitesse vs qualité)
+    const ocrScale = 2.0; // ✅ Équilibre entre précision et performance
     const viewport = page.getViewport({ scale: ocrScale });
-    console.log('OCR Viewport dimensions (scale 4x):', viewport.width, 'x', viewport.height);
+    console.log('OCR Viewport dimensions (scale 2x):', viewport.width, 'x', viewport.height);
     
     // Obtenir les dimensions du canvas affiché dans PDFViewer pour comparaison
     const pdfCanvas = document.querySelector('.pdf-canvas');
@@ -416,9 +416,9 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
       throw new Error('Zone sélectionnée trop petite');
     }
 
-    // ✅ AMÉLIORATION: Taille optimale pour OCR (plus grande = plus précise)
-    const minWidth = Math.max(width, 600); // ✅ Double la taille minimale
-    const minHeight = Math.max(height, 300);
+    // Taille optimale pour OCR (équilibre performance/qualité)
+    const minWidth = Math.max(width, 300); // ✅ Taille raisonnable
+    const minHeight = Math.max(height, 150);
     
     const zoneCanvas = document.createElement('canvas');
     const zoneContext = zoneCanvas.getContext('2d');

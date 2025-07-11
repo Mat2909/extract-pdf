@@ -30,10 +30,10 @@ module.exports = async function handler(req, res) {
           'base64Image': imageData,
           'language': 'fre', // Français en priorité
           'isOverlayRequired': 'false',
-          'detectOrientation': 'true', // ✅ Activer détection orientation
+          'detectOrientation': 'false', // ✅ Désactiver pour plus de vitesse
           'scale': 'true', // ✅ Mise à l'échelle automatique
           'isTable': 'false',
-          'OCREngine': '2', // ✅ Moteur OCR v2 (plus précis)
+          'OCREngine': '1', // ✅ Moteur OCR v1 (plus rapide)
           'filetype': 'PNG',
           'isSearchablePdfHideTextLayer': 'false'
         })
