@@ -26,10 +26,10 @@ export class TesseractOCR {
         }
       });
       
-      // Configuration SPÉCIALISÉE pour la détection des POINTS DÉCIMAUX
+      // Configuration ÉQUILIBRÉE pour points décimaux ET texte normal
       await this.worker.setParameters({
-        // Caractères essentiels avec POINT en priorité
-        tessedit_char_whitelist: '0123456789.,+-XY \n\t',
+        // Caractères complets pour reconnaissance normale + points décimaux
+        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,+-:éèàùç() \n\t',
         tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
         
         // OPTIMISATIONS CRITIQUES pour les points décimaux
@@ -176,57 +176,40 @@ export class TesseractOCR {
   }
 
   /**
-   * Post-traitement intelligent pour corriger les points décimaux manqués
+   * Post-traitement PRUDENT pour corriger UNIQUEMENT les points décimaux évidents
    * @param {string} text - Texte OCR brut
    * @returns {string} - Texte corrigé
    */
   static fixDecimalPoints(text) {
-    console.log('🔧 Correction des points décimaux...');
+    console.log('🔧 Correction PRUDENTE des points décimaux...');
     console.log('📝 Texte avant correction:', text);
     
     let correctedText = text;
     
-    // Pattern 1: Corriger les espaces entre chiffres (probable point manqué)
-    // Ex: "123 456" → "123.456"
-    correctedText = correctedText.replace(/(\d{3,})\s+(\d{3})/g, '$1.$2');
+    // SEULEMENT des corrections TRÈS SÛRES et CONSERVATRICES
     
-    // Pattern 2: Corriger les chiffres collés sans séparateur évident
-    // Ex: "123456789" avec longueur 6+ → insérer point au milieu
-    correctedText = correctedText.replace(/(\d{6,})(?!\.\d)/g, (match) => {
-      if (match.length >= 6) {
-        const mid = Math.floor(match.length / 2);
-        return match.slice(0, mid) + '.' + match.slice(mid);
-      }
-      return match;
-    });
-    
-    // Pattern 3: Corriger les caractères confondus avec des points
-    // Ex: "123,456" → "123.456" (virgule au lieu de point)
+    // Pattern 1: Corriger UNIQUEMENT les virgules entre chiffres (très sûr)
+    // Ex: "123,456" → "123.456"
     correctedText = correctedText.replace(/(\d),(\d)/g, '$1.$2');
     
-    // Pattern 4: Corriger les caractères spéciaux reconnus comme points
-    // Ex: "123°456" → "123.456", "123·456" → "123.456"
+    // Pattern 2: Corriger les caractères spéciaux ÉVIDENTS comme séparateurs
+    // Ex: "123°456" → "123.456", "123·456" → "123.456" 
+    // MAIS SEULEMENT entre chiffres
     correctedText = correctedText.replace(/(\d)[°·•‧⋅](\d)/g, '$1.$2');
     
-    // Pattern 5: Corriger les lettres confondues (O pour 0, I pour 1, etc.)
-    correctedText = correctedText.replace(/[Oo]/g, '0');
-    correctedText = correctedText.replace(/[Il|]/g, '1');
-    correctedText = correctedText.replace(/[Ss$]/g, '5');
-    correctedText = correctedText.replace(/[Zz]/g, '2');
-    
-    // Pattern 6: Format Lambert typique (6-7 chiffres.3 décimales)
-    // Ex: "1234567123" → "1234567.123"
-    correctedText = correctedText.replace(/(\d{6,7})(\d{3})(?!\d)/g, '$1.$2');
-    
-    // Pattern 7: Nettoyer les caractères parasites autour des nombres
-    correctedText = correctedText.replace(/[^\d\.\s\-\+XY]/g, '');
-    
-    // Pattern 8: Corriger les doubles points
+    // Pattern 3: Corriger les doubles points (sûr)
     correctedText = correctedText.replace(/\.{2,}/g, '.');
     
+    // Pattern 4: UNIQUEMENT corriger O en 0 dans des contextes numériques évidents
+    // Ex: "12O.456" → "120.456" mais PAS "Lambert" → "Lamoert"
+    correctedText = correctedText.replace(/(\d)[Oo](\d)/g, '$1' + '0' + '$2');
+    correctedText = correctedText.replace(/(\d)[Oo]\.(\d)/g, '$1' + '0' + '.$2');
+    
+    // C'EST TOUT ! Plus de corrections agressives
+    
     if (correctedText !== text) {
-      console.log('✅ Texte après correction:', correctedText);
-      console.log('🎯 Corrections appliquées!');
+      console.log('✅ Texte après correction PRUDENTE:', correctedText);
+      console.log('🎯 Corrections conservatrices appliquées');
     } else {
       console.log('ℹ️ Aucune correction nécessaire');
     }
