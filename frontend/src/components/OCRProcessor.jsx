@@ -377,9 +377,9 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
     const page = await pdf.getPage(pageNumber);
     
     // Scale équilibrée pour OCR (vitesse vs qualité)
-    const ocrScale = 2.0; // ✅ Équilibre entre précision et performance
+    const ocrScale = 3.0; // ✅ Compromis performance/qualité
     const viewport = page.getViewport({ scale: ocrScale });
-    console.log('OCR Viewport dimensions (scale 2x):', viewport.width, 'x', viewport.height);
+    console.log('OCR Viewport dimensions (scale 3x):', viewport.width, 'x', viewport.height);
     
     // Obtenir les dimensions du canvas affiché dans PDFViewer pour comparaison
     const pdfCanvas = document.querySelector('.pdf-canvas');
@@ -417,8 +417,8 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
     }
 
     // Taille optimale pour OCR (équilibre performance/qualité)
-    const minWidth = Math.max(width, 300); // ✅ Taille raisonnable
-    const minHeight = Math.max(height, 150);
+    const minWidth = Math.max(width, 450); // ✅ Compromis taille/qualité
+    const minHeight = Math.max(height, 225);
     
     const zoneCanvas = document.createElement('canvas');
     const zoneContext = zoneCanvas.getContext('2d');
@@ -442,8 +442,8 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
 
     console.log('Canvas zone créé:', minWidth, 'x', minHeight);
 
-    // ✅ AMÉLIORATION: Format PNG haute qualité pour OCR
-    const dataURL = zoneCanvas.toDataURL('image/png', 1.0); // PNG sans compression
+    // Format JPEG haute qualité pour OCR (compromis taille/qualité)
+    const dataURL = zoneCanvas.toDataURL('image/jpeg', 0.95); // JPEG 95% qualité
     console.log('Image OCR haute qualité générée, taille:', dataURL.length, 'dimensions:', minWidth, 'x', minHeight);
     
     // Stocker l'image pour l'affichage dans la modal de validation

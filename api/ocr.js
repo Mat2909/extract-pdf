@@ -33,8 +33,8 @@ module.exports = async function handler(req, res) {
           'detectOrientation': 'false', // ✅ Désactiver pour plus de vitesse
           'scale': 'true', // ✅ Mise à l'échelle automatique
           'isTable': 'false',
-          'OCREngine': '1', // ✅ Moteur OCR v1 (plus rapide)
-          'filetype': 'PNG',
+          'OCREngine': '2', // ✅ Moteur OCR v2 (meilleure qualité)
+          'filetype': 'JPG',
           'isSearchablePdfHideTextLayer': 'false'
         })
       });
