@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import profileManager from './utils/profileManager';
 import workflowEngine from './utils/WorkflowEngine';
+import authManager from './utils/authManager';
+import LoginPage from './components/LoginPage';
+import ProfileSelectionPage from './components/ProfileSelectionPage';
+import AdminPage from './components/AdminPage';
 
 /**
  * Application V2 - Architecture modulaire et configurable
@@ -8,7 +12,7 @@ import workflowEngine from './utils/WorkflowEngine';
  */
 function AppV2() {
   const [currentUser, setCurrentUser] = useState(null);
-  const [availableProfiles, setAvailableProfiles] = useState([]);
+  const [currentView, setCurrentView] = useState('login'); // 'login', 'profiles', 'admin', 'workflow'
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [workflowState, setWorkflowState] = useState(null);
   const [currentModule, setCurrentModule] = useState(null);
@@ -21,44 +25,58 @@ function AppV2() {
 
   const initializeApp = () => {
     try {
-      // Initialiser le gestionnaire de profils (pour l'instant en mode user)
-      const user = profileManager.initialize('user');
-      setCurrentUser(user);
-
-      // Charger les profils disponibles
-      const profiles = profileManager.getProfiles();
-      setAvailableProfiles(profiles);
-
-      // Sélectionner le profil par défaut
-      const defaultProfile = profileManager.getDefaultProfile();
-      if (defaultProfile) {
-        selectProfile(defaultProfile.id);
+      // Vérifier si l'utilisateur est déjà connecté
+      if (authManager.isLoggedIn()) {
+        const user = authManager.getCurrentUser();
+        setCurrentUser(user);
+        setCurrentView('profiles');
+      } else {
+        setCurrentView('login');
       }
 
       setIsInitialized(true);
     } catch (error) {
       console.error('Erreur lors de l\'initialisation:', error);
+      setCurrentView('login');
+      setIsInitialized(true);
     }
   };
 
-  const selectProfile = (profileId) => {
+  // Gestionnaires d'événements
+  const handleLogin = (user) => {
+    setCurrentUser(user);
+    setCurrentView('profiles');
+  };
+
+  const handleProfileSelected = (profile) => {
     try {
+      // Initialiser le gestionnaire de profils avec le rôle de l'utilisateur
+      profileManager.initialize(currentUser.role);
+      
       // Définir le profil actuel
-      profileManager.setCurrentProfile(profileId);
-      const profile = profileManager.getCurrentProfile();
+      profileManager.setCurrentProfile(profile.id);
       setSelectedProfile(profile);
 
       // Initialiser le workflow avec ce profil
-      const workflow = workflowEngine.initialize(profileId);
+      const workflow = workflowEngine.initialize(profile.id);
       setWorkflowState(workflow);
 
       // Charger le premier module
       const firstModule = workflowEngine.getCurrentModule();
       setCurrentModule(firstModule);
 
+      setCurrentView('workflow');
     } catch (error) {
       console.error('Erreur lors de la sélection du profil:', error);
     }
+  };
+
+  const handleShowAdmin = () => {
+    setCurrentView('admin');
+  };
+
+  const handleBackToProfiles = () => {
+    setCurrentView('profiles');
   };
 
   const handleModuleNext = (data) => {
@@ -126,119 +144,121 @@ function AppV2() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header de l'application */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">
-                PDF OCR Extractor V2
-              </h1>
-              {selectedProfile && (
-                <span className="ml-4 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                  {selectedProfile.name}
-                </span>
-              )}
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              {/* Sélecteur de profil */}
-              <div className="relative">
-                <select
-                  value={selectedProfile?.id || ''}
-                  onChange={(e) => selectProfile(e.target.value)}
-                  className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                >
-                  {availableProfiles.map(profile => (
-                    <option key={profile.id} value={profile.id}>
-                      {profile.name} - {profile.description}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Informations utilisateur */}
-              <div className="text-sm text-gray-500">
-                Connecté en tant que: <span className="font-medium">{currentUser?.role}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Barre de progression */}
-      {workflowState && (
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-medium text-gray-900">
-                Étape {workflowState.progress?.current || 1} sur {workflowState.progress?.total || 1}
-              </h2>
-              <span className="text-sm text-gray-500">
-                {workflowState.progress?.percentage || 0}% terminé
-              </span>
-            </div>
-            
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${workflowState.progress?.percentage || 0}%` }}
-              ></div>
-            </div>
-            
-            {/* Navigation des étapes */}
-            <div className="flex justify-between mt-4">
-              <button
-                onClick={resetWorkflow}
-                className="text-sm text-gray-500 hover:text-gray-700"
-              >
-                Recommencer
-              </button>
-              
-              <div className="text-sm text-gray-500">
-                {workflowState.progress?.completed || 0} module(s) terminé(s)
+  // Rendu selon la vue actuelle
+  switch (currentView) {
+    case 'login':
+      return <LoginPage onLogin={handleLogin} />;
+      
+    case 'profiles':
+      return (
+        <ProfileSelectionPage 
+          user={currentUser}
+          onProfileSelected={handleProfileSelected}
+          onShowAdmin={handleShowAdmin}
+        />
+      );
+      
+    case 'admin':
+      return <AdminPage onBack={handleBackToProfiles} />;
+      
+    case 'workflow':
+      return (
+        <div className="min-h-screen bg-gray-50">
+          {/* Header de l'application */}
+          <header className="bg-white shadow-sm border-b border-gray-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex justify-between items-center py-4">
+                <div className="flex items-center">
+                  <button
+                    onClick={handleBackToProfiles}
+                    className="mr-4 p-2 text-gray-400 hover:text-gray-600"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    PDF OCR Extractor V2
+                  </h1>
+                  {selectedProfile && (
+                    <span className="ml-4 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                      {selectedProfile.name}
+                    </span>
+                  )}
+                </div>
+                
+                <div className="text-sm text-gray-700">
+                  <span className="font-medium">{authManager.getDisplayName()}</span>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </header>
 
-      {/* Contenu principal */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {selectedProfile && currentModule ? (
-          <ModuleRenderer
-            module={currentModule}
-            onNext={handleModuleNext}
-            onPrevious={handleModulePrevious}
-            onSkip={handleModuleSkip}
-            isFirst={workflowEngine.isFirstStep()}
-            isLast={workflowEngine.isLastStep()}
-            workflowData={workflowEngine.getAllData()}
-          />
-        ) : (
-          <div className="text-center py-12">
-            <h2 className="text-xl font-medium text-gray-900 mb-4">
-              Aucun profil sélectionné
-            </h2>
-            <p className="text-gray-500">
-              Veuillez sélectionner un profil pour commencer le traitement.
-            </p>
-          </div>
-        )}
-      </main>
+          {/* Barre de progression */}
+          {workflowState && (
+            <div className="bg-white border-b border-gray-200">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-lg font-medium text-gray-900">
+                    Étape {workflowState.progress?.current || 1} sur {workflowState.progress?.total || 1}
+                  </h2>
+                  <span className="text-sm text-gray-500">
+                    {workflowState.progress?.percentage || 0}% terminé
+                  </span>
+                </div>
+                
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${workflowState.progress?.percentage || 0}%` }}
+                  ></div>
+                </div>
+                
+                <div className="flex justify-between mt-4">
+                  <button
+                    onClick={resetWorkflow}
+                    className="text-sm text-gray-500 hover:text-gray-700"
+                  >
+                    Recommencer
+                  </button>
+                  
+                  <div className="text-sm text-gray-500">
+                    {workflowState.progress?.completed || 0} module(s) terminé(s)
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="text-center text-sm text-gray-500">
-            PDF OCR Extractor V2 - Architecture modulaire
-          </div>
+          {/* Contenu principal */}
+          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {currentModule ? (
+              <ModuleRenderer
+                module={currentModule}
+                onNext={handleModuleNext}
+                onPrevious={handleModulePrevious}
+                onSkip={handleModuleSkip}
+                isFirst={workflowEngine.isFirstStep()}
+                isLast={workflowEngine.isLastStep()}
+                workflowData={workflowEngine.getAllData()}
+              />
+            ) : (
+              <div className="text-center py-12">
+                <h2 className="text-xl font-medium text-gray-900 mb-4">
+                  Aucun module chargé
+                </h2>
+                <p className="text-gray-500">
+                  Erreur de configuration du workflow.
+                </p>
+              </div>
+            )}
+          </main>
         </div>
-      </footer>
-    </div>
-  );
+      );
+      
+    default:
+      return <LoginPage onLogin={handleLogin} />;
+  }
 }
 
 /**

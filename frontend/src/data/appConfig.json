@@ -91,7 +91,7 @@
       "id": "grdf",
       "name": "GrDF",
       "description": "Gestionnaire du Réseau de Distribution de gaz France",
-      "logo": "🔥",
+      "logo": "G",
       "color": "#0066cc",
       "active": true,
       "modules": [
@@ -114,7 +114,7 @@
       "id": "sfr",
       "name": "SFR",
       "description": "Société Française du Radiotéléphone",
-      "logo": "📡",
+      "logo": "S",
       "color": "#cc0000", 
       "active": true,
       "modules": [
@@ -134,7 +134,7 @@
       "id": "demo",
       "name": "Démo V2",
       "description": "Profil de démonstration avec workflow minimal",
-      "logo": "🚀",
+      "logo": "D",
       "color": "#10b981",
       "active": true,
       "modules": [
@@ -153,8 +153,12 @@
   "users": {
     "admin": {
       "id": "admin",
-      "username": "admin",
+      "username": "Admin",
+      "password": "Admin",
       "role": "administrator",
+      "firstName": "Administrateur",
+      "lastName": "Système",
+      "email": "admin@pdfocr.com",
       "permissions": [
         "create_profiles",
         "edit_profiles", 
@@ -163,10 +167,14 @@
         "view_all_data"
       ]
     },
-    "user": {
-      "id": "user", 
-      "username": "user",
+    "mathieu": {
+      "id": "mathieu",
+      "username": "Mathieu",
+      "password": "Mathieu", 
       "role": "user",
+      "firstName": "Mathieu",
+      "lastName": "Utilisateur",
+      "email": "mathieu@pdfocr.com",
       "permissions": [
         "use_profiles",
         "export_data",

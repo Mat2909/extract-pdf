@@ -15,7 +15,8 @@ class ProfileManager {
    * Initialise le gestionnaire avec un utilisateur
    */
   initialize(userRole = 'user') {
-    this.currentUser = this.config.users[userRole] || this.config.users.user;
+    // Utiliser la configuration des utilisateurs depuis authManager si possible
+    this.currentUser = this.config.users[userRole === 'administrator' ? 'admin' : 'mathieu'] || this.config.users.mathieu;
     this.currentProfile = this.getDefaultProfile();
     return this.currentUser;
   }
