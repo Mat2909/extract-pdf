@@ -26,37 +26,49 @@ export class TesseractOCR {
         }
       });
       
-      // Configuration HAUTE PRÉCISION pour coordonnées et texte technique
+      // Configuration SPÉCIALISÉE pour la détection des POINTS DÉCIMAUX
       await this.worker.setParameters({
-        // Améliorer la reconnaissance des caractères
-        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,+-=()[]XY \n\t',
+        // Caractères essentiels avec POINT en priorité
+        tessedit_char_whitelist: '0123456789.,+-XY \n\t',
         tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
         
-        // Améliorations de précision
+        // OPTIMISATIONS CRITIQUES pour les points décimaux
         preserve_interword_spaces: '1',
         tessedit_do_invert: '0',
         tessedit_write_images: '0',
         
-        // Optimisations OCR Engine
+        // Désactiver tous les dictionnaires (focus chiffres + ponctuation)
         load_system_dawg: '0',
         load_freq_dawg: '0',
         load_unambig_dawg: '0',
-        load_punc_dawg: '0',
-        load_number_dawg: '1', // Garder les chiffres
+        load_punc_dawg: '1',     // GARDER la ponctuation (points!)
+        load_number_dawg: '1',   // GARDER les chiffres
         load_bigram_dawg: '0',
         
-        // Améliorer la détection des chiffres et coordonnées
+        // Améliorer spécifiquement la détection des petits caractères (points)
         classify_enable_learning: '0',
         classify_enable_adaptive_matcher: '1',
         classify_use_pre_adapted_templates: '1',
         
-        // Qualité d'image
-        textord_really_old_xheight: '1',
-        textord_min_xheight: '10',
+        // Paramètres CRITIQUES pour les points
+        textord_really_old_xheight: '0',      // Désactiver pour petits caractères
+        textord_min_xheight: '5',             // Hauteur minimum très basse
+        textord_noise_rejwords: '0',          // Ne pas rejeter les "mots" courts
+        textord_noise_rejrows: '0',           // Ne pas rejeter les lignes courtes
         
-        // Seuils de confiance
-        tessedit_good_quality_unrej: '1.1',
-        tessedit_quality_rej: '0.0'
+        // Seuils AJUSTÉS pour accepter les points (confidence plus basse)
+        tessedit_good_quality_unrej: '0.8',   // Plus permissif
+        tessedit_quality_rej: '0.0',          // Accepter même faible qualité
+        
+        // Paramètres spéciaux pour ponctuation
+        classify_norm_adj_midpoint: '96',     // Ajuster pour petits caractères
+        classify_norm_adj_curl: '2',          // Réduire pour points
+        textord_noise_sizefraction: '0.5',    // Accepter petites formes
+        textord_noise_translimit: '16',       // Limite de translation
+        
+        // Améliorer détection des espaces (important pour séparateurs)
+        tosp_old_to_method: '0',
+        tosp_old_to_bug_fix: '1'
       });
       
       this.isInitialized = true;
@@ -69,7 +81,7 @@ export class TesseractOCR {
   }
 
   /**
-   * Pré-traitement d'image pour améliorer la précision OCR
+   * Pré-traitement SPÉCIALISÉ pour la détection des points décimaux
    * @param {HTMLImageElement|HTMLCanvasElement} image 
    * @returns {HTMLCanvasElement}
    */
@@ -87,20 +99,21 @@ export class TesseractOCR {
       height = image.height;
     }
     
-    // Augmenter la résolution pour améliorer la précision
-    const scale = 1.5; // Augmentation de 50%
+    // AUGMENTATION MASSIVE pour les points décimaux (2x au lieu de 1.5x)
+    const scale = 2.0; // Augmentation de 100% pour mieux voir les points
     canvas.width = width * scale;
     canvas.height = height * scale;
     
-    // Améliorer la qualité de rendu
-    ctx.imageSmoothingEnabled = false; // Pas de lissage pour les textes nets
+    // Rendu haute qualité pour préserver les détails
+    ctx.imageSmoothingEnabled = false;
+    ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
     
-    // Appliquer des filtres pour améliorer la lisibilité
+    // Traitement SPÉCIALISÉ pour les points décimaux
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
     
-    // Améliorer le contraste et la netteté
+    // Algorithme optimisé pour la détection des points
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i];
       const g = data[i + 1];
@@ -109,31 +122,120 @@ export class TesseractOCR {
       // Calculer la luminosité
       const brightness = (r + g + b) / 3;
       
-      // Augmenter le contraste (seuil adaptatif)
-      const threshold = 128;
-      const factor = 1.2; // Facteur de contraste
+      // CONTRASTE EXTRÊME pour faire ressortir les points
+      const threshold = 140; // Seuil plus élevé
       
       if (brightness > threshold) {
-        // Éclaircir les zones claires
-        data[i] = Math.min(255, r * factor);
-        data[i + 1] = Math.min(255, g * factor);
-        data[i + 2] = Math.min(255, b * factor);
+        // BLANC PUR pour le fond
+        data[i] = 255;
+        data[i + 1] = 255;
+        data[i + 2] = 255;
       } else {
-        // Assombrir les zones sombres
-        data[i] = Math.max(0, r / factor);
-        data[i + 1] = Math.max(0, g / factor);
-        data[i + 2] = Math.max(0, b / factor);
+        // NOIR PUR pour le texte et les points
+        data[i] = 0;
+        data[i + 1] = 0;
+        data[i + 2] = 0;
       }
     }
     
-    ctx.putImageData(imageData, 0, 0);
+    // Deuxième passe: améliorer la visibilité des petits éléments (points)
+    const processedData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const processed = processedData.data;
     
-    console.log(`🖼️ Image pré-traitée: ${width}x${height} → ${canvas.width}x${canvas.height}`);
+    // Dilatation légère pour épaissir les points trop fins
+    for (let y = 1; y < canvas.height - 1; y++) {
+      for (let x = 1; x < canvas.width - 1; x++) {
+        const idx = (y * canvas.width + x) * 4;
+        
+        // Si le pixel actuel est noir (texte/point)
+        if (processed[idx] < 128) {
+          // Vérifier les pixels adjacents pour détecter des points isolés
+          const neighbors = [
+            processed[((y-1) * canvas.width + x) * 4],     // haut
+            processed[((y+1) * canvas.width + x) * 4],     // bas
+            processed[(y * canvas.width + (x-1)) * 4],     // gauche
+            processed[(y * canvas.width + (x+1)) * 4]      // droite
+          ];
+          
+          // Si c'est un point isolé entouré de blanc, le renforcer
+          const blackNeighbors = neighbors.filter(n => n < 128).length;
+          if (blackNeighbors <= 2) {
+            // Renforcer ce pixel (probablement un point décimal)
+            processed[idx] = 0;     // R
+            processed[idx + 1] = 0; // G
+            processed[idx + 2] = 0; // B
+          }
+        }
+      }
+    }
+    
+    ctx.putImageData(processedData, 0, 0);
+    
+    console.log(`🔍 Image optimisée pour points décimaux: ${width}x${height} → ${canvas.width}x${canvas.height}`);
     return canvas;
   }
 
   /**
-   * Reconnaissance OCR sur une image avec pré-traitement
+   * Post-traitement intelligent pour corriger les points décimaux manqués
+   * @param {string} text - Texte OCR brut
+   * @returns {string} - Texte corrigé
+   */
+  static fixDecimalPoints(text) {
+    console.log('🔧 Correction des points décimaux...');
+    console.log('📝 Texte avant correction:', text);
+    
+    let correctedText = text;
+    
+    // Pattern 1: Corriger les espaces entre chiffres (probable point manqué)
+    // Ex: "123 456" → "123.456"
+    correctedText = correctedText.replace(/(\d{3,})\s+(\d{3})/g, '$1.$2');
+    
+    // Pattern 2: Corriger les chiffres collés sans séparateur évident
+    // Ex: "123456789" avec longueur 6+ → insérer point au milieu
+    correctedText = correctedText.replace(/(\d{6,})(?!\.\d)/g, (match) => {
+      if (match.length >= 6) {
+        const mid = Math.floor(match.length / 2);
+        return match.slice(0, mid) + '.' + match.slice(mid);
+      }
+      return match;
+    });
+    
+    // Pattern 3: Corriger les caractères confondus avec des points
+    // Ex: "123,456" → "123.456" (virgule au lieu de point)
+    correctedText = correctedText.replace(/(\d),(\d)/g, '$1.$2');
+    
+    // Pattern 4: Corriger les caractères spéciaux reconnus comme points
+    // Ex: "123°456" → "123.456", "123·456" → "123.456"
+    correctedText = correctedText.replace(/(\d)[°·•‧⋅](\d)/g, '$1.$2');
+    
+    // Pattern 5: Corriger les lettres confondues (O pour 0, I pour 1, etc.)
+    correctedText = correctedText.replace(/[Oo]/g, '0');
+    correctedText = correctedText.replace(/[Il|]/g, '1');
+    correctedText = correctedText.replace(/[Ss$]/g, '5');
+    correctedText = correctedText.replace(/[Zz]/g, '2');
+    
+    // Pattern 6: Format Lambert typique (6-7 chiffres.3 décimales)
+    // Ex: "1234567123" → "1234567.123"
+    correctedText = correctedText.replace(/(\d{6,7})(\d{3})(?!\d)/g, '$1.$2');
+    
+    // Pattern 7: Nettoyer les caractères parasites autour des nombres
+    correctedText = correctedText.replace(/[^\d\.\s\-\+XY]/g, '');
+    
+    // Pattern 8: Corriger les doubles points
+    correctedText = correctedText.replace(/\.{2,}/g, '.');
+    
+    if (correctedText !== text) {
+      console.log('✅ Texte après correction:', correctedText);
+      console.log('🎯 Corrections appliquées!');
+    } else {
+      console.log('ℹ️ Aucune correction nécessaire');
+    }
+    
+    return correctedText;
+  }
+
+  /**
+   * Reconnaissance OCR sur une image avec pré-traitement ET post-traitement
    * @param {string|HTMLCanvasElement|HTMLImageElement} image - Image à traiter
    * @returns {Promise<{text: string, confidence: number}>}
    */
@@ -142,7 +244,7 @@ export class TesseractOCR {
       await this.initialize();
     }
 
-    console.log('🔍 Démarrage OCR local avec pré-traitement...');
+    console.log('🔍 Démarrage OCR local avec optimisations points décimaux...');
     const startTime = Date.now();
 
     try {
@@ -155,21 +257,25 @@ export class TesseractOCR {
         processedImage = img;
       }
       
-      // Pré-traitement pour améliorer la précision
+      // Pré-traitement spécialisé pour les points
       const enhancedImage = this.preprocessImage(processedImage);
       
-      // OCR avec image améliorée
+      // OCR avec image optimisée
       const { data: { text, confidence } } = await this.worker.recognize(enhancedImage);
+      
+      // Post-traitement pour corriger les points manqués
+      const correctedText = this.fixDecimalPoints(text);
       
       const processingTime = Date.now() - startTime;
       console.log(`✅ OCR terminé en ${processingTime}ms`);
       console.log(`📊 Confiance: ${confidence}%`);
-      console.log(`📝 Texte reconnu: "${text.trim()}"`);
+      console.log(`📝 Texte final: "${correctedText.trim()}"`);
 
       return {
-        text: text.trim(),
+        text: correctedText.trim(),
         confidence: confidence / 100, // Normaliser 0-1
-        processingTime
+        processingTime,
+        originalText: text.trim() // Garder l'original pour debug
       };
 
     } catch (error) {
