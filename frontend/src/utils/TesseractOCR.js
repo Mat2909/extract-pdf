@@ -33,50 +33,38 @@ export class TesseractOCR {
         load_bigram_dawg: false
       });
       
-      // Configuration ULTRA-SPÉCIALISÉE pour POINTS DÉCIMAUX
+      // Configuration ÉQUILIBRÉE pour reconnaissance fiable
       await this.worker.setParameters({
-        // WHITELIST ULTRA-RESTRICTIVE: seulement chiffres + points
-        tessedit_char_whitelist: '0123456789.,',
+        // Caractères autorisés complets
+        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,+-:()éèàùç ',
+        tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
         
-        // MODE SINGLE_CHAR pour traiter chaque caractère individuellement
-        tessedit_pageseg_mode: Tesseract.PSM.SINGLE_CHAR,
+        // Optimisations pour images vectorielles
+        preserve_interword_spaces: '1',
+        tessedit_do_invert: '0',
+        tessedit_write_images: '0',
         
-        // DÉSACTIVER TOUS LES FILTRES DE BRUIT
-        textord_noise_rejwords: '0',           // Pas de rejet mots "bruyants"
-        textord_noise_rejrows: '0',            // Pas de rejet lignes "bruyantes"
-        textord_noise_area_ratio: '0',         // Accepter toutes les zones
-        textord_noise_cert_factor: '0',        // Pas de certification bruit
-        textord_noise_rowratio: '0',           // Accepter toutes les lignes
+        // Paramètres équilibrés
+        classify_enable_learning: '0',
+        classify_enable_adaptive_matcher: '1',
+        classify_use_pre_adapted_templates: '1',
         
-        // SEUILS DE QUALITÉ À ZÉRO (accepter même points "douteux")
-        tessedit_good_quality_unrej: '0.0',    // Accepter toute qualité
-        tessedit_quality_rej: '0.0',           // Pas de rejet qualité
-        tessedit_ok_mode: '0',                 // Mode permissif
+        // Paramètres modérés
+        textord_min_xheight: '6',
+        textord_noise_rejwords: '0',
+        textord_noise_rejrows: '0',
         
-        // DÉSACTIVER CORRECTIONS ORTHOGRAPHIQUES
-        load_system_dawg: '0',                 // Pas de dictionnaire système
-        load_freq_dawg: '0',                   // Pas de fréquences
-        load_unambig_dawg: '0',                // Pas de désambiguïsation
-        load_punc_dawg: '1',                   // GARDER ponctuation (points!)
-        load_number_dawg: '1',                 // GARDER chiffres
-        load_bigram_dawg: '0',                 // Pas de bigrammes
+        // Qualité équilibrée
+        tessedit_good_quality_unrej: '1.0',
+        tessedit_quality_rej: '0.0',
         
-        // PARAMÈTRES ULTRA-PERMISSIFS
-        tessedit_zero_rejection: '1',          // Accepter TOUT
-        tessedit_minimal_rejection: '1',       // Rejet minimal
-        suspect_level: '99',                   // Niveau suspect maximal
-        suspect_short_words: '0',              // Pas de suspicion mots courts
+        // Contraste standard
+        classify_norm_adj_midpoint: '96',
+        classify_norm_adj_curl: '2',
         
-        // OPTIMISATIONS pour petits caractères
-        textord_min_xheight: '1',              // Accepter très petits caractères
-        textord_min_linesize: '0.25',          // Lignes très fines OK
-        classify_norm_adj_midpoint: '32',      // Plus sensible
-        classify_norm_adj_curl: '1',           // Très sensible
-        
-        // ESPACEMENT ultra-permissif
-        preserve_interword_spaces: '0',        // Pas d'espacement forcé
-        tosp_old_to_method: '1',              // Méthode permissive
-        tosp_old_to_bug_fix: '0'              // Pas de "correction"
+        // Espacement standard
+        tosp_old_to_method: '0',
+        tosp_old_to_bug_fix: '1'
       });
       
       this.isInitialized = true;
@@ -119,8 +107,8 @@ export class TesseractOCR {
       return canvas;
     }
     
-    // Augmentation ULTRA-MASSIVE spécialement pour les points décimaux
-    const scale = 8.0; // GIGANTESQUE pour voir les points microscopiques
+    // Échelle optimisée pour qualité/vitesse
+    const scale = 3.0; // Équilibre optimal pour plans vectorisés
     canvas.width = Math.floor(width * scale);
     canvas.height = Math.floor(height * scale);
     
@@ -216,43 +204,143 @@ export class TesseractOCR {
   }
 
   /**
-   * Post-traitement PRUDENT pour corriger UNIQUEMENT les points décimaux évidents
+   * Post-traitement INTELLIGENT avec analyse de patterns
    * @param {string} text - Texte OCR brut
-   * @returns {string} - Texte corrigé
+   * @param {Object} config - Configuration {decimals: number, coordinateType: string}
+   * @returns {string} - Texte corrigé intelligemment
    */
-  static fixDecimalPoints(text) {
-    console.log('🔧 Correction PRUDENTE des points décimaux...');
+  static fixDecimalPoints(text, config = { decimals: 3, coordinateType: 'lambert' }) {
+    console.log('🧠 Correction INTELLIGENTE avec analyse de patterns...');
     console.log('📝 Texte avant correction:', text);
+    console.log('⚙️ Config:', config);
     
     let correctedText = text;
     
-    // SEULEMENT des corrections TRÈS SÛRES et CONSERVATRICES
+    // Étape 1: Corrections de base (sûres)
+    correctedText = correctedText.replace(/(\d),(\d)/g, '$1.$2'); // Virgules → points
+    correctedText = correctedText.replace(/(\d)[°·•‧⋅](\d)/g, '$1.$2'); // Caractères spéciaux
+    correctedText = correctedText.replace(/(\d)[Oo](\d)/g, '$1' + '0' + '$2'); // O → 0
+    correctedText = correctedText.replace(/\.{2,}/g, '.'); // Doubles points
     
-    // Pattern 1: Corriger UNIQUEMENT les virgules entre chiffres (très sûr)
-    // Ex: "123,456" → "123.456"
-    correctedText = correctedText.replace(/(\d),(\d)/g, '$1.$2');
+    // Étape 2: ANALYSE INTELLIGENTE des patterns numériques
+    const patterns = this.analyzeNumericPatterns(correctedText, config);
     
-    // Pattern 2: Corriger les caractères spéciaux ÉVIDENTS comme séparateurs
-    // Ex: "123°456" → "123.456", "123·456" → "123.456" 
-    // MAIS SEULEMENT entre chiffres
-    correctedText = correctedText.replace(/(\d)[°·•‧⋅](\d)/g, '$1.$2');
-    
-    // Pattern 3: Corriger les doubles points (sûr)
-    correctedText = correctedText.replace(/\.{2,}/g, '.');
-    
-    // Pattern 4: UNIQUEMENT corriger O en 0 dans des contextes numériques évidents
-    // Ex: "12O.456" → "120.456" mais PAS "Lambert" → "Lamoert"
-    correctedText = correctedText.replace(/(\d)[Oo](\d)/g, '$1' + '0' + '$2');
-    correctedText = correctedText.replace(/(\d)[Oo]\.(\d)/g, '$1' + '0' + '.$2');
-    
-    // C'EST TOUT ! Plus de corrections agressives
+    // Étape 3: Application des corrections intelligentes
+    correctedText = this.applyIntelligentCorrections(correctedText, patterns, config);
     
     if (correctedText !== text) {
-      console.log('✅ Texte après correction PRUDENTE:', correctedText);
-      console.log('🎯 Corrections conservatrices appliquées');
+      console.log('✅ Texte après correction INTELLIGENTE:', correctedText);
+      console.log('🎯 Corrections de patterns appliquées');
     } else {
-      console.log('ℹ️ Aucune correction nécessaire');
+      console.log('ℹ️ Aucune correction de pattern nécessaire');
     }
+    
+    return correctedText;
+  }
+  
+  /**
+   * Analyse les patterns numériques pour détecter les coordonnées malformées
+   * @param {string} text - Texte à analyser
+   * @param {Object} config - Configuration
+   * @returns {Array} - Patterns détectés
+   */
+  static analyzeNumericPatterns(text, config) {
+    const patterns = [];
+    
+    // Regex pour détecter différents patterns suspects
+    const suspectPatterns = [
+      // Pattern 1: "123456 789" (espace au lieu du point)
+      {
+        regex: /(\d{6,7})\s+(\d{3})/g,
+        type: 'space_separated',
+        description: 'Coordonnées séparées par espace au lieu de point'
+      },
+      // Pattern 2: "1234567890" (point complètement absent)
+      {
+        regex: /(\d{6,7})(\d{3})(?![\d\.])/g,
+        type: 'no_separator',
+        description: 'Coordonnées sans séparateur décimal'
+      },
+      // Pattern 3: "123456." (point en fin sans décimales)
+      {
+        regex: /(\d{6,7})\.(?!\d)/g,
+        type: 'trailing_dot',
+        description: 'Point sans décimales'
+      }
+    ];
+    
+    suspectPatterns.forEach(pattern => {
+      let match;
+      while ((match = pattern.regex.exec(text)) !== null) {
+        patterns.push({
+          type: pattern.type,
+          description: pattern.description,
+          original: match[0],
+          start: match.index,
+          end: match.index + match[0].length,
+          groups: match.slice(1),
+          config: config
+        });
+      }
+    });
+    
+    console.log(`🔍 ${patterns.length} patterns suspects détectés:`, patterns);
+    return patterns;
+  }
+  
+  /**
+   * Applique les corrections intelligentes basées sur les patterns détectés
+   * @param {string} text - Texte original
+   * @param {Array} patterns - Patterns détectés
+   * @param {Object} config - Configuration
+   * @returns {string} - Texte corrigé
+   */
+  static applyIntelligentCorrections(text, patterns, config) {
+    let correctedText = text;
+    
+    // Trier les patterns par position (de la fin vers le début pour éviter les décalages)
+    patterns.sort((a, b) => b.start - a.start);
+    
+    patterns.forEach(pattern => {
+      let replacement = '';
+      
+      switch (pattern.type) {
+        case 'space_separated':
+          // "123456 789" → "123456.789"
+          replacement = `${pattern.groups[0]}.${pattern.groups[1]}`;
+          console.log(`🔧 Correction espace: "${pattern.original}" → "${replacement}"`);
+          break;
+          
+        case 'no_separator':
+          // "1234567890" → "1234567.890" (selon config.decimals)
+          const integral = pattern.groups[0];
+          const decimal = pattern.groups[1];
+          if (decimal.length === config.decimals) {
+            replacement = `${integral}.${decimal}`;
+            console.log(`🔧 Correction point manqué: "${pattern.original}" → "${replacement}"`);
+          } else {
+            replacement = pattern.original; // Pas de correction si longueur incorrecte
+          }
+          break;
+          
+        case 'trailing_dot':
+          // "123456." → "123456.000" (selon config.decimals)
+          const zeros = '0'.repeat(config.decimals);
+          replacement = `${pattern.groups[0]}.${zeros}`;
+          console.log(`🔧 Correction point final: "${pattern.original}" → "${replacement}"`);
+          break;
+          
+        default:
+          replacement = pattern.original;
+      }
+      
+      // Appliquer la correction
+      if (replacement !== pattern.original) {
+        correctedText = correctedText.substring(0, pattern.start) + 
+                      replacement + 
+                      correctedText.substring(pattern.end);
+      }
+    });
     
     return correctedText;
   }
@@ -286,8 +374,9 @@ export class TesseractOCR {
       // OCR avec image optimisée
       const { data: { text, confidence } } = await this.worker.recognize(enhancedImage);
       
-      // Post-traitement pour corriger les points manqués
-      const correctedText = this.fixDecimalPoints(text);
+      // Post-traitement INTELLIGENT avec configuration
+      const ocrConfig = window.currentOCRConfig || { decimals: 3, coordinateType: 'lambert' };
+      const correctedText = this.fixDecimalPoints(text, ocrConfig);
       
       const processingTime = Date.now() - startTime;
       console.log(`✅ OCR terminé en ${processingTime}ms`);

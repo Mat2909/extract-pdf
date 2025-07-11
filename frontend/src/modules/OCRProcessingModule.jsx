@@ -1,6 +1,7 @@
 import React from 'react';
 import BaseModule from './BaseModule';
 import TesseractOCR from '../utils/TesseractOCR';
+import OCRConfigDialog from '../components/OCRConfigDialog';
 import * as pdfjsLib from 'pdfjs-dist';
 
 /**
@@ -21,7 +22,9 @@ class OCRProcessingModule extends BaseModule {
       currentImageData: null,
       correctedText: '',
       confidence: 0,
-      isCancelled: false
+      isCancelled: false,
+      showConfigDialog: false,
+      ocrConfig: { decimals: 3, coordinateType: 'lambert', autoFix: true }
     };
   }
 
@@ -230,7 +233,21 @@ class OCRProcessingModule extends BaseModule {
 
   // Gestionnaires d'événements
   handleStartProcessing = () => {
+    this.setState({ showConfigDialog: true });
+  };
+
+  handleConfigConfirm = (config) => {
+    this.setState({ 
+      showConfigDialog: false,
+      ocrConfig: config 
+    });
+    // Stocker la config globalement pour l'OCR
+    window.currentOCRConfig = config;
     this.process(this.props.workflowData);
+  };
+
+  handleConfigCancel = () => {
+    this.setState({ showConfigDialog: false });
   };
 
   handleCancelProcessing = () => {
@@ -253,7 +270,20 @@ class OCRProcessingModule extends BaseModule {
   };
 
   renderContent() {
-    const { isProcessing, currentPage, totalPages, results, showValidation } = this.state;
+    const { isProcessing, currentPage, totalPages, results, showValidation, showConfigDialog } = this.state;
+
+    if (showConfigDialog) {
+      return (
+        <>
+          {this.renderStartView()}
+          <OCRConfigDialog
+            isOpen={showConfigDialog}
+            onClose={this.handleConfigCancel}
+            onConfirm={this.handleConfigConfirm}
+          />
+        </>
+      );
+    }
 
     if (showValidation) {
       return this.renderValidationModal();
@@ -279,7 +309,7 @@ class OCRProcessingModule extends BaseModule {
       <div className="space-y-6">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
           <h3 className="text-lg font-medium text-blue-900 mb-4">
-            Traitement OCR prêt
+            🧠 OCR Intelligent avec Détection Automatique
           </h3>
           
           <div className="space-y-3 text-sm text-blue-700">
@@ -293,7 +323,11 @@ class OCRProcessingModule extends BaseModule {
             </div>
             <div className="flex justify-between">
               <span>Moteur OCR:</span>
-              <span className="font-medium">{this.config.engine}</span>
+              <span className="font-medium">{this.config.engine} + IA</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Correction points:</span>
+              <span className="font-medium text-green-600">Intelligente</span>
             </div>
             <div className="flex justify-between">
               <span>Validation:</span>
@@ -301,6 +335,12 @@ class OCRProcessingModule extends BaseModule {
                 {this.config.validationRequired ? 'Manuelle' : 'Automatique'}
               </span>
             </div>
+          </div>
+          
+          <div className="mt-4 pt-4 border-t border-blue-200">
+            <p className="text-xs text-blue-600">
+              ✨ <strong>Nouveau :</strong> Configuration intelligente pour détecter automatiquement les points décimaux manqués dans vos coordonnées !
+            </p>
           </div>
         </div>
 
