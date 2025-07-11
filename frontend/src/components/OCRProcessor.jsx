@@ -3,6 +3,7 @@ import './OCRProcessor.css';
 import CoordinateConverter from './CoordinateConverter';
 import CoordinatePreview from './CoordinatePreview';
 import { COORDINATE_SYSTEMS, normalizeCoordinates } from '../utils/coordinateConverter';
+import TesseractOCR from '../utils/TesseractOCR';
 import * as XLSX from 'xlsx';
 
 // Fonction utilitaire pour forcer le format avec point décimal
@@ -310,25 +311,25 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
         throw new Error('Échec de l\'extraction de l\'image');
       }
       
-      console.log('Envoi à l\'API OCR...');
-      const response = await fetch('/api/ocr', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          imageData: imageData
-        })
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Erreur API OCR:', errorText);
-        throw new Error(`Erreur API OCR: ${response.status} - ${errorText}`);
-      }
-
-      const result = await response.json();
-      console.log('Réponse OCR:', result);
+      console.log('🚀 Démarrage OCR local avec Tesseract.js...');
+      
+      // Convertir base64 en image pour Tesseract
+      const img = new Image();
+      img.src = imageData;
+      await new Promise(resolve => img.onload = resolve);
+      
+      // Traitement OCR local - GRATUIT et ILLIMITÉ !
+      const ocrResult = await TesseractOCR.recognize(img);
+      
+      // Format compatible avec l'ancien système
+      const result = {
+        success: true,
+        text: ocrResult.text,
+        confidence: Math.round(ocrResult.confidence * 100), // Convertir 0-1 vers 0-100
+        processingTime: ocrResult.processingTime
+      };
+      
+      console.log('✅ OCR local terminé:', result);
       
       if (result.success) {
         console.log(`Texte détecté: "${result.text}" (confiance: ${result.confidence}%)`);

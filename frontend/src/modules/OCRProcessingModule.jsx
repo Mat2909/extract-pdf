@@ -1,5 +1,6 @@
 import React from 'react';
 import BaseModule from './BaseModule';
+import TesseractOCR from '../utils/TesseractOCR';
 import * as pdfjsLib from 'pdfjs-dist';
 
 /**
@@ -25,9 +26,9 @@ class OCRProcessingModule extends BaseModule {
   }
 
   static defaultConfig = {
-    engine: 'ocr.space',
-    language: 'fre',
-    scale: 4.0,
+    engine: 'tesseract.js',
+    language: 'fra+eng',
+    scale: 3.0,
     batchMode: true,
     validationRequired: true
   };
@@ -128,23 +129,26 @@ class OCRProcessingModule extends BaseModule {
       // Extraire l'image de la page
       const imageData = await this.extractImageFromPDF(pageNumber, uploadData.url);
       
-      // Traitement OCR
-      const response = await fetch('/api/ocr', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          imageData: imageData
-        })
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Erreur API OCR: ${response.status} - ${errorText}`);
-      }
-
-      const result = await response.json();
+      // 🚀 Traitement OCR local avec Tesseract.js - GRATUIT et ILLIMITÉ !
+      console.log('🚀 Démarrage OCR local avec Tesseract.js...');
+      
+      // Convertir base64 en image pour Tesseract
+      const img = new Image();
+      img.src = imageData;
+      await new Promise(resolve => img.onload = resolve);
+      
+      // Traitement OCR local
+      const ocrResult = await TesseractOCR.recognize(img);
+      
+      // Format compatible avec l'ancien système
+      const result = {
+        success: true,
+        text: ocrResult.text,
+        confidence: Math.round(ocrResult.confidence * 100), // Convertir 0-1 vers 0-100
+        processingTime: ocrResult.processingTime
+      };
+      
+      console.log('✅ OCR local terminé:', result);
       
       if (result.success) {
         this.setState({
