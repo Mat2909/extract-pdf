@@ -66,24 +66,25 @@ class CoordinateFormatModule extends BaseModule {
   }
 
   validateInput(workflowData) {
+    console.log('🔍 CoordinateFormatModule validateInput:', workflowData);
     const errors = [];
 
     const uploadData = workflowData?.upload;
     if (!uploadData?.url) {
       errors.push('Aucun fichier PDF trouvé');
+      console.log('❌ Validation: Pas de PDF');
     }
 
     const pageSelectionData = workflowData?.['page-selection'];
     if (!pageSelectionData?.selectedPages || pageSelectionData.selectedPages.length === 0) {
       errors.push('Aucune page sélectionnée');
+      console.log('❌ Validation: Pas de pages sélectionnées');
     }
 
-    // Temporaire: Zone par défaut si pas de sélection de zone
-    // const areaSelectionData = workflowData?.['area-selection'];
-    // if (!areaSelectionData?.selectedArea) {
-    //   errors.push('Aucune zone OCR sélectionnée');
-    // }
+    // Zone par défaut - pas de validation stricte
+    console.log('✅ Validation: Zone par défaut acceptée');
 
+    console.log(`🎯 Validation result: ${errors.length === 0 ? 'VALID' : 'INVALID'}`, errors);
     return {
       valid: errors.length === 0,
       errors
@@ -91,13 +92,16 @@ class CoordinateFormatModule extends BaseModule {
   }
 
   async process(workflowData) {
+    console.log('🚀 CoordinateFormatModule process START');
     const validation = this.validateInput(workflowData);
     
     if (!validation.valid) {
+      console.log('❌ Validation échouée:', validation.errors);
       this.setError(validation.errors.join(', '));
       return;
     }
 
+    console.log('✅ Validation OK, démarrage traitement...');
     try {
       this.setLoading(true);
 
