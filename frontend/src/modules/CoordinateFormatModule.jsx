@@ -63,6 +63,13 @@ class CoordinateFormatModule extends BaseModule {
 
   initialize(config) {
     this.config = { ...CoordinateFormatModule.defaultConfig, ...config };
+    console.log('🎯 CoordinateFormatModule initialized with config:', config);
+    
+    // Auto-démarrage du traitement si données disponibles
+    if (this.props.workflowData) {
+      console.log('📊 WorkflowData disponible, démarrage automatique...');
+      setTimeout(() => this.process(this.props.workflowData), 100);
+    }
   }
 
   validateInput(workflowData) {

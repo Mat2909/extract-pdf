@@ -117,6 +117,17 @@ class BaseModule extends React.Component {
     }
   }
 
+  componentDidUpdate(prevProps) {
+    // Auto-traitement quand workflowData change et module pas encore complété
+    if (this.props.workflowData !== prevProps.workflowData && 
+        this.props.workflowData && 
+        !this.state.isCompleted &&
+        !this.state.isLoading) {
+      console.log(`🔄 ${this.constructor.name}: WorkflowData mis à jour, auto-traitement...`);
+      setTimeout(() => this.process(this.props.workflowData), 100);
+    }
+  }
+
   componentWillUnmount() {
     this.cleanup();
   }
