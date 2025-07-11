@@ -17,70 +17,54 @@ export class TesseractOCR {
     console.log('🤖 Initialisation Tesseract.js...');
     
     try {
-      // Créer un worker avec français + anglais
+      // Créer un worker avec français + anglais ET paramètres d'initialisation
       this.worker = await Tesseract.createWorker('fra+eng', 1, {
         logger: m => {
           if (m.status === 'recognizing text') {
             console.log(`📖 OCR en cours: ${Math.round(m.progress * 100)}%`);
           }
-        }
+        },
+        // PARAMÈTRES D'INITIALISATION (obligatoires ici)
+        load_system_dawg: false,
+        load_freq_dawg: false,
+        load_unambig_dawg: true,    // Pour éviter 9→3
+        load_punc_dawg: true,       // Pour les points
+        load_number_dawg: true,     // Pour les chiffres
+        load_bigram_dawg: false
       });
       
-      // Configuration HAUTE PRÉCISION pour images vectorielles parfaites
+      // Configuration ÉQUILIBRÉE (sans paramètres sensibles)
       await this.worker.setParameters({
         // Caractères complets pour reconnaissance parfaite
         tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,+-:éèàùç() \n\t',
         tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
         
-        // OPTIMISATIONS pour images vectorielles PARFAITES
+        // OPTIMISATIONS SÛRES pour images vectorielles
         preserve_interword_spaces: '1',
         tessedit_do_invert: '0',
         tessedit_write_images: '0',
         
-        // Garder les dictionnaires pour meilleure précision sur images nettes
-        load_system_dawg: '0',     // Pas de dictionnaire général
-        load_freq_dawg: '0',       // Pas de fréquences
-        load_unambig_dawg: '1',    // GARDER les caractères non-ambigus (9 vs 3)
-        load_punc_dawg: '1',       // GARDER la ponctuation (points)
-        load_number_dawg: '1',     // GARDER les chiffres
-        load_bigram_dawg: '0',     // Pas de bigrammes
-        
-        // STRICTE précision pour images nettes (pas de tolérance)
+        // Paramètres de base pour précision
         classify_enable_learning: '0',
         classify_enable_adaptive_matcher: '1',
         classify_use_pre_adapted_templates: '1',
         
-        // Paramètres STRICTS pour images parfaites
-        textord_really_old_xheight: '0',
-        textord_min_xheight: '8',              // Plus strict que 5
-        textord_noise_rejwords: '1',           // Rejeter les mots douteux
-        textord_noise_rejrows: '1',            // Rejeter les lignes douteuses
+        // Paramètres MODÉRÉS (éviter divide by zero)
+        textord_min_xheight: '6',              // Sécurisé (pas trop bas)
+        textord_noise_rejwords: '0',           // Désactivé pour éviter erreurs
+        textord_noise_rejrows: '0',            // Désactivé pour éviter erreurs
         
-        // Seuils STRICTS pour images parfaites (haute qualité exigée)
-        tessedit_good_quality_unrej: '1.2',    // Plus strict (vs 0.8)
-        tessedit_quality_rej: '0.2',           // Rejeter basse qualité
+        // Seuils MODÉRÉS (éviter erreurs de calcul)
+        tessedit_good_quality_unrej: '1.0',    // Valeur sûre
+        tessedit_quality_rej: '0.0',           // Pas de rejet
         
-        // Paramètres optimisés pour contraste parfait
-        classify_norm_adj_midpoint: '128',     // Valeur standard pour contraste parfait
-        classify_norm_adj_curl: '8',           // Valeur plus stricte
-        textord_noise_sizefraction: '0.25',    // Plus strict sur tailles
-        textord_noise_translimit: '8',         // Limite plus stricte
+        // Paramètres sûrs pour contraste
+        classify_norm_adj_midpoint: '96',      // Valeur standard sûre
+        classify_norm_adj_curl: '2',           // Valeur sûre
         
-        // Optimisations spéciales pour images vectorielles
-        edges_use_new_outline_complexity: '1',
-        edges_debug: '0',
-        textord_debug_tabfind: '0',
-        
-        // Améliorer distinction 9/3, 6/5, etc.
-        classify_debug_level: '0',
-        classify_learning_debug_level: '0',
-        matcher_debug_level: '0',
-        
-        // Espacement optimisé pour texte vectoriel
-        tosp_old_to_method: '1',
-        tosp_old_to_bug_fix: '1',
-        tosp_enough_space_samples_for_median: '3',
-        tosp_redo_kern_limit: '10'
+        // Espacement standard
+        tosp_old_to_method: '0',
+        tosp_old_to_bug_fix: '1'
       });
       
       this.isInitialized = true;
@@ -93,7 +77,7 @@ export class TesseractOCR {
   }
 
   /**
-   * Pré-traitement OPTIMISÉ pour images vectorielles haute qualité
+   * Pré-traitement SÉCURISÉ pour images vectorielles haute qualité
    * @param {HTMLImageElement|HTMLCanvasElement} image 
    * @returns {HTMLCanvasElement}
    */
@@ -101,7 +85,7 @@ export class TesseractOCR {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
-    // Déterminer les dimensions source
+    // Déterminer les dimensions source avec validation
     let width, height;
     if (image instanceof HTMLImageElement) {
       width = image.naturalWidth || image.width;
@@ -111,49 +95,71 @@ export class TesseractOCR {
       height = image.height;
     }
     
-    // Augmentation modérée pour images vectorielles (déjà nettes)
-    const scale = 1.8; // Plus modéré car images déjà parfaites
-    canvas.width = width * scale;
-    canvas.height = height * scale;
-    
-    // Rendu PARFAIT pour images vectorielles
-    ctx.imageSmoothingEnabled = false; // Pas de lissage sur du vectoriel
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-    
-    // Traitement MINIMAL pour images vectorielles (déjà parfaites)
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
-    
-    // Seuil PRÉCIS pour images vectorielles (contraste parfait)
-    const threshold = 128; // Seuil standard pour noir/blanc parfait
-    
-    // Traitement simple : juste nettoyer le seuil noir/blanc
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i];
-      const g = data[i + 1];
-      const b = data[i + 2];
-      
-      // Calculer la luminosité
-      const brightness = (r + g + b) / 3;
-      
-      if (brightness > threshold) {
-        // BLANC PUR
-        data[i] = 255;
-        data[i + 1] = 255;
-        data[i + 2] = 255;
-      } else {
-        // NOIR PUR 
-        data[i] = 0;
-        data[i + 1] = 0;
-        data[i + 2] = 0;
+    // VALIDATION pour éviter divide by zero
+    if (!width || !height || width < 10 || height < 10) {
+      console.warn('⚠️ Dimensions invalides, utilisation image originale');
+      // Retourner image originale sans traitement
+      canvas.width = Math.max(width || 100, 100);
+      canvas.height = Math.max(height || 100, 100);
+      if (width > 0 && height > 0) {
+        ctx.drawImage(image, 0, 0);
       }
+      return canvas;
     }
     
-    // PAS de post-traitement agressif car images vectorielles déjà parfaites
-    ctx.putImageData(imageData, 0, 0);
+    // Augmentation PRUDENTE pour éviter images trop grandes
+    const scale = 1.5; // Plus conservateur
+    canvas.width = Math.floor(width * scale);
+    canvas.height = Math.floor(height * scale);
     
-    console.log(`🎯 Image vectorielle optimisée: ${width}x${height} → ${canvas.width}x${canvas.height}`);
+    // Validation finale des dimensions
+    if (canvas.width === 0 || canvas.height === 0) {
+      canvas.width = Math.max(canvas.width, 100);
+      canvas.height = Math.max(canvas.height, 100);
+    }
+    
+    // Rendu sécurisé
+    ctx.imageSmoothingEnabled = false;
+    try {
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    } catch (error) {
+      console.warn('⚠️ Erreur rendu image, utilisation simplifiée:', error);
+      // Fallback: fond blanc avec cadre noir
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = 'black';
+      ctx.strokeRect(1, 1, canvas.width-2, canvas.height-2);
+      return canvas;
+    }
+    
+    // Traitement MINIMAL et SÉCURISÉ
+    try {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+      
+      // Traitement simple sans risque de division par zéro
+      for (let i = 0; i < data.length; i += 4) {
+        const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+        
+        if (brightness > 128) {
+          // BLANC
+          data[i] = 255;
+          data[i + 1] = 255;
+          data[i + 2] = 255;
+        } else {
+          // NOIR
+          data[i] = 0;
+          data[i + 1] = 0;
+          data[i + 2] = 0;
+        }
+      }
+      
+      ctx.putImageData(imageData, 0, 0);
+    } catch (error) {
+      console.warn('⚠️ Erreur traitement image, image conservée telle quelle:', error);
+    }
+    
+    console.log(`🎯 Image sécurisée: ${width}x${height} → ${canvas.width}x${canvas.height}`);
     return canvas;
   }
 
