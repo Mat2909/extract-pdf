@@ -218,8 +218,8 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
       return;
     }
 
-    // 🧠 NOUVEAU: Afficher le dialog de configuration intelligente
-    setShowConfigDialog(true);
+    // 🧠 BYPASS: popup cassé, démarrage direct
+    startActualBatchOCR();
   };
 
   const handleConfigConfirm = (config) => {
@@ -869,11 +869,12 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
         </div>
       )}
 
-      <OCRConfigDialog
+      {/* POPUP DÉSACTIVÉ - trop de problèmes CSS */}
+      {/* <OCRConfigDialog
         isOpen={showConfigDialog}
         onClose={handleConfigCancel}
         onConfirm={handleConfigConfirm}
-      />
+      /> */}
 
       {results.length > 0 && (
         <div className="results-preview">
