@@ -2,7 +2,9 @@ import profileManager from './profileManager';
 
 // Import des modules
 import UploadModule from '../modules/UploadModule';
-// Les autres modules seront importés au fur et à mesure
+import PageSelectionModule from '../modules/PageSelectionModule';
+import OCRProcessingModule from '../modules/OCRProcessingModule';
+import ExportModule from '../modules/ExportModule';
 
 /**
  * Moteur de workflow pour orchestrer les modules selon les profils
@@ -17,6 +19,9 @@ class WorkflowEngine {
     
     // Enregistrer les modules disponibles
     this.registerModule('UploadModule', UploadModule);
+    this.registerModule('PageSelectionModule', PageSelectionModule);
+    this.registerModule('OCRProcessingModule', OCRProcessingModule);
+    this.registerModule('ExportModule', ExportModule);
   }
 
   /**

@@ -45,7 +45,8 @@
       "config": {
         "engine": "ocr.space",
         "language": "fre",
-        "scale": 4.0
+        "scale": 4.0,
+        "validationRequired": true
       }
     },
     "COORDINATE_EXTRACTION": {
@@ -120,14 +121,32 @@
         "UPLOAD",
         "PAGE_SELECTION",
         "OCR_PROCESSING", 
-        "COORDINATE_EXTRACTION",
         "EXPORT"
       ],
       "config": {
         "coordinateSystem": "WGS84",
         "exportFormat": "csv",
-        "exportColumns": ["page", "latitude", "longitude"],
-        "autoProcessing": true
+        "exportColumns": ["page", "text_content", "confidence"],
+        "validationRequired": false
+      }
+    },
+    "demo": {
+      "id": "demo",
+      "name": "Démo V2",
+      "description": "Profil de démonstration avec workflow minimal",
+      "logo": "🚀",
+      "color": "#10b981",
+      "active": true,
+      "modules": [
+        "UPLOAD",
+        "PAGE_SELECTION",
+        "OCR_PROCESSING",
+        "EXPORT"
+      ],
+      "config": {
+        "exportFormat": "xlsx",
+        "validationRequired": true,
+        "includeMetadata": true
       }
     }
   },
@@ -156,7 +175,7 @@
     }
   },
   "settings": {
-    "defaultProfile": "grdf",
+    "defaultProfile": "demo",
     "allowProfileSelection": true,
     "maxConcurrentUploads": 5,
     "sessionTimeout": 3600,

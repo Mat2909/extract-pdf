@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:v2": "vite --config vite.config-v2.js",
     "build": "vite build",
+    "build:v2": "vite build --config vite.config-v2.js",
     "preview": "vite preview",
     "lint": "eslint ."
   },
@@ -14,6 +16,7 @@
     "axios": "^1.9.0",
     "pdfjs-dist": "^3.11.174",
     "proj4": "^2.17.0",
+    "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.3.8",
