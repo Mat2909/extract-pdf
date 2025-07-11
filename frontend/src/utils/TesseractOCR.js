@@ -107,8 +107,8 @@ export class TesseractOCR {
       return canvas;
     }
     
-    // Augmentation MASSIVE spécialement pour les points décimaux
-    const scale = 3.0; // ÉNORME pour voir les points microscopiques
+    // Augmentation ULTRA-MASSIVE spécialement pour les points décimaux
+    const scale = 8.0; // GIGANTESQUE pour voir les points microscopiques
     canvas.width = Math.floor(width * scale);
     canvas.height = Math.floor(height * scale);
     
