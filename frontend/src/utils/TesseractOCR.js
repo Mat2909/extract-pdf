@@ -77,7 +77,7 @@ export class TesseractOCR {
   }
 
   /**
-   * Pré-traitement SÉCURISÉ pour images vectorielles haute qualité
+   * Pré-traitement SPÉCIALISÉ points décimaux pour images vectorielles
    * @param {HTMLImageElement|HTMLCanvasElement} image 
    * @returns {HTMLCanvasElement}
    */
@@ -107,8 +107,8 @@ export class TesseractOCR {
       return canvas;
     }
     
-    // Augmentation PRUDENTE pour éviter images trop grandes
-    const scale = 1.5; // Plus conservateur
+    // Augmentation MASSIVE spécialement pour les points décimaux
+    const scale = 3.0; // ÉNORME pour voir les points microscopiques
     canvas.width = Math.floor(width * scale);
     canvas.height = Math.floor(height * scale);
     
@@ -132,31 +132,71 @@ export class TesseractOCR {
       return canvas;
     }
     
-    // Traitement MINIMAL et SÉCURISÉ
+    // Traitement SPÉCIALISÉ pour AMPLIFIER les points décimaux
     try {
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const data = imageData.data;
       
-      // Traitement simple sans risque de division par zéro
+      // PHASE 1: Seuillage noir/blanc strict
       for (let i = 0; i < data.length; i += 4) {
         const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
         
         if (brightness > 128) {
-          // BLANC
-          data[i] = 255;
-          data[i + 1] = 255;
-          data[i + 2] = 255;
+          data[i] = 255; data[i + 1] = 255; data[i + 2] = 255;
         } else {
-          // NOIR
-          data[i] = 0;
-          data[i + 1] = 0;
-          data[i + 2] = 0;
+          data[i] = 0; data[i + 1] = 0; data[i + 2] = 0;
         }
       }
       
-      ctx.putImageData(imageData, 0, 0);
+      // PHASE 2: DÉTECTION et AMPLIFICATION des points décimaux
+      const amplifiedData = new Uint8ClampedArray(data);
+      
+      for (let y = 2; y < canvas.height - 2; y++) {
+        for (let x = 2; x < canvas.width - 2; x++) {
+          const idx = (y * canvas.width + x) * 4;
+          
+          // Si pixel noir (texte potentiel)
+          if (data[idx] < 128) {
+            // Vérifier si c'est un POINT isolé (petit élément rond)
+            let blackNeighbors = 0;
+            let neighborPattern = [];
+            
+            // Analyser zone 5x5 autour du pixel
+            for (let dy = -2; dy <= 2; dy++) {
+              for (let dx = -2; dx <= 2; dx++) {
+                const nIdx = ((y + dy) * canvas.width + (x + dx)) * 4;
+                if (data[nIdx] < 128) {
+                  blackNeighbors++;
+                  neighborPattern.push({x: dx, y: dy});
+                }
+              }
+            }
+            
+            // Si c'est un petit élément isolé (probable point décimal)
+            if (blackNeighbors >= 2 && blackNeighbors <= 8) {
+              console.log(`🔍 Point potentiel détecté en (${x},${y}) avec ${blackNeighbors} voisins`);
+              
+              // AMPLIFIER cette zone (faire un point plus gros)
+              for (let dy = -1; dy <= 1; dy++) {
+                for (let dx = -1; dx <= 1; dx++) {
+                  const ampIdx = ((y + dy) * canvas.width + (x + dx)) * 4;
+                  if (ampIdx >= 0 && ampIdx < amplifiedData.length) {
+                    amplifiedData[ampIdx] = 0;     // R
+                    amplifiedData[ampIdx + 1] = 0; // G  
+                    amplifiedData[ampIdx + 2] = 0; // B
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // Appliquer les améliorations
+      ctx.putImageData(new ImageData(amplifiedData, canvas.width, canvas.height), 0, 0);
+      
     } catch (error) {
-      console.warn('⚠️ Erreur traitement image, image conservée telle quelle:', error);
+      console.warn('⚠️ Erreur traitement spécialisé, fallback simple:', error);
     }
     
     console.log(`🎯 Image sécurisée: ${width}x${height} → ${canvas.width}x${canvas.height}`);
