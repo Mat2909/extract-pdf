@@ -53,93 +53,88 @@ function LoginPageSimple({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 flex items-center justify-center py-12 px-4">
-      {/* Fenêtre de connexion centrée */}
-      <div className="bg-white rounded-xl shadow-2xl border border-gray-200 w-full max-w-md">
-        {/* En-tête avec fond coloré */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-xl px-6 py-8 text-center">
-          <h1 className="text-2xl font-bold text-white">PDF OCR Extractor</h1>
-          <p className="text-blue-100 mt-2 text-sm">Plateforme de traitement PDF</p>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      {/* Fenêtre style MsgBox Excel */}
+      <div className="bg-white border border-gray-400 shadow-lg w-96">
+        {/* Barre de titre style Windows */}
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-3 py-2 border-b border-gray-400">
+          <h1 className="text-white text-sm font-medium">PDF Extract - Authentification</h1>
         </div>
 
-        {/* Contenu de la fenêtre */}
-        <div className="px-6 py-6">
-          <div className="text-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-800">Connexion</h2>
-            <p className="text-gray-600 text-sm mt-1">Accédez à votre espace de travail</p>
+        {/* Contenu principal */}
+        <div className="p-6">
+          {/* Icône et titre */}
+          <div className="flex items-center mb-4">
+            <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center mr-3">
+              <span className="text-white text-sm font-bold">P</span>
+            </div>
+            <div>
+              <h2 className="text-sm font-medium text-gray-800">Connexion requise</h2>
+              <p className="text-xs text-gray-600">Veuillez vous identifier pour continuer</p>
+            </div>
           </div>
 
-          {/* Formulaire */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div className="bg-red-50 border-l-4 border-red-400 p-3 rounded">
-                <p className="text-red-700 text-sm">{error}</p>
-              </div>
-            )}
+          {/* Message d'erreur */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 p-2 mb-4 text-xs text-red-700">
+              {error}
+            </div>
+          )}
 
+          {/* Formulaire compact */}
+          <form onSubmit={handleSubmit} className="space-y-3">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                Nom d'utilisateur
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Nom d'utilisateur :
               </label>
               <input
-                id="username"
                 name="username"
                 type="text"
                 required
                 value={credentials.username}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="Votre nom d'utilisateur"
+                className="w-full px-2 py-1 text-xs border border-gray-400 focus:border-blue-500 focus:outline-none"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Mot de passe
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Mot de passe :
               </label>
               <input
-                id="password"
                 name="password"
                 type="password"
                 required
                 value={credentials.password}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="Votre mot de passe"
+                className="w-full px-2 py-1 text-xs border border-gray-400 focus:border-blue-500 focus:outline-none"
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading || !credentials.username || !credentials.password}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-3 px-4 rounded-lg transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Connexion...
-                </span>
-              ) : (
-                'Se connecter'
-              )}
-            </button>
+            {/* Boutons style Windows */}
+            <div className="flex justify-end space-x-2 mt-6">
+              <button
+                type="submit"
+                disabled={isLoading || !credentials.username || !credentials.password}
+                className="px-4 py-1 text-xs bg-gray-200 border border-gray-400 hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-300"
+              >
+                {isLoading ? 'Connexion...' : 'OK'}
+              </button>
+              <button
+                type="button"
+                className="px-4 py-1 text-xs bg-gray-200 border border-gray-400 hover:bg-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-300"
+              >
+                Annuler
+              </button>
+            </div>
           </form>
-        </div>
 
-        {/* Pied de la fenêtre */}
-        <div className="bg-gray-50 rounded-b-xl px-6 py-4">
-          <div className="text-center">
-            <p className="text-xs text-gray-500 mb-2">Comptes de démonstration</p>
-            <div className="space-y-1">
-              <div className="text-xs text-gray-600 bg-white px-2 py-1 rounded border">
-                <span className="font-medium">Admin</span> / <span className="font-medium">Admin</span> <span className="text-gray-500">(Administrateur)</span>
-              </div>
-              <div className="text-xs text-gray-600 bg-white px-2 py-1 rounded border">
-                <span className="font-medium">Mathieu</span> / <span className="font-medium">Mathieu</span> <span className="text-gray-500">(Utilisateur)</span>
-              </div>
+          {/* Comptes de test en bas */}
+          <div className="mt-4 pt-3 border-t border-gray-200">
+            <p className="text-xs text-gray-500 mb-2">Comptes de test :</p>
+            <div className="text-xs text-gray-600 space-y-1">
+              <div>• Admin / Admin (Administrateur)</div>
+              <div>• Mathieu / Mathieu (Utilisateur)</div>
             </div>
           </div>
         </div>

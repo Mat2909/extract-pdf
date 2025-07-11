@@ -31,7 +31,7 @@ function AppAuth() {
       {/* Barre d'info utilisateur simple */}
       <div className="bg-blue-600 text-white px-4 py-2 text-sm">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <span>Connecté en tant que : <strong>{currentUser.name}</strong> ({currentUser.role === 'administrator' ? 'Administrateur' : 'Utilisateur'})</span>
+          <span>PDF Extract - Connecté en tant que : <strong>{currentUser.name}</strong> ({currentUser.role === 'administrator' ? 'Administrateur' : 'Utilisateur'})</span>
           <button 
             onClick={handleLogout}
             className="text-blue-200 hover:text-white underline"
