@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import './OCRProcessor.css';
 import CoordinateConverter from './CoordinateConverter';
 import CoordinatePreview from './CoordinatePreview';
+import OCRConfigDialog from './OCRConfigDialog';
 import { COORDINATE_SYSTEMS, normalizeCoordinates } from '../utils/coordinateConverter';
 import TesseractOCR from '../utils/TesseractOCR';
 import * as XLSX from 'xlsx';
@@ -31,6 +32,8 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
   const [targetSystem, setTargetSystem] = useState(COORDINATE_SYSTEMS.LAMBERT93);
   const [enableConversion, setEnableConversion] = useState(true);
   const [isCancelled, setIsCancelled] = useState(false);
+  const [showConfigDialog, setShowConfigDialog] = useState(false);
+  const [ocrConfig, setOcrConfig] = useState({ decimals: 3, coordinateType: 'lambert', autoFix: true });
 
   // Effect to handle image display in validation modal
   useEffect(() => {
@@ -215,8 +218,29 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
       return;
     }
 
+    // 🧠 NOUVEAU: Afficher le dialog de configuration intelligente
+    setShowConfigDialog(true);
+  };
+
+  const handleConfigConfirm = (config) => {
+    setShowConfigDialog(false);
+    setOcrConfig(config);
+    // Stocker la config globalement pour l'OCR
+    window.currentOCRConfig = config;
+    
+    console.log('🎯 Configuration OCR:', config);
     console.log('Démarrage OCR batch avec zone:', selectedArea);
     console.log('Pages sélectionnées:', selectedPages);
+    
+    // Démarrer le traitement réel
+    startActualBatchOCR();
+  };
+
+  const handleConfigCancel = () => {
+    setShowConfigDialog(false);
+  };
+
+  const startActualBatchOCR = async () => {
     setIsProcessing(true);
     setResults([]);
     
@@ -844,6 +868,12 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
           </div>
         </div>
       )}
+
+      <OCRConfigDialog
+        isOpen={showConfigDialog}
+        onClose={handleConfigCancel}
+        onConfirm={handleConfigConfirm}
+      />
 
       {results.length > 0 && (
         <div className="results-preview">
