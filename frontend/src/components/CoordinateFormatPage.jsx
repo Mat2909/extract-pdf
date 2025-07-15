@@ -220,9 +220,9 @@ const CoordinateFormatPage = ({
         </div>
         
         {/* Layout 2 colonnes : Aperçu GAUCHE, Configuration DROITE */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        <div className="flex flex-row gap-8 items-start">
           {/* GAUCHE : Aperçu zone */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6 order-1">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 w-1/2 flex-shrink-0">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               📸 Aperçu de la zone sélectionnée
             </h3>
@@ -244,9 +244,6 @@ const CoordinateFormatPage = ({
                   onLoad={() => console.log('✅ Image preview chargée avec succès')}
                   onError={(e) => console.error('❌ Erreur chargement image preview:', e)}
                 />
-                <p className="text-xs text-gray-500 text-center mt-2">
-                  Aperçu de la zone sélectionnée
-                </p>
               </div>
             ) : (
               <div className="flex items-center justify-center h-64 bg-gray-50 rounded">
@@ -264,7 +261,7 @@ const CoordinateFormatPage = ({
           </div>
           
           {/* DROITE : Configuration format */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6 order-2">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 w-1/2 flex-shrink-0">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               ⚙️ Configuration du format
             </h3>
