@@ -33,38 +33,57 @@ export class TesseractOCR {
         load_bigram_dawg: false
       });
       
-      // Configuration ÉQUILIBRÉE pour reconnaissance fiable
+      // Configuration RÉVOLUTIONNAIRE pour images vectorielles PARFAITES
       await this.worker.setParameters({
-        // Caractères autorisés complets
-        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,+-:()éèàùç ',
+        // Caractères optimisés pour coordonnées numériques
+        tessedit_char_whitelist: '0123456789.,+-:()XYLambertmétendu ',
         tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
         
-        // Optimisations pour images vectorielles
-        preserve_interword_spaces: '1',
-        tessedit_do_invert: '0',
-        tessedit_write_images: '0',
+        // 🎯 OPTIMISATIONS IMAGES VECTORIELLES (contraste parfait)
+        tessedit_do_invert: '0',           // Pas d'inversion
+        tessedit_write_images: '0',        // Pas d'écriture debug
+        classify_bln_numeric_mode: '1',    // Mode numérique activé
         
-        // Paramètres équilibrés
-        classify_enable_learning: '0',
-        classify_enable_adaptive_matcher: '1',
-        classify_use_pre_adapted_templates: '1',
+        // 🚀 RECONNAISSANCE CHIFFRES ULTRA-PRÉCISE
+        classify_enable_learning: '0',              // Pas d'apprentissage
+        classify_enable_adaptive_matcher: '1',      // Matcher adaptatif
+        classify_use_pre_adapted_templates: '1',    // Templates pré-adaptés
         
-        // Paramètres modérés
-        textord_min_xheight: '6',
-        textord_noise_rejwords: '0',
-        textord_noise_rejrows: '0',
+        // 📊 PARAMÈTRES IMAGES HAUTE QUALITÉ
+        textord_min_xheight: '8',           // Hauteur minimale augmentée
+        textord_noise_rejwords: '0',        // Pas de rejet bruit
+        textord_noise_rejrows: '0',         // Pas de rejet lignes
         
-        // Qualité équilibrée
-        tessedit_good_quality_unrej: '1.0',
-        tessedit_quality_rej: '0.0',
+        // 🎯 QUALITÉ MAXIMALE pour images vectorielles
+        tessedit_good_quality_unrej: '1.2',  // Seuil qualité élevé
+        tessedit_quality_rej: '0.0',         // Pas de rejet
         
-        // Contraste standard
-        classify_norm_adj_midpoint: '96',
-        classify_norm_adj_curl: '2',
+        // 🔍 CONTRASTE OPTIMISÉ pour noir/blanc parfait
+        classify_norm_adj_midpoint: '128',   // Milieu parfait noir/blanc
+        classify_norm_adj_curl: '2',         // Courbure standard
         
-        // Espacement standard
-        tosp_old_to_method: '0',
-        tosp_old_to_bug_fix: '1'
+        // 📏 ESPACEMENT ADAPTÉ aux coordonnées
+        preserve_interword_spaces: '1',     // Préserver espaces mots
+        tosp_old_to_method: '0',           // Méthode moderne
+        tosp_old_to_bug_fix: '1',          // Corrections bugs
+        
+        // 🎪 PARAMÈTRES SPÉCIAUX pour coordonnées
+        numeric_restriction: '0',           // Pas de restriction numérique stricte
+        load_system_dawg: '0',             // Pas dictionnaire système
+        load_freq_dawg: '0',               // Pas fréquences
+        load_unambig_dawg: '1',            // Désambiguïsation activée
+        load_punc_dawg: '1',               // Ponctuation (points!) activée
+        load_number_dawg: '1',             // Chiffres activés
+        
+        // 🔧 PARAMÈTRES FINS pour éviter confusion 7/8, 5 manqué
+        classify_float_tolerance: '0.1',    // Tolérance flottant réduite
+        classify_min_outline_points: '6',   // Points contour minimum
+        classify_min_outline_area: '20',    // Zone contour minimum
+        
+        // 🎯 DÉSACTIVER filtres agressifs
+        textord_noise_area_ratio: '0.7',   // Ratio aire bruit
+        textord_noise_cert_factor: '1.0',  // Facteur certification
+        textord_noise_rowratio: '6.0'      // Ratio ligne bruit
       });
       
       this.isInitialized = true;
