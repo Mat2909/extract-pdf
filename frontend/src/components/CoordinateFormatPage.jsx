@@ -58,16 +58,8 @@ const CoordinateFormatPage = ({
 
   // Générer l'aperçu de la zone sélectionnée
   useEffect(() => {
-    console.log('🔍 useEffect aperçu - uploadedPDF:', uploadedPDF);
-    console.log('🔍 useEffect aperçu - selectedArea:', selectedArea);
-    
     if (uploadedPDF && selectedArea) {
-      console.log('✅ Conditions remplies, génération aperçu...');
       generateAreaPreview();
-    } else {
-      console.log('❌ Conditions non remplies pour aperçu');
-      console.log('  - uploadedPDF:', !!uploadedPDF);
-      console.log('  - selectedArea:', !!selectedArea);
     }
   }, [uploadedPDF, selectedArea]);
 
@@ -227,10 +219,10 @@ const CoordinateFormatPage = ({
           </p>
         </div>
         
-        {/* Layout 2 colonnes */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Layout 2 colonnes : Aperçu GAUCHE, Configuration DROITE */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* GAUCHE : Aperçu zone */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 order-1">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               📸 Aperçu de la zone sélectionnée
             </h3>
@@ -253,10 +245,7 @@ const CoordinateFormatPage = ({
                   onError={(e) => console.error('❌ Erreur chargement image preview:', e)}
                 />
                 <p className="text-xs text-gray-500 text-center mt-2">
-                  Zone qui sera analysée par l'OCR
-                </p>
-                <p className="text-xs text-blue-600 text-center mt-1">
-                  🔍 Image data: {previewImage ? previewImage.length : 0} chars
+                  Aperçu de la zone sélectionnée
                 </p>
               </div>
             ) : (
@@ -265,29 +254,9 @@ const CoordinateFormatPage = ({
                   <p className="text-gray-500 mb-2">Aucun aperçu disponible</p>
                   <button
                     onClick={generateAreaPreview}
-                    className="text-blue-600 hover:text-blue-800 text-sm block mb-2"
+                    className="text-blue-600 hover:text-blue-800 text-sm"
                   >
                     Réessayer
-                  </button>
-                  <button
-                    onClick={() => {
-                      console.log('🔍 DEBUG - État actuel:');
-                      console.log('  uploadedPDF:', uploadedPDF);
-                      console.log('  selectedArea:', selectedArea);
-                      console.log('  selectedPages:', selectedPages);
-                      console.log('  isGeneratingPreview:', isGeneratingPreview);
-                      console.log('  previewImage length:', previewImage ? previewImage.length : 'null');
-                      console.log('  previewImage start:', previewImage ? previewImage.substring(0, 50) : 'null');
-                      
-                      // Forcer la génération
-                      if (uploadedPDF && selectedArea) {
-                        console.log('🔄 Force nouvelle génération...');
-                        generateAreaPreview();
-                      }
-                    }}
-                    className="text-red-600 hover:text-red-800 text-xs"
-                  >
-                    🔍 Debug + Force
                   </button>
                 </div>
               </div>
@@ -295,7 +264,7 @@ const CoordinateFormatPage = ({
           </div>
           
           {/* DROITE : Configuration format */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 order-2">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               ⚙️ Configuration du format
             </h3>
