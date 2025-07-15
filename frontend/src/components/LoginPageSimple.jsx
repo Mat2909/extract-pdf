@@ -55,12 +55,40 @@ function LoginPageSimple({ onLogin }) {
   };
 
   return (
-    <section className="bg-gray-50" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif' }}>
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+    <section style={{ 
+      backgroundColor: '#f9fafb', 
+      fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif',
+      minHeight: '100vh'
+    }}>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '32px 24px',
+        margin: '0 auto',
+        minHeight: '100vh'
+      }}>
         {/* Logo et titre */}
-        <div className="flex items-center mb-6 text-2xl font-semibold text-gray-900">
-          <div className="flex items-center justify-center w-8 h-8 mr-2 bg-red-600 rounded-lg">
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          marginBottom: '24px',
+          fontSize: '24px',
+          fontWeight: '600',
+          color: '#111827'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '32px',
+            height: '32px',
+            marginRight: '8px',
+            backgroundColor: '#dc2626',
+            borderRadius: '8px'
+          }}>
+            <svg style={{ width: '20px', height: '20px', color: 'white' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
@@ -68,8 +96,14 @@ function LoginPageSimple({ onLogin }) {
         </div>
         
         {/* Carte de connexion */}
-        <div className="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+        <div style={{
+          width: '100%',
+          maxWidth: '448px',
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+        }}>
+          <div style={{ padding: '32px' }}>
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
               Connectez-vous à votre compte
             </h1>
