@@ -432,19 +432,20 @@ function App() {
         </div>
       )}
 
-      {/* Header fixe avec titre et bouton nouveau */}
+      {/* Header fixe avec titre et navigation */}
       <div className="app-header sticky top-0 bg-white z-50 border-b-2 border-gray-200 pb-2.5">
-        <button 
-          onClick={resetApp} 
-          className="absolute top-5 left-5 bg-green-600 hover:bg-green-700 text-white border-none px-3 py-1 rounded cursor-pointer text-sm"
-        >
-          ↻ Nouvelle extraction
-        </button>
-        
         <h1 className="text-center text-3xl font-bold text-gray-800 my-5">Extraction de coordonnées PDF</h1>
         
         {/* Barre de progression avec boutons précédent/suivant */}
         <div className="flex items-center justify-center gap-4 mt-4">
+          {/* Bouton Nouvelle extraction à gauche */}
+          <button 
+            onClick={resetApp} 
+            className="bg-green-600 hover:bg-green-700 text-white border-none px-4 py-2 rounded cursor-pointer text-base"
+          >
+            ↻ Nouvelle extraction
+          </button>
+          
           {/* Bouton Précédent */}
           {currentStep > 0 && (
             <button 
@@ -469,7 +470,7 @@ function App() {
                   setCoordinateFormat(null);
                 }
               }} 
-              className="bg-gray-600 hover:bg-gray-700 text-white border-none px-3 py-1 rounded cursor-pointer text-sm"
+              className="bg-gray-600 hover:bg-gray-700 text-white border-none px-4 py-2 rounded cursor-pointer text-base"
             >
               ← Précédent
             </button>
@@ -501,7 +502,7 @@ function App() {
                 (currentStep === 3 && !selectedArea) ||
                 (currentStep === 4 && !coordinateFormatConfigured)
               }
-              className={`border-none px-3 py-1 rounded text-sm ${
+              className={`border-none px-4 py-2 rounded text-base ${
                 (currentStep === 0 && selectedConcessionaire) ||
                 (currentStep === 1 && uploadedPDF) ||
                 (currentStep === 2 && selectedPages.length > 0) ||
@@ -599,7 +600,7 @@ function App() {
                 <div className="flex justify-center items-center gap-4 mt-6">
                   <button
                     onClick={() => setCurrentStep(0)}
-                    className="bg-gray-600 hover:bg-gray-700 text-white border-none px-4 py-2 rounded cursor-pointer"
+                    className="bg-gray-600 hover:bg-gray-700 text-white border-none px-6 py-3 rounded cursor-pointer text-base"
                   >
                     ← Précédent
                   </button>
@@ -607,7 +608,7 @@ function App() {
                   <button
                     onClick={handleUpload}
                     disabled={!selectedFile || uploading}
-                    className={`border-none px-4 py-2 rounded ${
+                    className={`border-none px-6 py-3 rounded text-base ${
                       !selectedFile || uploading 
                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
                         : 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
@@ -675,7 +676,7 @@ function App() {
               <div className="flex justify-center items-center gap-4 mt-8">
                 <button
                   onClick={() => setCurrentStep(1)}
-                  className="bg-gray-600 hover:bg-gray-700 text-white border-none px-4 py-2 rounded cursor-pointer"
+                  className="bg-gray-600 hover:bg-gray-700 text-white border-none px-6 py-3 rounded cursor-pointer text-base"
                 >
                   ← Précédent
                 </button>
@@ -683,7 +684,7 @@ function App() {
                 <button
                   onClick={() => setCurrentStep(3)}
                   disabled={selectedPages.length === 0}
-                  className={`border-none px-4 py-2 rounded ${
+                  className={`border-none px-6 py-3 rounded text-base ${
                     selectedPages.length > 0
                       ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -739,14 +740,14 @@ function App() {
                   <div className="flex justify-center items-center gap-4 mt-8">
                     <button
                       onClick={() => setCurrentStep(2)}
-                      className="bg-gray-600 hover:bg-gray-700 text-white border-none px-4 py-2 rounded cursor-pointer"
+                      className="bg-gray-600 hover:bg-gray-700 text-white border-none px-6 py-3 rounded cursor-pointer text-base"
                     >
                       ← Précédent
                     </button>
                     
                     <button
                       onClick={() => setCurrentStep(4)}
-                      className="bg-green-600 hover:bg-green-700 text-white border-none px-4 py-2 rounded cursor-pointer"
+                      className="bg-green-600 hover:bg-green-700 text-white border-none px-6 py-3 rounded cursor-pointer text-base"
                     >
                       Suivant →
                     </button>

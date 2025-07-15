@@ -408,7 +408,7 @@ const CoordinateFormatPage = ({
           {/* Bouton Précédent */}
           <button
             onClick={onBack}
-            className="bg-gray-600 hover:bg-gray-700 text-white border-none px-4 py-2 rounded cursor-pointer"
+            className="bg-gray-600 hover:bg-gray-700 text-white border-none px-6 py-3 rounded cursor-pointer text-base"
           >
             ← Précédent
           </button>
@@ -417,7 +417,7 @@ const CoordinateFormatPage = ({
           <button
             onClick={handleValidateFormat}
             disabled={!formatSelected}
-            className={`border-none px-4 py-2 rounded ${
+            className={`border-none px-6 py-3 rounded text-base ${
               formatSelected
                 ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
