@@ -122,13 +122,24 @@ const CoordinateFormatPage = ({
       const zoneContext = zoneCanvas.getContext('2d');
       
       // Calculer les dimensions de la zone en pixels
-      const zoneWidth = (selectedArea.width / 100) * canvas.width;
-      const zoneHeight = (selectedArea.height / 100) * canvas.height;
-      const zoneX = (selectedArea.x / 100) * canvas.width;
-      const zoneY = (selectedArea.y / 100) * canvas.height;
+      // selectedArea est déjà en format 0-1, pas besoin de diviser par 100
+      const zoneWidth = selectedArea.width * canvas.width;
+      const zoneHeight = selectedArea.height * canvas.height;
+      const zoneX = selectedArea.x * canvas.width;
+      const zoneY = selectedArea.y * canvas.height;
       
-      zoneCanvas.width = zoneWidth;
-      zoneCanvas.height = zoneHeight;
+      console.log('📏 Dimensions calculées:');
+      console.log('  Canvas:', canvas.width, 'x', canvas.height);
+      console.log('  Zone relative:', selectedArea);
+      console.log('  Zone pixels:', {x: zoneX, y: zoneY, width: zoneWidth, height: zoneHeight});
+      
+      // Validation des dimensions minimales
+      if (zoneWidth < 10 || zoneHeight < 10) {
+        throw new Error(`Zone trop petite: ${zoneWidth}x${zoneHeight} pixels`);
+      }
+      
+      zoneCanvas.width = Math.max(zoneWidth, 10);
+      zoneCanvas.height = Math.max(zoneHeight, 10);
       
       // Copier la zone sélectionnée
       zoneContext.drawImage(
@@ -141,6 +152,11 @@ const CoordinateFormatPage = ({
       
       console.log('📸 Image générée, taille data URL:', previewDataURL.length);
       console.log('📸 Données image (début):', previewDataURL.substring(0, 50));
+      
+      // Validation de l'image générée
+      if (previewDataURL.length < 100 || !previewDataURL.startsWith('data:image/png;base64,')) {
+        throw new Error(`Image générée invalide: ${previewDataURL.length} chars, début: ${previewDataURL.substring(0, 20)}`);
+      }
       
       setPreviewImage(previewDataURL);
       setIsGeneratingPreview(false);
