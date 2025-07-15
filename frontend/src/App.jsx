@@ -472,9 +472,7 @@ function App() {
               className="flex items-center justify-center w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
               title="Retour à l'étape précédente"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+              <span className="text-lg font-bold">←</span>
             </button>
           )}
           
@@ -565,7 +563,7 @@ function App() {
                   <button
                     onClick={handleUpload}
                     disabled={!selectedFile || uploading}
-                    className={`flex items-center justify-center w-12 h-12 rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 ${
+                    className={`flex items-center justify-center w-14 h-14 rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 ${
                       !selectedFile || uploading 
                         ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
                         : 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
@@ -573,13 +571,9 @@ function App() {
                     title={uploading ? 'Upload en cours...' : 'Valider et continuer'}
                   >
                     {uploading ? (
-                      <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
+                      <span className="text-xl font-bold animate-pulse">⟳</span>
                     ) : (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
+                      <span className="text-xl font-bold">→</span>
                     )}
                   </button>
                 </div>
@@ -624,12 +618,10 @@ function App() {
                       setSelectedPages(allPages);
                       setCurrentStep(3);
                     }}
-                    className="flex items-center justify-center w-12 h-12 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
+                    className="flex items-center justify-center w-14 h-14 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
                     title={`Sélectionner toutes les pages (${totalPDFPages} pages)`}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                    <span className="text-xl font-bold">✓</span>
                   </button>
                 </div>
                 <p className="text-sm text-gray-700 mb-2">
@@ -654,12 +646,10 @@ function App() {
                 <div className="flex justify-center items-center gap-6 mt-8">
                   <button
                     onClick={() => setCurrentStep(3)}
-                    className="flex items-center justify-center w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
+                    className="flex items-center justify-center w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
                     title={`Continuer avec ${selectedPages.length} page${selectedPages.length > 1 ? 's' : ''}`}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                    <span className="text-xl font-bold">→</span>
                   </button>
                 </div>
               )}
@@ -710,12 +700,10 @@ function App() {
                   <div className="flex justify-center items-center gap-6 mt-8">
                     <button
                       onClick={() => setCurrentStep(4)}
-                      className="flex items-center justify-center w-12 h-12 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
+                      className="flex items-center justify-center w-14 h-14 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
                       title="Configurer le format de coordonnées"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
+                      <span className="text-xl font-bold">→</span>
                     </button>
                   </div>
                 </div>

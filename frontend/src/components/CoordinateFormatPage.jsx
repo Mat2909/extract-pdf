@@ -274,15 +274,41 @@ const CoordinateFormatPage = ({
                   <button
                     key={index}
                     onClick={() => handlePresetSelect(preset)}
-                    className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                    className={`w-full text-left p-3 rounded-lg border transition-colors relative ${
                       coordinateFormat.coordinateType === preset.type
                         ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <div className="font-medium text-sm">{preset.name}</div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      X: {preset.examples.x} • Y: {preset.examples.y}
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="font-medium text-sm">{preset.name}</div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          X: {preset.examples.x} • Y: {preset.examples.y}
+                        </div>
+                      </div>
+                      
+                      {/* Case de coche verte sur le format sélectionné */}
+                      {coordinateFormat.coordinateType === preset.type && (
+                        <div className="flex-shrink-0 ml-3">
+                          <div style={{ 
+                            width: '20px',
+                            height: '20px',
+                            backgroundColor: '#22c55e',
+                            border: '2px solid #16a34a',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                            color: 'white',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                          }}>
+                            ✓
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </button>
                 ))}
@@ -362,40 +388,6 @@ const CoordinateFormatPage = ({
               </div>
             </div>
 
-            {/* Case verte de validation - même style que l'étape 2 */}
-            {formatSelected && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    {/* Case verte avec coche - même style que PDFViewer */}
-                    <div style={{ 
-                      width: '24px',
-                      height: '24px',
-                      backgroundColor: '#22c55e',
-                      border: '2px solid #16a34a',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '14px',
-                      fontWeight: 'bold',
-                      color: 'white',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                    }}>
-                      ✓
-                    </div>
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-green-800">
-                      Format sélectionné
-                    </h3>
-                    <div className="mt-2 text-sm text-green-700">
-                      X: {coordinateFormat.examples.x} • Y: {coordinateFormat.examples.y}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Aperçu de la détection */}
             <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -416,28 +408,24 @@ const CoordinateFormatPage = ({
           {/* Bouton Précédent */}
           <button
             onClick={onBack}
-            className="flex items-center justify-center w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
+            className="flex items-center justify-center w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
             title="Retour à l'étape précédente"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            <span className="text-xl font-bold">←</span>
           </button>
           
           {/* Bouton Suivant */}
           <button
             onClick={handleValidateFormat}
             disabled={!formatSelected}
-            className={`flex items-center justify-center w-12 h-12 rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 ${
+            className={`flex items-center justify-center w-14 h-14 rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 ${
               formatSelected
                 ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
             title={formatSelected ? "Continuer vers l'OCR" : "Sélectionnez un format pour continuer"}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <span className="text-xl font-bold">→</span>
           </button>
         </div>
       </div>
