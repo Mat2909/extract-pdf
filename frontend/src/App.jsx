@@ -469,12 +469,12 @@ function App() {
                   setCoordinateFormat(null);
                 }
               }} 
-              className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-2.5 px-5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
+              className="flex items-center justify-center w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
+              title="Retour à l'étape précédente"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Précédent
             </button>
           )}
           
@@ -561,17 +561,31 @@ function App() {
                   </div>
                 )}
                 
-                <button
-                  onClick={handleUpload}
-                  disabled={!selectedFile || uploading}
-                  className={`mt-5 px-8 py-4 rounded-md text-lg font-bold transition-colors duration-200 ${
-                    !selectedFile || uploading 
-                      ? 'bg-gray-600 text-white cursor-not-allowed' 
-                      : 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
-                  }`}
-                >
+                <div className="flex justify-center items-center gap-6 mt-6">
+                  <button
+                    onClick={handleUpload}
+                    disabled={!selectedFile || uploading}
+                    className={`flex items-center justify-center w-12 h-12 rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 ${
+                      !selectedFile || uploading 
+                        ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                        : 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
+                    }`}
+                    title={uploading ? 'Upload en cours...' : 'Valider et continuer'}
+                  >
+                    {uploading ? (
+                      <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+                <p className="text-center text-sm text-gray-600 mt-2">
                   {uploading ? 'Upload en cours...' : 'Valider et continuer'}
-                </button>
+                </p>
                 
                 {message && (
                   <div className={`mt-5 p-2.5 rounded ${
@@ -600,20 +614,27 @@ function App() {
               <h2 className="text-2xl font-bold text-gray-800 mb-4">Étape 2 : Sélection des pages à traiter</h2>
               <p className="text-gray-600 mb-8">Cliquez sur les pages contenant les coordonnées à extraire</p>
               
-              <div className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
-                <button
-                  onClick={() => {
-                    const allPages = totalPDFPages > 0 ? 
-                      [...Array(totalPDFPages).keys()].map(i => i + 1) : 
-                      [...Array(10).keys()].map(i => i + 1);
-                    setSelectedPages(allPages);
-                    setCurrentStep(3);
-                  }}
-                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-md text-lg transition-colors duration-200 mb-4"
-                >
-                  ✓ Sélectionner toutes les pages ({totalPDFPages} pages)
-                </button>
-                <br />
+              <div className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200 text-center">
+                <div className="flex justify-center items-center gap-6 mb-4">
+                  <button
+                    onClick={() => {
+                      const allPages = totalPDFPages > 0 ? 
+                        [...Array(totalPDFPages).keys()].map(i => i + 1) : 
+                        [...Array(10).keys()].map(i => i + 1);
+                      setSelectedPages(allPages);
+                      setCurrentStep(3);
+                    }}
+                    className="flex items-center justify-center w-12 h-12 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
+                    title={`Sélectionner toutes les pages (${totalPDFPages} pages)`}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </button>
+                </div>
+                <p className="text-sm text-gray-700 mb-2">
+                  <strong>Sélectionner toutes les pages ({totalPDFPages} pages)</strong>
+                </p>
                 <span className="text-gray-500 text-base">ou sélectionnez manuellement les pages ci-dessous</span>
               </div>
               
@@ -630,12 +651,15 @@ function App() {
               
               {/* Bouton continuer si des pages sont sélectionnées manuellement */}
               {selectedPages.length > 0 && (
-                <div className="text-center mt-5">
+                <div className="flex justify-center items-center gap-6 mt-8">
                   <button
                     onClick={() => setCurrentStep(3)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-md text-base transition-colors duration-200"
+                    className="flex items-center justify-center w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
+                    title={`Continuer avec ${selectedPages.length} page${selectedPages.length > 1 ? 's' : ''}`}
                   >
-                    Continuer avec {selectedPages.length} page{selectedPages.length > 1 ? 's' : ''} →
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </button>
                 </div>
               )}
@@ -682,13 +706,18 @@ function App() {
                     </p>
                   </div>
                   
-                  {/* BOUTON MANQUANT - AJOUTÉ ! */}
-                  <button
-                    onClick={() => setCurrentStep(4)}
-                    className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-md text-base transition-colors duration-200 mt-4"
-                  >
-                    🎯 Configurer le format de coordonnées →
-                  </button>
+                  {/* Bouton navigation uniforme */}
+                  <div className="flex justify-center items-center gap-6 mt-8">
+                    <button
+                      onClick={() => setCurrentStep(4)}
+                      className="flex items-center justify-center w-12 h-12 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
+                      title="Configurer le format de coordonnées"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
