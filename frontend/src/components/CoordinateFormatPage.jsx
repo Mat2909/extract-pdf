@@ -404,28 +404,26 @@ const CoordinateFormatPage = ({
         </div>
         
         {/* Boutons de navigation uniformes */}
-        <div className="flex justify-center items-center gap-6 mt-8">
+        <div className="flex justify-center items-center gap-4 mt-8">
           {/* Bouton Précédent */}
           <button
             onClick={onBack}
-            className="flex items-center justify-center w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
-            title="Retour à l'étape précédente"
+            className="bg-gray-600 hover:bg-gray-700 text-white border-none px-4 py-2 rounded cursor-pointer"
           >
-            <span className="text-xl font-bold">←</span>
+            ← Précédent
           </button>
           
           {/* Bouton Suivant */}
           <button
             onClick={handleValidateFormat}
             disabled={!formatSelected}
-            className={`flex items-center justify-center w-14 h-14 rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 ${
+            className={`border-none px-4 py-2 rounded ${
               formatSelected
                 ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
-            title={formatSelected ? "Continuer vers l'OCR" : "Sélectionnez un format pour continuer"}
           >
-            <span className="text-xl font-bold">→</span>
+            Suivant →
           </button>
         </div>
       </div>

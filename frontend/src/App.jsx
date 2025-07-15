@@ -306,6 +306,12 @@ function App() {
           <div key={step.number} style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
             <div 
               className={`step-circle ${currentStep >= step.number ? 'active' : ''}`}
+              onClick={() => {
+                // Permettre de cliquer sur les étapes précédentes uniquement
+                if (step.number < currentStep) {
+                  setCurrentStep(step.number);
+                }
+              }}
               style={{
                 width: '40px',
                 height: '40px',
@@ -316,7 +322,8 @@ function App() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontWeight: 'bold',
-                fontSize: '14px'
+                fontSize: '14px',
+                cursor: step.number < currentStep ? 'pointer' : 'default'
               }}
             >
               {currentStep > step.number ? '✓' : step.number}
@@ -429,18 +436,16 @@ function App() {
       <div className="app-header sticky top-0 bg-white z-50 border-b-2 border-gray-200 pb-2.5">
         <button 
           onClick={resetApp} 
-          className="absolute top-5 left-5 flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-2.5 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
+          className="absolute top-5 left-5 bg-green-600 hover:bg-green-700 text-white border-none px-3 py-1 rounded cursor-pointer text-sm"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-          Nouvelle extraction
+          ↻ Nouvelle extraction
         </button>
         
         <h1 className="text-center text-3xl font-bold text-gray-800 my-5">Extraction de coordonnées PDF</h1>
         
-        {/* Barre de progression avec bouton précédent */}
+        {/* Barre de progression avec boutons précédent/suivant */}
         <div className="flex items-center justify-center gap-4 mt-4">
+          {/* Bouton Précédent */}
           {currentStep > 0 && (
             <button 
               onClick={() => {
@@ -449,34 +454,66 @@ function App() {
                 
                 // Réinitialiser certains états selon l'étape précédente
                 if (prevStep === 0) {
-                  // Retour à l'étape 0 : réinitialiser le concessionnaire
                   setSelectedConcessionaire(null);
                   setSelectedFile(null);
                   setMessage('');
                   setErrorMessage(null);
                 } else if (prevStep === 1) {
-                  // Retour à l'étape 1 : garder le PDF mais permettre d'en changer
                   setMessage('');
                 } else if (prevStep === 2) {
-                  // Retour à l'étape 2 : effacer la zone sélectionnée
                   setSelectedArea(null);
                 } else if (prevStep === 3) {
-                  // Retour à l'étape 3 : rester avec la zone mais permettre de la modifier
                   // Pas de réinitialisation nécessaire
                 } else if (prevStep === 4) {
-                  // Retour à l'étape 4 : effacer la configuration du format
                   setCoordinateFormatConfigured(false);
                   setCoordinateFormat(null);
                 }
               }} 
-              className="flex items-center justify-center w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
-              title="Retour à l'étape précédente"
+              className="bg-gray-600 hover:bg-gray-700 text-white border-none px-3 py-1 rounded cursor-pointer text-sm"
             >
-              <span className="text-lg font-bold">←</span>
+              ← Précédent
             </button>
           )}
           
           <ProgressBar />
+          
+          {/* Bouton Suivant */}
+          {currentStep < steps.length - 1 && (
+            <button 
+              onClick={() => {
+                // Logique pour passer à l'étape suivante si conditions remplies
+                if (currentStep === 0 && selectedConcessionaire) {
+                  setCurrentStep(1);
+                } else if (currentStep === 1 && uploadedPDF) {
+                  setCurrentStep(2);
+                } else if (currentStep === 2 && selectedPages.length > 0) {
+                  setCurrentStep(3);
+                } else if (currentStep === 3 && selectedArea) {
+                  setCurrentStep(4);
+                } else if (currentStep === 4 && coordinateFormatConfigured) {
+                  setCurrentStep(5);
+                }
+              }} 
+              disabled={
+                (currentStep === 0 && !selectedConcessionaire) ||
+                (currentStep === 1 && !uploadedPDF) ||
+                (currentStep === 2 && selectedPages.length === 0) ||
+                (currentStep === 3 && !selectedArea) ||
+                (currentStep === 4 && !coordinateFormatConfigured)
+              }
+              className={`border-none px-3 py-1 rounded text-sm ${
+                (currentStep === 0 && selectedConcessionaire) ||
+                (currentStep === 1 && uploadedPDF) ||
+                (currentStep === 2 && selectedPages.length > 0) ||
+                (currentStep === 3 && selectedArea) ||
+                (currentStep === 4 && coordinateFormatConfigured)
+                  ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              Suivant →
+            </button>
+          )}
         </div>
       </div>
       
@@ -559,27 +596,26 @@ function App() {
                   </div>
                 )}
                 
-                <div className="flex justify-center items-center gap-6 mt-6">
+                <div className="flex justify-center items-center gap-4 mt-6">
+                  <button
+                    onClick={() => setCurrentStep(0)}
+                    className="bg-gray-600 hover:bg-gray-700 text-white border-none px-4 py-2 rounded cursor-pointer"
+                  >
+                    ← Précédent
+                  </button>
+                  
                   <button
                     onClick={handleUpload}
                     disabled={!selectedFile || uploading}
-                    className={`flex items-center justify-center w-14 h-14 rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 ${
+                    className={`border-none px-4 py-2 rounded ${
                       !selectedFile || uploading 
-                        ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
                         : 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
                     }`}
-                    title={uploading ? 'Upload en cours...' : 'Valider et continuer'}
                   >
-                    {uploading ? (
-                      <span className="text-xl font-bold animate-pulse">⟳</span>
-                    ) : (
-                      <span className="text-xl font-bold">→</span>
-                    )}
+                    {uploading ? 'Upload en cours...' : 'Suivant →'}
                   </button>
                 </div>
-                <p className="text-center text-sm text-gray-600 mt-2">
-                  {uploading ? 'Upload en cours...' : 'Valider et continuer'}
-                </p>
                 
                 {message && (
                   <div className={`mt-5 p-2.5 rounded ${
@@ -609,25 +645,19 @@ function App() {
               <p className="text-gray-600 mb-8">Cliquez sur les pages contenant les coordonnées à extraire</p>
               
               <div className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200 text-center">
-                <div className="flex justify-center items-center gap-6 mb-4">
-                  <button
-                    onClick={() => {
-                      const allPages = totalPDFPages > 0 ? 
-                        [...Array(totalPDFPages).keys()].map(i => i + 1) : 
-                        [...Array(10).keys()].map(i => i + 1);
-                      setSelectedPages(allPages);
-                      setCurrentStep(3);
-                    }}
-                    className="flex items-center justify-center w-14 h-14 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
-                    title={`Sélectionner toutes les pages (${totalPDFPages} pages)`}
-                  >
-                    <span className="text-xl font-bold">✓</span>
-                  </button>
-                </div>
-                <p className="text-sm text-gray-700 mb-2">
-                  <strong>Sélectionner toutes les pages ({totalPDFPages} pages)</strong>
-                </p>
-                <span className="text-gray-500 text-base">ou sélectionnez manuellement les pages ci-dessous</span>
+                <button
+                  onClick={() => {
+                    const allPages = totalPDFPages > 0 ? 
+                      [...Array(totalPDFPages).keys()].map(i => i + 1) : 
+                      [...Array(10).keys()].map(i => i + 1);
+                    setSelectedPages(allPages);
+                    setCurrentStep(3);
+                  }}
+                  className="bg-green-600 hover:bg-green-700 text-white border-none px-4 py-2 rounded cursor-pointer font-bold mb-4"
+                >
+                  ✓ Sélectionner toutes les pages ({totalPDFPages} pages)
+                </button>
+                <p className="text-gray-500 text-base">ou sélectionnez manuellement les pages ci-dessous</p>
               </div>
               
               <PDFViewer
@@ -641,18 +671,27 @@ function App() {
                 thumbnailMode={true}
               />
               
-              {/* Bouton continuer si des pages sont sélectionnées manuellement */}
-              {selectedPages.length > 0 && (
-                <div className="flex justify-center items-center gap-6 mt-8">
-                  <button
-                    onClick={() => setCurrentStep(3)}
-                    className="flex items-center justify-center w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
-                    title={`Continuer avec ${selectedPages.length} page${selectedPages.length > 1 ? 's' : ''}`}
-                  >
-                    <span className="text-xl font-bold">→</span>
-                  </button>
-                </div>
-              )}
+              {/* Boutons de navigation */}
+              <div className="flex justify-center items-center gap-4 mt-8">
+                <button
+                  onClick={() => setCurrentStep(1)}
+                  className="bg-gray-600 hover:bg-gray-700 text-white border-none px-4 py-2 rounded cursor-pointer"
+                >
+                  ← Précédent
+                </button>
+                
+                <button
+                  onClick={() => setCurrentStep(3)}
+                  disabled={selectedPages.length === 0}
+                  className={`border-none px-4 py-2 rounded ${
+                    selectedPages.length > 0
+                      ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  Suivant →
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -696,14 +735,20 @@ function App() {
                     </p>
                   </div>
                   
-                  {/* Bouton navigation uniforme */}
-                  <div className="flex justify-center items-center gap-6 mt-8">
+                  {/* Boutons de navigation */}
+                  <div className="flex justify-center items-center gap-4 mt-8">
+                    <button
+                      onClick={() => setCurrentStep(2)}
+                      className="bg-gray-600 hover:bg-gray-700 text-white border-none px-4 py-2 rounded cursor-pointer"
+                    >
+                      ← Précédent
+                    </button>
+                    
                     <button
                       onClick={() => setCurrentStep(4)}
-                      className="flex items-center justify-center w-14 h-14 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
-                      title="Configurer le format de coordonnées"
+                      className="bg-green-600 hover:bg-green-700 text-white border-none px-4 py-2 rounded cursor-pointer"
                     >
-                      <span className="text-xl font-bold">→</span>
+                      Suivant →
                     </button>
                   </div>
                 </div>
