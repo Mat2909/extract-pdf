@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import PDFViewer from './components/PDFViewer';
 import OCRProcessor from './components/OCRProcessor';
+import CoordinateFormatPage from './components/CoordinateFormatPage';
 
 function App() {
   const [selectedConcessionaire, setSelectedConcessionaire] = useState(null);
@@ -17,6 +18,8 @@ function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const [pagesValidated, setPagesValidated] = useState(false);
   const [totalPDFPages, setTotalPDFPages] = useState(0);
+  const [coordinateFormatConfigured, setCoordinateFormatConfigured] = useState(false);
+  const [coordinateFormat, setCoordinateFormat] = useState(null);
   
   // Activer le debug panel avec Ctrl+D
   useEffect(() => {
@@ -56,15 +59,18 @@ function App() {
       { number: 1, title: 'Sélection du PDF', description: 'Choisir le fichier PDF à traiter' },
       { number: 2, title: 'Sélection des pages', description: 'Choisir les pages à analyser' },
       { number: 3, title: 'Zone d\'extraction', description: 'Définir la zone de coordonnées' },
-      { number: 4, title: 'Validation des données', description: 'Contrôler les valeurs extraites' },
-      { number: 5, title: 'Extraction Excel', description: 'Génération du fichier final' }
+      { number: 4, title: 'Format coordonnées', description: 'Configurer le format de coordonnées' },
+      { number: 5, title: 'Validation des données', description: 'Contrôler les valeurs extraites' },
+      { number: 6, title: 'Extraction Excel', description: 'Génération du fichier final' }
     ];
     
     // Personnalisation selon le concessionnaire
     if (concessionaireId === 'grdf') {
       baseSteps[3].description = 'Définir la zone de coordonnées GrDF';
+      baseSteps[4].description = 'Format coordonnées Lambert';
     } else if (concessionaireId === 'sfr') {
       baseSteps[3].description = 'Définir la zone de lecture SFR';
+      baseSteps[4].description = 'Format coordonnées GPS';
     }
     
     return baseSteps;
@@ -194,6 +200,8 @@ function App() {
     setCurrentStep(1);
     setPagesValidated(false);
     setTotalPDFPages(0);
+    setCoordinateFormatConfigured(false);
+    setCoordinateFormat(null);
     
     // Réinitialiser aussi le input file
     const fileInput = document.querySelector('input[type="file"]');
@@ -256,12 +264,26 @@ function App() {
     // L'utilisateur devra cliquer sur "Valider cette zone" pour continuer
   };
   
+  const handleCoordinateFormatConfigured = (formatConfig) => {
+    console.log('🎯 Configuration format coordonnées reçue:', formatConfig);
+    
+    // Stocker localement
+    setCoordinateFormat(formatConfig);
+    setCoordinateFormatConfigured(true);
+    
+    // 🚀 STOCKER GLOBALEMENT pour TesseractOCR
+    window.currentCoordinateFormat = formatConfig;
+    console.log('✅ Format stocké globalement pour OCR intelligent');
+    
+    setCurrentStep(5); // Passer à l'étape OCR
+  };
+  
   const handleOCRStart = () => {
-    setCurrentStep(4);
+    setCurrentStep(5);
   };
   
   const handleExcelGeneration = () => {
-    setCurrentStep(5);
+    setCurrentStep(6);
   };
 
   // Composant pour la barre de progression
@@ -441,6 +463,10 @@ function App() {
                 } else if (prevStep === 3) {
                   // Retour à l'étape 3 : rester avec la zone mais permettre de la modifier
                   // Pas de réinitialisation nécessaire
+                } else if (prevStep === 4) {
+                  // Retour à l'étape 4 : effacer la configuration du format
+                  setCoordinateFormatConfigured(false);
+                  setCoordinateFormat(null);
                 }
               }} 
               className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-2.5 px-5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
@@ -652,17 +678,36 @@ function App() {
                     <p>Position : X: {(selectedArea.x * 100).toFixed(1)}%, Y: {(selectedArea.y * 100).toFixed(1)}%</p>
                     <p>Dimensions : {(selectedArea.width * 100).toFixed(1)}% × {(selectedArea.height * 100).toFixed(1)}%</p>
                     <p style={{ color: '#155724', fontWeight: 'bold', marginTop: '10px' }}>
-                      Passez à l'étape suivante pour démarrer l'OCR
+                      Passez à l'étape suivante pour configurer le format de coordonnées
                     </p>
                   </div>
+                  
+                  {/* BOUTON MANQUANT - AJOUTÉ ! */}
+                  <button
+                    onClick={() => setCurrentStep(4)}
+                    className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-md text-base transition-colors duration-200 mt-4"
+                  >
+                    🎯 Configurer le format de coordonnées →
+                  </button>
                 </div>
               )}
             </div>
           </div>
         )}
         
-        {/* Étapes 4 et 5 : OCR et Excel */}
-        {currentStep >= 4 && uploadedPDF && selectedArea && (
+        {/* Étape 4 : Configuration du format de coordonnées */}
+        {currentStep === 4 && uploadedPDF && selectedArea && (
+          <CoordinateFormatPage
+            uploadedPDF={uploadedPDF}
+            selectedArea={selectedArea}
+            selectedPages={selectedPages}
+            onFormatConfigured={handleCoordinateFormatConfigured}
+            onBack={() => setCurrentStep(3)}
+          />
+        )}
+        
+        {/* Étapes 5 et 6 : OCR et Excel */}
+        {currentStep >= 5 && uploadedPDF && selectedArea && coordinateFormatConfigured && (
           <div className="step-page">
             <OCRProcessor
               pdfFile={uploadedPDF}
@@ -673,6 +718,7 @@ function App() {
               onStepChange={setCurrentStep}
               onOCRStart={handleOCRStart}
               onExcelGeneration={handleExcelGeneration}
+              coordinateFormat={coordinateFormat}
             />
           </div>
         )}

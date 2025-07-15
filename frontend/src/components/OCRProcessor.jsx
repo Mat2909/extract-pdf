@@ -18,7 +18,7 @@ const forceDecimalPoint = (num) => {
   });
 };
 
-const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
+const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete, coordinateFormat }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -34,6 +34,19 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
   const [isCancelled, setIsCancelled] = useState(false);
   const [showConfigDialog, setShowConfigDialog] = useState(false);
   const [ocrConfig, setOcrConfig] = useState({ decimals: 3, coordinateType: 'lambert', autoFix: true });
+
+  // Effect to update OCR config when coordinateFormat changes
+  useEffect(() => {
+    if (coordinateFormat) {
+      console.log('🎯 Updating OCR config with coordinate format:', coordinateFormat);
+      setOcrConfig({
+        decimals: coordinateFormat.x.decimals,
+        coordinateType: coordinateFormat.coordinateType,
+        autoFix: true,
+        formatConfig: coordinateFormat // Store the full format config
+      });
+    }
+  }, [coordinateFormat]);
 
   // Effect to handle image display in validation modal
   useEffect(() => {
@@ -107,6 +120,13 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
 
   // Fonction basique d'extraction de coordonnées (sans conversion)
   const extractBasicCoordinates = async (text) => {
+    // Use coordinate format configuration if available
+    if (ocrConfig.formatConfig) {
+      console.log('🎯 Using coordinate format configuration for extraction:', ocrConfig.formatConfig);
+      return extractCoordinatesWithFormat(text, ocrConfig.formatConfig);
+    }
+    
+    // Fallback to original patterns
     const patterns = [
       /(?:Lambert\s*2?\s*)?(?:étendu|etend[iu])\s*:?\s*(\d{4,}(?:[.,]\d+)?)\s*m?[,\s;]+(\d{4,}(?:[.,]\d+)?)\s*m?/i,
       /X\s*[:=]\s*(\d{4,}(?:[.,]\d+)?)[,\s;]+Y\s*[:=]\s*(\d{4,}(?:[.,]\d+)?)/i,
@@ -148,6 +168,122 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete }) => {
     }
     
     return { x: 0, y: 0 };
+  };
+
+  // Enhanced coordinate extraction using format configuration
+  const extractCoordinatesWithFormat = (text, formatConfig) => {
+    console.log('🎯 Extracting coordinates with format:', formatConfig);
+    
+    // Create dynamic pattern based on format configuration
+    const xPattern = formatConfig.x.decimals > 0 
+      ? `\\d{${formatConfig.x.integers}}[.,]\\d{${formatConfig.x.decimals}}`
+      : `\\d{${formatConfig.x.integers}}`;
+    
+    const yPattern = formatConfig.y.decimals > 0
+      ? `\\d{${formatConfig.y.integers}}[.,]\\d{${formatConfig.y.decimals}}`
+      : `\\d{${formatConfig.y.integers}}`;
+    
+    // Create patterns based on format
+    const formatPatterns = [
+      // Exact format match
+      new RegExp(`(${xPattern})\\s*[,;\\s]+\\s*(${yPattern})`, 'i'),
+      // Flexible format with optional decimals
+      new RegExp(`(\\d{${formatConfig.x.integers}}(?:[.,]\\d{1,${formatConfig.x.decimals}})?)\\s*[,;\\s]+\\s*(\\d{${formatConfig.y.integers}}(?:[.,]\\d{1,${formatConfig.y.decimals}})?)`, 'i'),
+      // Space-separated format
+      new RegExp(`(\\d{${formatConfig.x.integers}}(?:[.,]\\d{1,${formatConfig.x.decimals}})?)\\s{2,}(\\d{${formatConfig.y.integers}}(?:[.,]\\d{1,${formatConfig.y.decimals}})?)`, 'i'),
+      // Line-separated format
+      new RegExp(`(\\d{${formatConfig.x.integers}}(?:[.,]\\d{1,${formatConfig.x.decimals}})?)\\s*[\\r\\n]+\\s*(\\d{${formatConfig.y.integers}}(?:[.,]\\d{1,${formatConfig.y.decimals}})?)`, 'i'),
+    ];
+    
+    // Try format-specific patterns first
+    for (const pattern of formatPatterns) {
+      const match = text.match(pattern);
+      if (match) {
+        try {
+          console.log('✅ Format-specific match found:', match[1], match[2]);
+          const normalized = normalizeCoordinatesWithFormat(match[1], match[2], formatConfig);
+          if (normalized.x > 1000 && normalized.y > 1000) {
+            return normalized;
+          }
+        } catch (error) {
+          console.log('❌ Error normalizing format-specific match:', error);
+          continue;
+        }
+      }
+    }
+    
+    // Fallback to generic extraction
+    const longNumbers = text.match(/\d{4,}(?:[.,]\d+)?/g);
+    if (longNumbers && longNumbers.length >= 2) {
+      try {
+        const normalized = normalizeCoordinatesWithFormat(longNumbers[0], longNumbers[1], formatConfig);
+        return normalized;
+      } catch (error) {
+        console.log('❌ Error normalizing fallback coordinates:', error);
+      }
+    }
+    
+    return { x: 0, y: 0 };
+  };
+
+  // Enhanced coordinate normalization using format configuration
+  const normalizeCoordinatesWithFormat = (xStr, yStr, formatConfig) => {
+    console.log('🎯 Normalizing coordinates with format:', { xStr, yStr, formatConfig });
+    
+    // Smart decimal point detection based on format
+    const smartDecimalConversion = (str, expectedDecimals) => {
+      // Remove spaces
+      str = str.replace(/\s/g, '');
+      
+      // If expected decimals is 0, remove any decimal part
+      if (expectedDecimals === 0) {
+        return str.replace(/[.,].*$/, '');
+      }
+      
+      // If already has a decimal point and no commas, keep as is
+      if (str.includes('.') && !str.includes(',')) {
+        return str;
+      }
+      
+      // If contains both point and commas, remove commas (thousands) and keep point
+      if (str.includes('.') && str.includes(',')) {
+        return str.replace(/,/g, '');
+      }
+      
+      // If only commas, determine if it's decimal separator or thousands
+      if (str.includes(',')) {
+        const commaParts = str.split(',');
+        if (commaParts.length === 2) {
+          // If last part length matches expected decimals, it's decimal separator
+          if (commaParts[1].length === expectedDecimals) {
+            return str.replace(',', '.');
+          }
+          // If last part is 3 digits or less and we expect decimals, it's decimal separator
+          if (commaParts[1].length <= 3 && expectedDecimals > 0) {
+            return str.replace(',', '.');
+          }
+        }
+        // Otherwise treat as thousands separator
+        return str.replace(/,/g, '');
+      }
+      
+      return str;
+    };
+    
+    let cleanX = smartDecimalConversion(xStr.trim(), formatConfig.x.decimals);
+    let cleanY = smartDecimalConversion(yStr.trim(), formatConfig.y.decimals);
+    
+    console.log('🎯 After smart decimal conversion:', { cleanX, cleanY });
+    
+    // Convert to numbers
+    const x = parseFloat(cleanX);
+    const y = parseFloat(cleanY);
+    
+    if (isNaN(x) || isNaN(y)) {
+      throw new Error('Invalid coordinates after normalization');
+    }
+    
+    return { x, y };
   };
 
   const convertViaGeofree = async (x, y) => {
