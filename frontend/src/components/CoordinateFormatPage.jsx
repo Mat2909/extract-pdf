@@ -139,10 +139,13 @@ const CoordinateFormatPage = ({
 
       const previewDataURL = zoneCanvas.toDataURL('image/png', 1.0);
       
+      console.log('📸 Image générée, taille data URL:', previewDataURL.length);
+      console.log('📸 Données image (début):', previewDataURL.substring(0, 50));
+      
       setPreviewImage(previewDataURL);
       setIsGeneratingPreview(false);
       
-      console.log('✅ Aperçu zone généré');
+      console.log('✅ Aperçu zone généré et setPreviewImage appelé');
       
     } catch (error) {
       console.error('❌ Erreur génération aperçu:', error);
@@ -230,9 +233,14 @@ const CoordinateFormatPage = ({
                   alt="Zone sélectionnée"
                   className="max-w-full max-h-96 border border-gray-300 rounded shadow-sm mx-auto block"
                   style={{ imageRendering: 'crisp-edges' }}
+                  onLoad={() => console.log('✅ Image preview chargée avec succès')}
+                  onError={(e) => console.error('❌ Erreur chargement image preview:', e)}
                 />
                 <p className="text-xs text-gray-500 text-center mt-2">
                   Zone qui sera analysée par l'OCR
+                </p>
+                <p className="text-xs text-blue-600 text-center mt-1">
+                  🔍 Image data: {previewImage ? previewImage.length : 0} chars
                 </p>
               </div>
             ) : (
@@ -252,11 +260,18 @@ const CoordinateFormatPage = ({
                       console.log('  selectedArea:', selectedArea);
                       console.log('  selectedPages:', selectedPages);
                       console.log('  isGeneratingPreview:', isGeneratingPreview);
-                      console.log('  previewImage:', previewImage);
+                      console.log('  previewImage length:', previewImage ? previewImage.length : 'null');
+                      console.log('  previewImage start:', previewImage ? previewImage.substring(0, 50) : 'null');
+                      
+                      // Forcer la génération
+                      if (uploadedPDF && selectedArea) {
+                        console.log('🔄 Force nouvelle génération...');
+                        generateAreaPreview();
+                      }
                     }}
                     className="text-red-600 hover:text-red-800 text-xs"
                   >
-                    🔍 Debug
+                    🔍 Debug + Force
                   </button>
                 </div>
               </div>
