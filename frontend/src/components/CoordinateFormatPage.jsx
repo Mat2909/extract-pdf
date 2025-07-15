@@ -58,8 +58,16 @@ const CoordinateFormatPage = ({
 
   // Générer l'aperçu de la zone sélectionnée
   useEffect(() => {
+    console.log('🔍 useEffect aperçu - uploadedPDF:', uploadedPDF);
+    console.log('🔍 useEffect aperçu - selectedArea:', selectedArea);
+    
     if (uploadedPDF && selectedArea) {
+      console.log('✅ Conditions remplies, génération aperçu...');
       generateAreaPreview();
+    } else {
+      console.log('❌ Conditions non remplies pour aperçu');
+      console.log('  - uploadedPDF:', !!uploadedPDF);
+      console.log('  - selectedArea:', !!selectedArea);
     }
   }, [uploadedPDF, selectedArea]);
 
@@ -72,11 +80,24 @@ const CoordinateFormatPage = ({
       console.log('📊 selectedArea:', selectedArea);
       console.log('📊 selectedPages:', selectedPages);
       
+      // Vérification détaillée des données
+      if (!uploadedPDF || !uploadedPDF.path) {
+        throw new Error('uploadedPDF ou uploadedPDF.path manquant');
+      }
+      
+      if (!selectedArea || !selectedArea.x || !selectedArea.y || !selectedArea.width || !selectedArea.height) {
+        throw new Error('selectedArea incomplete: ' + JSON.stringify(selectedArea));
+      }
+      
+      console.log('📄 Chargement PDF depuis:', uploadedPDF.path);
+      
       // Charger le PDF avec PDF.js
       const pdf = await pdfjsLib.getDocument(uploadedPDF.path).promise;
       const pageNumber = selectedArea.pageNumber || selectedPages[0] || 1;
       console.log('📄 Chargement page:', pageNumber);
       const page = await pdf.getPage(pageNumber);
+      
+      console.log('✅ Page chargée avec succès');
       
       // Scale pour preview (pas besoin d'ultra haute résolution)
       const viewport = page.getViewport({ scale: 2.0 });
@@ -220,9 +241,22 @@ const CoordinateFormatPage = ({
                   <p className="text-gray-500 mb-2">Aucun aperçu disponible</p>
                   <button
                     onClick={generateAreaPreview}
-                    className="text-blue-600 hover:text-blue-800 text-sm"
+                    className="text-blue-600 hover:text-blue-800 text-sm block mb-2"
                   >
                     Réessayer
+                  </button>
+                  <button
+                    onClick={() => {
+                      console.log('🔍 DEBUG - État actuel:');
+                      console.log('  uploadedPDF:', uploadedPDF);
+                      console.log('  selectedArea:', selectedArea);
+                      console.log('  selectedPages:', selectedPages);
+                      console.log('  isGeneratingPreview:', isGeneratingPreview);
+                      console.log('  previewImage:', previewImage);
+                    }}
+                    className="text-red-600 hover:text-red-800 text-xs"
+                  >
+                    🔍 Debug
                   </button>
                 </div>
               </div>
