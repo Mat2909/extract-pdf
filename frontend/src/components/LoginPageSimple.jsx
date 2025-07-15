@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 
 /**
- * Page d'authentification moderne inspirée de Flowbite
+ * Page d'authentification moderne inspirée de Flowbite  
  * Utilise les couleurs primaires rouges et la police Inter
+ * FORCE COMMIT - Design rouge avec Inter
  */
 function LoginPageSimple({ onLogin }) {
   const [credentials, setCredentials] = useState({
