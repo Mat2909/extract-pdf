@@ -452,11 +452,27 @@ const CoordinateFormatPage = ({
         </div>
         
         {/* Boutons de navigation uniformes */}
-        <div className="flex justify-center items-center gap-4 mt-8">
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginTop: '32px' }}>
           {/* Bouton Précédent */}
           <button
             onClick={onBack}
-            className="bg-gray-600 hover:bg-gray-700 text-white border-none px-6 py-3 rounded cursor-pointer text-base"
+            style={{
+              backgroundColor: '#f87171',
+              color: 'white',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '6px',
+              fontSize: '16px',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease-in-out'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#ef4444';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#f87171';
+            }}
           >
             ← Précédent
           </button>
@@ -465,11 +481,28 @@ const CoordinateFormatPage = ({
           <button
             onClick={handleValidateFormat}
             disabled={!formatSelected}
-            className={`border-none px-6 py-3 rounded text-base ${
-              formatSelected
-                ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
+            style={{
+              backgroundColor: formatSelected ? '#2563eb' : '#d1d5db',
+              color: formatSelected ? 'white' : '#6b7280',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '6px',
+              fontSize: '16px',
+              fontWeight: '500',
+              cursor: formatSelected ? 'pointer' : 'not-allowed',
+              transition: 'all 0.15s ease-in-out',
+              opacity: formatSelected ? '1' : '0.6'
+            }}
+            onMouseEnter={(e) => {
+              if (formatSelected) {
+                e.currentTarget.style.backgroundColor = '#1d4ed8';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (formatSelected) {
+                e.currentTarget.style.backgroundColor = '#2563eb';
+              }
+            }}
           >
             Suivant →
           </button>

@@ -55,23 +55,16 @@ function App() {
   // Définition des étapes selon le concessionnaire
   const getStepsForConcessionaire = (concessionaireId) => {
     const baseSteps = [
-      { number: 0, title: 'Sélection du concessionnaire', description: 'Choisir le type de réseau' },
-      { number: 1, title: 'Sélection du PDF', description: 'Choisir le fichier PDF à traiter' },
-      { number: 2, title: 'Sélection des pages', description: 'Choisir les pages à analyser' },
-      { number: 3, title: 'Zone d\'extraction', description: 'Définir la zone de coordonnées' },
-      { number: 4, title: 'Format coordonnées', description: 'Configurer le format de coordonnées' },
-      { number: 5, title: 'Validation des données', description: 'Contrôler les valeurs extraites' },
-      { number: 6, title: 'Extraction Excel', description: 'Génération du fichier final' }
+      { number: 0, title: 'Sélection du concessionnaire' },
+      { number: 1, title: 'Sélection du PDF' },
+      { number: 2, title: 'Sélection des pages à traiter' },
+      { number: 3, title: 'Définir zone d\'extraction' },
+      { number: 4, title: 'Définir format' },
+      { number: 5, title: 'Validation des données' },
+      { number: 6, title: 'Extraction données' }
     ];
     
-    // Personnalisation selon le concessionnaire
-    if (concessionaireId === 'grdf') {
-      baseSteps[3].description = 'Définir la zone de coordonnées GrDF';
-      baseSteps[4].description = 'Format coordonnées Lambert';
-    } else if (concessionaireId === 'sfr') {
-      baseSteps[3].description = 'Définir la zone de lecture SFR';
-      baseSteps[4].description = 'Format coordonnées GPS';
-    }
+    // Pas de personnalisation selon le concessionnaire - textes standardisés
     
     return baseSteps;
   };
@@ -360,7 +353,6 @@ function App() {
             }}
           >
             <div>{step.title}</div>
-            <div style={{ fontSize: '10px', marginTop: '2px' }}>{step.description}</div>
           </div>
         ))}
       </div>
@@ -985,6 +977,35 @@ function App() {
                       >
                         ✓ Sélectionner toutes les pages ({totalPDFPages} pages)
                       </button>
+                      
+                      <button
+                        onClick={() => {
+                          setSelectedPages([]);
+                        }}
+                        style={{
+                          width: '100%',
+                          color: 'white',
+                          backgroundColor: '#6b7280',
+                          fontWeight: '500',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                          padding: '12px 20px',
+                          textAlign: 'center',
+                          border: 'none',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease-in-out',
+                          marginBottom: '12px'
+                        }}
+                        onMouseOver={(e) => {
+                          e.target.style.backgroundColor = '#4b5563';
+                        }}
+                        onMouseOut={(e) => {
+                          e.target.style.backgroundColor = '#6b7280';
+                        }}
+                      >
+                        ✗ Désélectionner toutes les pages
+                      </button>
+                      
                       <p style={{ fontSize: '12px', color: '#6b7280', textAlign: 'center' }}>
                         ou sélectionnez manuellement les pages ci-dessous
                       </p>
