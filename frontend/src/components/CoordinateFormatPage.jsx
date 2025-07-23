@@ -463,7 +463,6 @@ const CoordinateFormatPage = ({
         
         {/* Les boutons de navigation sont maintenant dans la barre de progression fixe */}
           </div>
-          </div>
         </div>
       </section>
     </>
