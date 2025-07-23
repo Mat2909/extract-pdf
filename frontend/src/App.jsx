@@ -900,46 +900,46 @@ function App() {
             <ProgressBar />
           </div>
           
-          {/* Section droite avec boutons */}
-          <div className="flex items-center gap-2 ml-4">
-            {/* Bouton Suivant */}
-            {currentStep < steps.length - 1 && (
-              <button 
-                onClick={() => {
-                  // Logique pour passer à l'étape suivante si conditions remplies
-                  if (currentStep === 0 && selectedConcessionaire) {
-                    setCurrentStep(1);
-                  } else if (currentStep === 1 && uploadedPDF) {
-                    setCurrentStep(2);
-                  } else if (currentStep === 2 && selectedPages.length > 0) {
-                    setCurrentStep(3);
-                  } else if (currentStep === 3 && selectedArea) {
-                    setCurrentStep(4);
-                  } else if (currentStep === 4 && coordinateFormatConfigured) {
-                    setCurrentStep(5);
-                  }
-                }} 
-                disabled={
-                  (currentStep === 0 && !selectedConcessionaire) ||
-                  (currentStep === 1 && !uploadedPDF) ||
-                  (currentStep === 2 && selectedPages.length === 0) ||
-                  (currentStep === 3 && !selectedArea) ||
-                  (currentStep === 4 && !coordinateFormatConfigured)
+          {/* Bouton Suivant */}
+          {currentStep < steps.length - 1 && (
+            <button 
+              onClick={() => {
+                // Logique pour passer à l'étape suivante si conditions remplies
+                if (currentStep === 0 && selectedConcessionaire) {
+                  setCurrentStep(1);
+                } else if (currentStep === 1 && uploadedPDF) {
+                  setCurrentStep(2);
+                } else if (currentStep === 2 && selectedPages.length > 0) {
+                  setCurrentStep(3);
+                } else if (currentStep === 3 && selectedArea) {
+                  setCurrentStep(4);
+                } else if (currentStep === 4 && coordinateFormatConfigured) {
+                  setCurrentStep(5);
                 }
-                className={`border-none px-3 py-1.5 rounded text-sm transition-colors ${
-                  (currentStep === 0 && selectedConcessionaire) ||
-                  (currentStep === 1 && uploadedPDF) ||
-                  (currentStep === 2 && selectedPages.length > 0) ||
-                  (currentStep === 3 && selectedArea) ||
-                  (currentStep === 4 && coordinateFormatConfigured)
-                    ? 'bg-green-500 hover:bg-green-600 text-white cursor-pointer'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                Suivant →
-              </button>
-            )}
-            
+              }} 
+              disabled={
+                (currentStep === 0 && !selectedConcessionaire) ||
+                (currentStep === 1 && !uploadedPDF) ||
+                (currentStep === 2 && selectedPages.length === 0) ||
+                (currentStep === 3 && !selectedArea) ||
+                (currentStep === 4 && !coordinateFormatConfigured)
+              }
+              className={`border-none px-3 py-1.5 rounded text-sm transition-colors ml-4 ${
+                (currentStep === 0 && selectedConcessionaire) ||
+                (currentStep === 1 && uploadedPDF) ||
+                (currentStep === 2 && selectedPages.length > 0) ||
+                (currentStep === 3 && selectedArea) ||
+                (currentStep === 4 && coordinateFormatConfigured)
+                  ? 'bg-green-500 hover:bg-green-600 text-white cursor-pointer'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              Suivant →
+            </button>
+          )}
+          
+          {/* Section droite avec bouton centré */}
+          <div className="flex-1 flex justify-center ml-4">
             {/* Bouton Nouvelle extraction */}
             <button 
               onClick={resetApp} 
@@ -966,7 +966,7 @@ function App() {
                 e.target.style.backgroundColor = '#2563eb';
               }}
             >
-              <span style={{ fontSize: '16px' }}>↻</span>
+              <span style={{ fontSize: '24px' }}>↻</span>
               <span style={{ fontSize: '10px', lineHeight: '1.1' }}>Nouvelle<br/>extraction</span>
             </button>
           </div>
