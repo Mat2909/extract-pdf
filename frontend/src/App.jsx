@@ -873,12 +873,18 @@ function App() {
                 backgroundColor: '#dc2626',
                 color: 'white',
                 border: 'none',
-                padding: '6px 12px',
+                padding: '8px 12px',
                 borderRadius: '6px',
                 fontSize: '12px',
                 fontWeight: '500',
                 cursor: 'pointer',
-                transition: 'all 0.15s ease-in-out'
+                transition: 'all 0.15s ease-in-out',
+                lineHeight: '1.2',
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                minWidth: '80px'
               }}
               onMouseOver={(e) => {
                 e.target.style.backgroundColor = '#b91c1c';
@@ -887,7 +893,8 @@ function App() {
                 e.target.style.backgroundColor = '#dc2626';
               }}
             >
-              ↻ Nouvelle
+              <span style={{ fontSize: '16px', marginBottom: '2px' }}>↻</span>
+              <span style={{ fontSize: '10px' }}>Nouvelle<br/>extraction</span>
             </button>
             
             {/* Bouton Précédent */}
