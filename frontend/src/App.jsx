@@ -432,13 +432,9 @@ function App() {
         </div>
       )}
 
-      {/* Header simple */}
-      <div className="app-header bg-white border-b border-gray-200">
-        <h1 className="text-center text-2xl font-bold text-gray-800 py-4">Extraction de coordonnées PDF</h1>
-      </div>
       
       {/* Contenu des pages par étapes */}
-      <div className="page-content min-h-[calc(100vh-140px)] pb-24">
+      <div className="page-content min-h-[calc(100vh-80px)] pb-16">
         
         {/* Étape 0 : Sélection du concessionnaire */}
         {currentStep === 0 && (
@@ -849,15 +845,15 @@ function App() {
         
       </div>
 
-      {/* Barre de progression en bas de page */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-50">
-        <div className="flex items-center justify-center gap-4 max-w-4xl mx-auto">
+      {/* Barre de progression fine en bas */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-100 py-2 z-50">
+        <div className="flex items-center justify-center gap-3 max-w-6xl mx-auto px-4">
           {/* Bouton Nouvelle extraction */}
           <button 
             onClick={resetApp} 
-            className="bg-green-600 hover:bg-green-700 text-white border-none px-4 py-2 rounded cursor-pointer text-base"
+            className="bg-green-500 hover:bg-green-600 text-white border-none px-3 py-1.5 rounded text-sm transition-colors"
           >
-            ↻ Nouvelle extraction
+            ↻ Nouvelle
           </button>
           
           {/* Bouton Précédent */}
@@ -884,13 +880,15 @@ function App() {
                   setCoordinateFormat(null);
                 }
               }} 
-              className="bg-gray-600 hover:bg-gray-700 text-white border-none px-4 py-2 rounded cursor-pointer text-base"
+              className="bg-gray-500 hover:bg-gray-600 text-white border-none px-3 py-1.5 rounded text-sm transition-colors"
             >
               ← Précédent
             </button>
           )}
           
-          <ProgressBar />
+          <div className="flex-1 max-w-md">
+            <ProgressBar />
+          </div>
           
           {/* Bouton Suivant */}
           {currentStep < steps.length - 1 && (
@@ -916,13 +914,13 @@ function App() {
                 (currentStep === 3 && !selectedArea) ||
                 (currentStep === 4 && !coordinateFormatConfigured)
               }
-              className={`border-none px-4 py-2 rounded text-base ${
+              className={`border-none px-3 py-1.5 rounded text-sm transition-colors ${
                 (currentStep === 0 && selectedConcessionaire) ||
                 (currentStep === 1 && uploadedPDF) ||
                 (currentStep === 2 && selectedPages.length > 0) ||
                 (currentStep === 3 && selectedArea) ||
                 (currentStep === 4 && coordinateFormatConfigured)
-                  ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
+                  ? 'bg-green-500 hover:bg-green-600 text-white cursor-pointer'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
