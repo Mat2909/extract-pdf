@@ -432,198 +432,193 @@ function App() {
         </div>
       )}
 
-      {/* Header fixe avec titre et navigation */}
-      <div className="app-header sticky top-0 bg-white z-50 border-b-2 border-gray-200 pb-2.5">
-        <h1 className="text-center text-3xl font-bold text-gray-800 my-5">Extraction de coordonnées PDF</h1>
-        
-        {/* Barre de progression avec boutons précédent/suivant */}
-        <div className="flex items-center justify-center gap-4 mt-4">
-          {/* Bouton Nouvelle extraction à gauche */}
-          <button 
-            onClick={resetApp} 
-            className="bg-green-600 hover:bg-green-700 text-white border-none px-4 py-2 rounded cursor-pointer text-base"
-          >
-            ↻ Nouvelle extraction
-          </button>
-          
-          {/* Bouton Précédent */}
-          {currentStep > 0 && (
-            <button 
-              onClick={() => {
-                const prevStep = currentStep - 1;
-                setCurrentStep(prevStep);
-                
-                // Réinitialiser certains états selon l'étape précédente
-                if (prevStep === 0) {
-                  setSelectedConcessionaire(null);
-                  setSelectedFile(null);
-                  setMessage('');
-                  setErrorMessage(null);
-                } else if (prevStep === 1) {
-                  setMessage('');
-                } else if (prevStep === 2) {
-                  setSelectedArea(null);
-                } else if (prevStep === 3) {
-                  // Pas de réinitialisation nécessaire
-                } else if (prevStep === 4) {
-                  setCoordinateFormatConfigured(false);
-                  setCoordinateFormat(null);
-                }
-              }} 
-              className="bg-gray-600 hover:bg-gray-700 text-white border-none px-4 py-2 rounded cursor-pointer text-base"
-            >
-              ← Précédent
-            </button>
-          )}
-          
-          <ProgressBar />
-          
-          {/* Bouton Suivant */}
-          {currentStep < steps.length - 1 && (
-            <button 
-              onClick={() => {
-                // Logique pour passer à l'étape suivante si conditions remplies
-                if (currentStep === 0 && selectedConcessionaire) {
-                  setCurrentStep(1);
-                } else if (currentStep === 1 && uploadedPDF) {
-                  setCurrentStep(2);
-                } else if (currentStep === 2 && selectedPages.length > 0) {
-                  setCurrentStep(3);
-                } else if (currentStep === 3 && selectedArea) {
-                  setCurrentStep(4);
-                } else if (currentStep === 4 && coordinateFormatConfigured) {
-                  setCurrentStep(5);
-                }
-              }} 
-              disabled={
-                (currentStep === 0 && !selectedConcessionaire) ||
-                (currentStep === 1 && !uploadedPDF) ||
-                (currentStep === 2 && selectedPages.length === 0) ||
-                (currentStep === 3 && !selectedArea) ||
-                (currentStep === 4 && !coordinateFormatConfigured)
-              }
-              className={`border-none px-4 py-2 rounded text-base ${
-                (currentStep === 0 && selectedConcessionaire) ||
-                (currentStep === 1 && uploadedPDF) ||
-                (currentStep === 2 && selectedPages.length > 0) ||
-                (currentStep === 3 && selectedArea) ||
-                (currentStep === 4 && coordinateFormatConfigured)
-                  ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              Suivant →
-            </button>
-          )}
-        </div>
+      {/* Header simple */}
+      <div className="app-header bg-white border-b border-gray-200">
+        <h1 className="text-center text-2xl font-bold text-gray-800 py-4">Extraction de coordonnées PDF</h1>
       </div>
       
       {/* Contenu des pages par étapes */}
-      <div className="page-content p-5 min-h-[calc(100vh-200px)]">
+      <div className="page-content min-h-[calc(100vh-140px)] pb-24">
         
         {/* Étape 0 : Sélection du concessionnaire */}
         {currentStep === 0 && (
-          <div className="step-page" style={{ fontFamily: 'Inter, sans-serif' }}>
-            <div className="flex justify-center items-center min-h-[calc(100vh-300px)]">
-              <div 
-                className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg border border-gray-200"
-                style={{
-                  background: 'white',
-                  boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
-                  borderRadius: '8px'
-                }}
-              >
+          <>
+            <style>
+              {`
+                @keyframes spin {
+                  from { transform: rotate(0deg); }
+                  to { transform: rotate(360deg); }
+                }
+              `}
+            </style>
+            <section style={{ 
+              backgroundColor: '#f9fafb', 
+              fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif',
+              minHeight: 'calc(100vh - 140px)'
+            }}>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '32px 24px',
+                margin: '0 auto',
+                minHeight: 'calc(100vh - 140px)'
+              }}>
                 {/* Logo et titre */}
-                <div className="text-center mb-8">
-                  <div className="flex justify-center mb-4">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 2L2 7V10C2 16 6 20.5 12 22C18 20.5 22 16 22 10V7L12 2Z" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="#dc2626" fillOpacity="0.1"/>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '24px',
+                  fontSize: '24px',
+                  fontWeight: '600',
+                  color: '#111827'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '32px',
+                    height: '32px',
+                    marginRight: '8px',
+                    backgroundColor: '#dc2626',
+                    borderRadius: '8px'
+                  }}>
+                    <svg style={{ width: '20px', height: '20px', color: 'white' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
-                  <h1 className="text-2xl font-bold mb-2" style={{ color: '#1f2937' }}>
-                    Sélection du concessionnaire
-                  </h1>
-                  <p className="text-sm" style={{ color: '#6b7280' }}>
-                    Choisissez votre gestionnaire de réseau
-                  </p>
+                  PDF Extract
                 </div>
+                
+                {/* Carte de sélection */}
+                <div style={{
+                  width: '100%',
+                  maxWidth: '448px',
+                  backgroundColor: 'white',
+                  borderRadius: '8px',
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+                }}>
+                  <div style={{ padding: '32px' }}>
+                    <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
+                      Sélection du concessionnaire
+                    </h1>
+                    <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '24px', marginTop: '8px' }}>
+                      Choisissez votre gestionnaire de réseau
+                    </p>
+                    
+                    {/* Menu déroulant */}
+                    <div style={{ marginBottom: '20px' }}>
+                      <label htmlFor="concessionaire" style={{ 
+                        display: 'block', 
+                        marginBottom: '8px', 
+                        fontSize: '14px', 
+                        fontWeight: '500', 
+                        color: '#111827' 
+                      }}>
+                        Concessionnaire réseau
+                      </label>
+                      <select
+                        id="concessionaire"
+                        value={selectedConcessionaire?.id || ''}
+                        onChange={(e) => {
+                          const concessionaire = concessionaires.find(c => c.id === e.target.value);
+                          if (concessionaire) setSelectedConcessionaire(concessionaire);
+                        }}
+                        style={{
+                          backgroundColor: '#f9fafb',
+                          border: '1px solid #d1d5db',
+                          color: '#111827',
+                          borderRadius: '8px',
+                          display: 'block',
+                          width: '100%',
+                          padding: '10px',
+                          fontSize: '14px',
+                          boxSizing: 'border-box',
+                          appearance: 'none',
+                          backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+                          backgroundPosition: 'right 12px center',
+                          backgroundRepeat: 'no-repeat',
+                          backgroundSize: '16px',
+                          paddingRight: '40px'
+                        }}
+                      >
+                        <option value="">Sélectionnez un concessionnaire...</option>
+                        {concessionaires.map((concessionaire) => (
+                          <option key={concessionaire.id} value={concessionaire.id}>
+                            {concessionaire.logo} {concessionaire.name} - {concessionaire.description}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                {/* Menu déroulant Flowbite */}
-                <div className="mb-6">
-                  <label className="block text-sm font-medium mb-2" style={{ color: '#374151' }}>
-                    Concessionnaire réseau
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={selectedConcessionaire?.id || ''}
-                      onChange={(e) => {
-                        const concessionaire = concessionaires.find(c => c.id === e.target.value);
-                        if (concessionaire) handleConcessionaireSelect(concessionaire);
+                    {/* Aperçu du concessionnaire sélectionné */}
+                    {selectedConcessionaire && (
+                      <div 
+                        style={{
+                          padding: '16px',
+                          borderRadius: '8px',
+                          border: '2px solid',
+                          borderColor: selectedConcessionaire.color,
+                          backgroundColor: '#f9fafb',
+                          textAlign: 'center',
+                          marginBottom: '20px'
+                        }}
+                      >
+                        <div style={{ fontSize: '32px', marginBottom: '8px' }}>{selectedConcessionaire.logo}</div>
+                        <h3 style={{ 
+                          fontWeight: 'bold', 
+                          fontSize: '18px', 
+                          marginBottom: '4px',
+                          color: selectedConcessionaire.color 
+                        }}>
+                          {selectedConcessionaire.name}
+                        </h3>
+                        <p style={{ fontSize: '14px', color: '#6b7280' }}>
+                          {selectedConcessionaire.description}
+                        </p>
+                      </div>
+                    )}
+                    
+                    <button
+                      onClick={() => {
+                        if (selectedConcessionaire) {
+                          handleConcessionaireSelect(selectedConcessionaire);
+                        }
                       }}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                      disabled={!selectedConcessionaire}
                       style={{
-                        backgroundColor: '#f9fafb',
-                        fontSize: '16px',
-                        color: '#374151',
-                        appearance: 'none',
-                        backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
-                        backgroundPosition: 'right 12px center',
-                        backgroundRepeat: 'no-repeat',
-                        backgroundSize: '16px',
-                        paddingRight: '40px'
+                        width: '100%',
+                        color: 'white',
+                        backgroundColor: selectedConcessionaire ? '#dc2626' : '#d1d5db',
+                        fontWeight: '500',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        padding: '10px 20px',
+                        textAlign: 'center',
+                        border: 'none',
+                        cursor: selectedConcessionaire ? 'pointer' : 'not-allowed',
+                        opacity: selectedConcessionaire ? '1' : '0.5',
+                        transition: 'all 0.15s ease-in-out'
+                      }}
+                      onMouseOver={(e) => {
+                        if (selectedConcessionaire) {
+                          e.target.style.backgroundColor = '#b91c1c';
+                        }
+                      }}
+                      onMouseOut={(e) => {
+                        if (selectedConcessionaire) {
+                          e.target.style.backgroundColor = '#dc2626';
+                        }
                       }}
                     >
-                      <option value="">Sélectionnez un concessionnaire...</option>
-                      {concessionaires.map((concessionaire) => (
-                        <option key={concessionaire.id} value={concessionaire.id}>
-                          {concessionaire.logo} {concessionaire.name} - {concessionaire.description}
-                        </option>
-                      ))}
-                    </select>
+                      {selectedConcessionaire ? `Continuer avec ${selectedConcessionaire.name}` : 'Sélectionnez un concessionnaire'}
+                    </button>
                   </div>
                 </div>
-
-                {/* Aperçu du concessionnaire sélectionné */}
-                {selectedConcessionaire && (
-                  <div 
-                    className="p-4 rounded-lg border-2 mb-6 text-center transition-all duration-300"
-                    style={{
-                      backgroundColor: '#f9fafb',
-                      borderColor: selectedConcessionaire.color
-                    }}
-                  >
-                    <div className="text-3xl mb-2">{selectedConcessionaire.logo}</div>
-                    <h3 className="font-bold text-lg mb-1" style={{ color: selectedConcessionaire.color }}>
-                      {selectedConcessionaire.name}
-                    </h3>
-                    <p className="text-sm" style={{ color: '#6b7280' }}>
-                      {selectedConcessionaire.description}
-                    </p>
-                  </div>
-                )}
-
-                {/* Bouton de validation */}
-                {selectedConcessionaire && (
-                  <button
-                    onClick={() => handleConcessionaireSelect(selectedConcessionaire)}
-                    className="w-full py-3 px-4 text-white font-medium rounded-lg transition-all duration-200 hover:shadow-lg"
-                    style={{
-                      backgroundColor: '#dc2626',
-                      fontSize: '16px'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = '#b91c1c';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = '#dc2626';
-                    }}
-                  >
-                    Continuer avec {selectedConcessionaire.name}
-                  </button>
-                )}
               </div>
-            </div>
-          </div>
+            </section>
+          </>
         )}
         
         {/* Étape 1 : Sélection du PDF */}
@@ -852,6 +847,89 @@ function App() {
           </div>
         )}
         
+      </div>
+
+      {/* Barre de progression en bas de page */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-50">
+        <div className="flex items-center justify-center gap-4 max-w-4xl mx-auto">
+          {/* Bouton Nouvelle extraction */}
+          <button 
+            onClick={resetApp} 
+            className="bg-green-600 hover:bg-green-700 text-white border-none px-4 py-2 rounded cursor-pointer text-base"
+          >
+            ↻ Nouvelle extraction
+          </button>
+          
+          {/* Bouton Précédent */}
+          {currentStep > 0 && (
+            <button 
+              onClick={() => {
+                const prevStep = currentStep - 1;
+                setCurrentStep(prevStep);
+                
+                // Réinitialiser certains états selon l'étape précédente
+                if (prevStep === 0) {
+                  setSelectedConcessionaire(null);
+                  setSelectedFile(null);
+                  setMessage('');
+                  setErrorMessage(null);
+                } else if (prevStep === 1) {
+                  setMessage('');
+                } else if (prevStep === 2) {
+                  setSelectedArea(null);
+                } else if (prevStep === 3) {
+                  // Pas de réinitialisation nécessaire
+                } else if (prevStep === 4) {
+                  setCoordinateFormatConfigured(false);
+                  setCoordinateFormat(null);
+                }
+              }} 
+              className="bg-gray-600 hover:bg-gray-700 text-white border-none px-4 py-2 rounded cursor-pointer text-base"
+            >
+              ← Précédent
+            </button>
+          )}
+          
+          <ProgressBar />
+          
+          {/* Bouton Suivant */}
+          {currentStep < steps.length - 1 && (
+            <button 
+              onClick={() => {
+                // Logique pour passer à l'étape suivante si conditions remplies
+                if (currentStep === 0 && selectedConcessionaire) {
+                  setCurrentStep(1);
+                } else if (currentStep === 1 && uploadedPDF) {
+                  setCurrentStep(2);
+                } else if (currentStep === 2 && selectedPages.length > 0) {
+                  setCurrentStep(3);
+                } else if (currentStep === 3 && selectedArea) {
+                  setCurrentStep(4);
+                } else if (currentStep === 4 && coordinateFormatConfigured) {
+                  setCurrentStep(5);
+                }
+              }} 
+              disabled={
+                (currentStep === 0 && !selectedConcessionaire) ||
+                (currentStep === 1 && !uploadedPDF) ||
+                (currentStep === 2 && selectedPages.length === 0) ||
+                (currentStep === 3 && !selectedArea) ||
+                (currentStep === 4 && !coordinateFormatConfigured)
+              }
+              className={`border-none px-4 py-2 rounded text-base ${
+                (currentStep === 0 && selectedConcessionaire) ||
+                (currentStep === 1 && uploadedPDF) ||
+                (currentStep === 2 && selectedPages.length > 0) ||
+                (currentStep === 3 && selectedArea) ||
+                (currentStep === 4 && coordinateFormatConfigured)
+                  ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              Suivant →
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
