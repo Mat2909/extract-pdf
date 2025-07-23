@@ -436,7 +436,7 @@ function App() {
       {/* Contenu des pages par étapes */}
       <div 
         className="page-content min-h-[calc(100vh-80px)]"
-        style={{ paddingBottom: '200px' }}
+        style={{ paddingBottom: '80px' }}
       >
         
         {/* Étape 0 : Sélection du concessionnaire */}
@@ -852,7 +852,7 @@ function App() {
       <div 
         style={{
           position: 'fixed',
-          bottom: '60px',
+          bottom: '12px',
           left: '8px',
           right: '8px',
           backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -864,50 +864,69 @@ function App() {
           borderRadius: '8px 8px 0 0'
         }}
       >
-        <div className="flex items-center justify-center gap-3 max-w-6xl mx-auto px-4">
-          {/* Bouton Nouvelle extraction */}
-          <button 
-            onClick={resetApp} 
-            className="bg-green-500 hover:bg-green-600 text-white border-none px-3 py-1.5 rounded text-sm transition-colors"
-          >
-            ↻ Nouvelle
-          </button>
-          
-          {/* Bouton Précédent */}
-          {currentStep > 0 && (
+        <div className="flex items-center justify-between max-w-4xl mx-auto px-4">
+          {/* Section gauche avec bouton Nouvelle extraction */}
+          <div className="flex items-center gap-2">
             <button 
-              onClick={() => {
-                const prevStep = currentStep - 1;
-                setCurrentStep(prevStep);
-                
-                // Réinitialiser certains états selon l'étape précédente
-                if (prevStep === 0) {
-                  setSelectedConcessionaire(null);
-                  setSelectedFile(null);
-                  setMessage('');
-                  setErrorMessage(null);
-                } else if (prevStep === 1) {
-                  setMessage('');
-                } else if (prevStep === 2) {
-                  setSelectedArea(null);
-                } else if (prevStep === 3) {
-                  // Pas de réinitialisation nécessaire
-                } else if (prevStep === 4) {
-                  setCoordinateFormatConfigured(false);
-                  setCoordinateFormat(null);
-                }
-              }} 
-              className="bg-gray-500 hover:bg-gray-600 text-white border-none px-3 py-1.5 rounded text-sm transition-colors"
+              onClick={resetApp} 
+              style={{
+                backgroundColor: '#dc2626',
+                color: 'white',
+                border: 'none',
+                padding: '6px 12px',
+                borderRadius: '6px',
+                fontSize: '12px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease-in-out'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.backgroundColor = '#b91c1c';
+              }}
+              onMouseOut={(e) => {
+                e.target.style.backgroundColor = '#dc2626';
+              }}
             >
-              ← Précédent
+              ↻ Nouvelle
             </button>
-          )}
+            
+            {/* Bouton Précédent */}
+            {currentStep > 0 && (
+              <button 
+                onClick={() => {
+                  const prevStep = currentStep - 1;
+                  setCurrentStep(prevStep);
+                  
+                  // Réinitialiser certains états selon l'étape précédente
+                  if (prevStep === 0) {
+                    setSelectedConcessionaire(null);
+                    setSelectedFile(null);
+                    setMessage('');
+                    setErrorMessage(null);
+                  } else if (prevStep === 1) {
+                    setMessage('');
+                  } else if (prevStep === 2) {
+                    setSelectedArea(null);
+                  } else if (prevStep === 3) {
+                    // Pas de réinitialisation nécessaire
+                  } else if (prevStep === 4) {
+                    setCoordinateFormatConfigured(false);
+                    setCoordinateFormat(null);
+                  }
+                }} 
+                className="bg-gray-500 hover:bg-gray-600 text-white border-none px-3 py-1.5 rounded text-sm transition-colors"
+              >
+                ← Précédent
+              </button>
+            )}
+          </div>
           
-          <div className="flex-1 max-w-md">
+          {/* Barre de progression centrée */}
+          <div className="flex-1 max-w-md mx-4">
             <ProgressBar />
           </div>
           
-          {/* Bouton Suivant */}
+          {/* Bouton Suivant à droite */}
           {currentStep < steps.length - 1 && (
             <button 
               onClick={() => {
