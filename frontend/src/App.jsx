@@ -434,7 +434,10 @@ function App() {
 
       
       {/* Contenu des pages par étapes */}
-      <div className="page-content min-h-[calc(100vh-80px)] pb-48">
+      <div 
+        className="page-content min-h-[calc(100vh-80px)]"
+        style={{ paddingBottom: '200px' }}
+      >
         
         {/* Étape 0 : Sélection du concessionnaire */}
         {currentStep === 0 && (
@@ -846,7 +849,21 @@ function App() {
       </div>
 
       {/* Barre de progression fine en bas */}
-      <div className="fixed bottom-8 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-100 py-2 z-50 rounded-t-lg mx-2">
+      <div 
+        style={{
+          position: 'fixed',
+          bottom: '60px',
+          left: '8px',
+          right: '8px',
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(8px)',
+          borderTop: '1px solid #f3f4f6',
+          paddingTop: '8px',
+          paddingBottom: '8px',
+          zIndex: 9999,
+          borderRadius: '8px 8px 0 0'
+        }}
+      >
         <div className="flex items-center justify-center gap-3 max-w-6xl mx-auto px-4">
           {/* Bouton Nouvelle extraction */}
           <button 
