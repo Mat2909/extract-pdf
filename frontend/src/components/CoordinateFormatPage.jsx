@@ -29,7 +29,17 @@ const CoordinateFormatPage = ({
       y: '1234567.648'
     }
   });
-  const [formatSelected, setFormatSelected] = useState(false);
+  const [formatSelected, setFormatSelected] = useState(true); // Lambert II étendu pré-sélectionné
+
+  // Auto-configurer Lambert II étendu par défaut
+  useEffect(() => {
+    // Configurer automatiquement le format par défaut lors du montage
+    const defaultFormatConfig = {
+      ...coordinateFormat,
+      timestamp: Date.now()
+    };
+    onFormatConfigured(defaultFormatConfig);
+  }, [coordinateFormat, onFormatConfigured]); // Se déclenche seulement au montage
 
   // Formats prédéfinis
   const presetFormats = [
@@ -451,61 +461,7 @@ const CoordinateFormatPage = ({
           </div>
         </div>
         
-        {/* Boutons de navigation uniformes */}
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginTop: '32px' }}>
-          {/* Bouton Précédent */}
-          <button
-            onClick={onBack}
-            style={{
-              backgroundColor: '#f87171',
-              color: 'white',
-              border: 'none',
-              padding: '12px 24px',
-              borderRadius: '6px',
-              fontSize: '16px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease-in-out'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#ef4444';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#f87171';
-            }}
-          >
-            ← Précédent
-          </button>
-          
-          {/* Bouton Suivant */}
-          <button
-            onClick={handleValidateFormat}
-            disabled={!formatSelected}
-            style={{
-              backgroundColor: formatSelected ? '#2563eb' : '#d1d5db',
-              color: formatSelected ? 'white' : '#6b7280',
-              border: 'none',
-              padding: '12px 24px',
-              borderRadius: '6px',
-              fontSize: '16px',
-              fontWeight: '500',
-              cursor: formatSelected ? 'pointer' : 'not-allowed',
-              transition: 'all 0.15s ease-in-out',
-              opacity: formatSelected ? '1' : '0.6'
-            }}
-            onMouseEnter={(e) => {
-              if (formatSelected) {
-                e.currentTarget.style.backgroundColor = '#1d4ed8';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (formatSelected) {
-                e.currentTarget.style.backgroundColor = '#2563eb';
-              }
-            }}
-          >
-            Suivant →
-          </button>
+        {/* Les boutons de navigation sont maintenant dans la barre de progression fixe */}
           </div>
           </div>
         </div>

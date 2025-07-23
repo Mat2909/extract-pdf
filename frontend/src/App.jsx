@@ -813,7 +813,7 @@ function App() {
                           Upload en cours...
                         </>
                       ) : (
-                        selectedFile ? 'Télécharger et continuer' : 'Sélectionnez un fichier PDF'
+                        selectedFile ? 'Uploader et continuer' : 'Sélectionnez un fichier PDF'
                       )}
                     </button>
 
@@ -1154,23 +1154,6 @@ function App() {
                     <p style={{ color: '#155724', fontWeight: 'bold', marginTop: '10px' }}>
                       Passez à l'étape suivante pour configurer le format de coordonnées
                     </p>
-                  </div>
-                  
-                  {/* Boutons de navigation */}
-                  <div className="flex justify-center items-center gap-4 mt-8">
-                    <button
-                      onClick={() => setCurrentStep(2)}
-                      className="bg-gray-600 hover:bg-gray-700 text-white border-none px-6 py-3 rounded cursor-pointer text-base"
-                    >
-                      ← Précédent
-                    </button>
-                    
-                    <button
-                      onClick={() => setCurrentStep(4)}
-                      className="bg-green-600 hover:bg-green-700 text-white border-none px-6 py-3 rounded cursor-pointer text-base"
-                    >
-                      Suivant →
-                    </button>
                   </div>
                 </div>
               )}
