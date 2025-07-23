@@ -700,61 +700,190 @@ function App() {
         
         {/* Étape 2 : Sélection des pages */}
         {currentStep === 2 && uploadedPDF && (
-          <div className="step-page">
-            <div className="text-center max-w-6xl mx-auto">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Étape 2 : Sélection des pages à traiter</h2>
-              <p className="text-gray-600 mb-8">Cliquez sur les pages contenant les coordonnées à extraire</p>
-              
-              <div className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200 text-center">
-                <button
-                  onClick={() => {
-                    const allPages = totalPDFPages > 0 ? 
-                      [...Array(totalPDFPages).keys()].map(i => i + 1) : 
-                      [...Array(10).keys()].map(i => i + 1);
-                    setSelectedPages(allPages);
-                    setCurrentStep(3);
-                  }}
-                  className="bg-green-600 hover:bg-green-700 text-white border-none px-4 py-2 rounded cursor-pointer font-bold mb-4"
-                >
-                  ✓ Sélectionner toutes les pages ({totalPDFPages} pages)
-                </button>
-                <p className="text-gray-500 text-base">ou sélectionnez manuellement les pages ci-dessous</p>
-              </div>
-              
-              <PDFViewer
-                pdfUrl={uploadedPDF.path}
-                onAreaSelect={handleAreaSelect}
-                onPagesChange={handlePagesChange}
-                currentStep={currentStep}
-                onStepChange={setCurrentStep}
-                onTotalPagesChange={setTotalPDFPages}
-                selectedPages={selectedPages}
-                thumbnailMode={true}
-              />
-              
-              {/* Boutons de navigation */}
-              <div className="flex justify-center items-center gap-4 mt-8">
-                <button
-                  onClick={() => setCurrentStep(1)}
-                  className="bg-gray-600 hover:bg-gray-700 text-white border-none px-6 py-3 rounded cursor-pointer text-base"
-                >
-                  ← Précédent
-                </button>
+          <>
+            <style>
+              {`
+                @keyframes spin {
+                  from { transform: rotate(0deg); }
+                  to { transform: rotate(360deg); }
+                }
+              `}
+            </style>
+            <section style={{ 
+              backgroundColor: '#f9fafb', 
+              fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif',
+              minHeight: 'calc(100vh - 140px)'
+            }}>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '32px 24px',
+                margin: '0 auto',
+                minHeight: 'calc(100vh - 140px)'
+              }}>
+                {/* Logo et titre */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '24px',
+                  fontSize: '24px',
+                  fontWeight: '600',
+                  color: '#111827'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '32px',
+                    height: '32px',
+                    marginRight: '8px',
+                    backgroundColor: '#dc2626',
+                    borderRadius: '8px'
+                  }}>
+                    <svg style={{ width: '20px', height: '20px', color: 'white' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  PDF Extract
+                </div>
                 
-                <button
-                  onClick={() => setCurrentStep(3)}
-                  disabled={selectedPages.length === 0}
-                  className={`border-none px-6 py-3 rounded text-base ${
-                    selectedPages.length > 0
-                      ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  Suivant →
-                </button>
+                {/* Carte de sélection */}
+                <div style={{
+                  width: '100%',
+                  maxWidth: '600px',
+                  backgroundColor: 'white',
+                  borderRadius: '8px',
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+                }}>
+                  <div style={{ padding: '32px' }}>
+                    <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
+                      Sélection des pages à traiter
+                    </h1>
+                    <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '24px', marginTop: '8px' }}>
+                      Choisissez les pages contenant les coordonnées à extraire
+                    </p>
+
+                    {/* Affichage du concessionnaire sélectionné */}
+                    {selectedConcessionaire && (
+                      <div 
+                        style={{
+                          padding: '12px 16px',
+                          borderRadius: '6px',
+                          border: '1px solid',
+                          borderColor: selectedConcessionaire.color,
+                          backgroundColor: '#f9fafb',
+                          marginBottom: '20px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                      >
+                        <span style={{ fontSize: '16px' }}>{selectedConcessionaire.logo}</span>
+                        <span style={{ 
+                          fontWeight: '500', 
+                          fontSize: '14px',
+                          color: selectedConcessionaire.color 
+                        }}>
+                          {selectedConcessionaire.name}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {/* Bouton sélection rapide */}
+                    <div style={{ marginBottom: '24px' }}>
+                      <button
+                        onClick={() => {
+                          const allPages = totalPDFPages > 0 ? 
+                            [...Array(totalPDFPages).keys()].map(i => i + 1) : 
+                            [...Array(10).keys()].map(i => i + 1);
+                          setSelectedPages(allPages);
+                        }}
+                        style={{
+                          width: '100%',
+                          color: 'white',
+                          backgroundColor: '#dc2626',
+                          fontWeight: '500',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                          padding: '12px 20px',
+                          textAlign: 'center',
+                          border: 'none',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease-in-out',
+                          marginBottom: '12px'
+                        }}
+                        onMouseOver={(e) => {
+                          e.target.style.backgroundColor = '#b91c1c';
+                        }}
+                        onMouseOut={(e) => {
+                          e.target.style.backgroundColor = '#dc2626';
+                        }}
+                      >
+                        ✓ Sélectionner toutes les pages ({totalPDFPages} pages)
+                      </button>
+                      <p style={{ fontSize: '12px', color: '#6b7280', textAlign: 'center' }}>
+                        ou sélectionnez manuellement les pages ci-dessous
+                      </p>
+                    </div>
+
+                    {/* Aperçu des pages sélectionnées */}
+                    {selectedPages.length > 0 && (
+                      <div 
+                        style={{
+                          padding: '16px',
+                          borderRadius: '8px',
+                          border: '1px solid #10b981',
+                          backgroundColor: '#f0fdf4',
+                          marginBottom: '20px',
+                          textAlign: 'center'
+                        }}
+                      >
+                        <h3 style={{ 
+                          fontWeight: 'bold', 
+                          fontSize: '16px', 
+                          marginBottom: '8px',
+                          color: '#059669' 
+                        }}>
+                          Pages sélectionnées
+                        </h3>
+                        <p style={{ fontSize: '14px', color: '#6b7280' }}>
+                          {selectedPages.length === totalPDFPages ? 
+                            `Toutes les pages (${selectedPages.length})` :
+                            `${selectedPages.length} page${selectedPages.length > 1 ? 's' : ''} : ${selectedPages.join(', ')}`
+                          }
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Visualiseur PDF dans une carte séparée */}
+                <div style={{
+                  width: '100%',
+                  maxWidth: '800px',
+                  backgroundColor: 'white',
+                  borderRadius: '8px',
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                  marginTop: '20px'
+                }}>
+                  <div style={{ padding: '24px' }}>
+                    <PDFViewer
+                      pdfUrl={uploadedPDF.path}
+                      onAreaSelect={handleAreaSelect}
+                      onPagesChange={handlePagesChange}
+                      currentStep={currentStep}
+                      onStepChange={setCurrentStep}
+                      onTotalPagesChange={setTotalPDFPages}
+                      selectedPages={selectedPages}
+                      thumbnailMode={true}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </section>
+          </>
         )}
         
         {/* Étape 3 : Zone d'extraction */}
