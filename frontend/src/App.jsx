@@ -902,11 +902,17 @@ function App() {
           
           {/* Section droite avec boutons */}
           <div className="flex items-center gap-2 ml-4">
-            {/* Bouton Suivant */}
+            {/* Bouton Suivant - affiché si conditions validées */}
             {currentStep < steps.length - 1 && (
+              (currentStep === 0 && selectedConcessionaire) ||
+              (currentStep === 1 && uploadedPDF) ||
+              (currentStep === 2 && selectedPages.length > 0) ||
+              (currentStep === 3 && selectedArea) ||
+              (currentStep === 4 && coordinateFormatConfigured)
+            ) && (
               <button 
                 onClick={() => {
-                  // Logique pour passer à l'étape suivante si conditions remplies
+                  // Logique pour passer à l'étape suivante
                   if (currentStep === 0 && selectedConcessionaire) {
                     setCurrentStep(1);
                   } else if (currentStep === 1 && uploadedPDF) {
@@ -919,31 +925,6 @@ function App() {
                     setCurrentStep(5);
                   }
                 }} 
-                disabled={
-                  (currentStep === 0 && !selectedConcessionaire) ||
-                  (currentStep === 1 && !uploadedPDF) ||
-                  (currentStep === 2 && selectedPages.length === 0) ||
-                  (currentStep === 3 && !selectedArea) ||
-                  (currentStep === 4 && !coordinateFormatConfigured)
-                }
-                className={`border-none px-3 py-1.5 rounded text-sm transition-colors ${
-                  (currentStep === 0 && selectedConcessionaire) ||
-                  (currentStep === 1 && uploadedPDF) ||
-                  (currentStep === 2 && selectedPages.length > 0) ||
-                  (currentStep === 3 && selectedArea) ||
-                  (currentStep === 4 && coordinateFormatConfigured)
-                    ? 'bg-green-500 hover:bg-green-600 text-white cursor-pointer'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                Suivant →
-              </button>
-            )}
-            
-            {/* Bouton Nouvelle extraction centré dans l'espace restant */}
-            <div className="flex justify-center" style={{ width: '150px' }}>
-              <button 
-                onClick={resetApp} 
                 style={{
                   backgroundColor: '#2563eb',
                   color: 'white',
@@ -965,6 +946,49 @@ function App() {
                 }}
                 onMouseOut={(e) => {
                   e.target.style.backgroundColor = '#2563eb';
+                }}
+              >
+                <span style={{ fontSize: '24px' }}>→</span>
+                <span style={{ fontSize: '10px', lineHeight: '1.1' }}>Suivant</span>
+              </button>
+            )}
+            
+            {/* Bouton Nouvelle extraction centré dans l'espace restant */}
+            <div className="flex justify-center" style={{ width: '150px' }}>
+              <button 
+                onClick={() => {
+                  // Revenir à l'étape 0 - sélection du concessionnaire
+                  setCurrentStep(0);
+                  setSelectedConcessionaire(null);
+                  setSelectedFile(null);
+                  setMessage('');
+                  setErrorMessage(null);
+                  setSelectedArea(null);
+                  setCoordinateFormatConfigured(false);
+                  setCoordinateFormat(null);
+                  setSelectedPages([]);
+                }} 
+                style={{
+                  backgroundColor: '#16a34a',
+                  color: 'white',
+                  border: 'none',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease-in-out',
+                  lineHeight: '1.2',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  width: 'fit-content'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = '#15803d';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = '#16a34a';
                 }}
               >
                 <span style={{ fontSize: '24px' }}>↻</span>
