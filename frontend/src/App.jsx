@@ -523,38 +523,104 @@ function App() {
         
         {/* Étape 0 : Sélection du concessionnaire */}
         {currentStep === 0 && (
-          <div className="step-page">
-            <div className="text-center max-w-4xl mx-auto">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Étape 0 : Sélection du concessionnaire réseau</h2>
-              <p className="text-gray-600 mb-10">Choisissez le type de concessionnaire pour adapter l'extraction</p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 my-10">
-                {concessionaires.map((concessionaire) => (
-                  <div
-                    key={concessionaire.id}
-                    onClick={() => handleConcessionaireSelect(concessionaire)}
-                    className="p-8 bg-gray-50 rounded-xl border-2 border-gray-200 cursor-pointer transition-all duration-300 text-center hover:bg-white hover:shadow-lg hover:-translate-y-1"
+          <div className="step-page" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <div className="flex justify-center items-center min-h-[calc(100vh-300px)]">
+              <div 
+                className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg border border-gray-200"
+                style={{
+                  background: 'white',
+                  boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                  borderRadius: '8px'
+                }}
+              >
+                {/* Logo et titre */}
+                <div className="text-center mb-8">
+                  <div className="flex justify-center mb-4">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2L2 7V10C2 16 6 20.5 12 22C18 20.5 22 16 22 10V7L12 2Z" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="#dc2626" fillOpacity="0.1"/>
+                    </svg>
+                  </div>
+                  <h1 className="text-2xl font-bold mb-2" style={{ color: '#1f2937' }}>
+                    Sélection du concessionnaire
+                  </h1>
+                  <p className="text-sm" style={{ color: '#6b7280' }}>
+                    Choisissez votre gestionnaire de réseau
+                  </p>
+                </div>
+
+                {/* Menu déroulant Flowbite */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#374151' }}>
+                    Concessionnaire réseau
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={selectedConcessionaire?.id || ''}
+                      onChange={(e) => {
+                        const concessionaire = concessionaires.find(c => c.id === e.target.value);
+                        if (concessionaire) handleConcessionaireSelect(concessionaire);
+                      }}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                      style={{
+                        backgroundColor: '#f9fafb',
+                        fontSize: '16px',
+                        color: '#374151',
+                        appearance: 'none',
+                        backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+                        backgroundPosition: 'right 12px center',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundSize: '16px',
+                        paddingRight: '40px'
+                      }}
+                    >
+                      <option value="">Sélectionnez un concessionnaire...</option>
+                      {concessionaires.map((concessionaire) => (
+                        <option key={concessionaire.id} value={concessionaire.id}>
+                          {concessionaire.logo} {concessionaire.name} - {concessionaire.description}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Aperçu du concessionnaire sélectionné */}
+                {selectedConcessionaire && (
+                  <div 
+                    className="p-4 rounded-lg border-2 mb-6 text-center transition-all duration-300"
                     style={{
-                      borderColor: concessionaire.color
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.borderColor = concessionaire.color;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.borderColor = concessionaire.color;
+                      backgroundColor: '#f9fafb',
+                      borderColor: selectedConcessionaire.color
                     }}
                   >
-                    <div className="text-5xl mb-4">
-                      {concessionaire.logo}
-                    </div>
-                    <h3 className="text-2xl font-bold mb-2.5" style={{ color: concessionaire.color }}>
-                      {concessionaire.name}
+                    <div className="text-3xl mb-2">{selectedConcessionaire.logo}</div>
+                    <h3 className="font-bold text-lg mb-1" style={{ color: selectedConcessionaire.color }}>
+                      {selectedConcessionaire.name}
                     </h3>
-                    <p className="text-gray-500 text-sm leading-relaxed">
-                      {concessionaire.description}
+                    <p className="text-sm" style={{ color: '#6b7280' }}>
+                      {selectedConcessionaire.description}
                     </p>
                   </div>
-                ))}
+                )}
+
+                {/* Bouton de validation */}
+                {selectedConcessionaire && (
+                  <button
+                    onClick={() => handleConcessionaireSelect(selectedConcessionaire)}
+                    className="w-full py-3 px-4 text-white font-medium rounded-lg transition-all duration-200 hover:shadow-lg"
+                    style={{
+                      backgroundColor: '#dc2626',
+                      fontSize: '16px'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = '#b91c1c';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = '#dc2626';
+                    }}
+                  >
+                    Continuer avec {selectedConcessionaire.name}
+                  </button>
+                )}
               </div>
             </div>
           </div>
