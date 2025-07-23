@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 
 /**
  * Page de configuration du format de coordonnées
  * Layout: Aperçu zone (gauche) + Configuration (droite)
  */
-const CoordinateFormatPage = ({ 
+const CoordinateFormatPage = forwardRef(({ 
   uploadedPDF, 
   selectedArea, 
   selectedPages, 
   onFormatConfigured,
   onBack 
-}) => {
+}, ref) => {
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [coordinateFormat, setCoordinateFormat] = useState({
@@ -31,15 +31,12 @@ const CoordinateFormatPage = ({
   });
   const [formatSelected, setFormatSelected] = useState(true); // Lambert II étendu pré-sélectionné
 
-  // Auto-configurer Lambert II étendu par défaut
-  useEffect(() => {
-    // Configurer automatiquement le format par défaut lors du montage
-    const defaultFormatConfig = {
-      ...coordinateFormat,
-      timestamp: Date.now()
-    };
-    onFormatConfigured(defaultFormatConfig);
-  }, [coordinateFormat, onFormatConfigured]); // Se déclenche seulement au montage
+  // Lambert II étendu est pré-sélectionné mais pas auto-validé
+
+  // Exposer la méthode validateFormat pour le parent
+  useImperativeHandle(ref, () => ({
+    validateFormat: handleValidateFormat
+  }));
 
   // Formats prédéfinis
   const presetFormats = [
@@ -467,6 +464,6 @@ const CoordinateFormatPage = ({
       </section>
     </>
   );
-};
+});
 
 export default CoordinateFormatPage;

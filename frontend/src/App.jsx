@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import PDFViewer from './components/PDFViewer';
 import OCRProcessor from './components/OCRProcessor';
 import CoordinateFormatPage from './components/CoordinateFormatPage';
 
 function App() {
+  const coordinateFormatPageRef = useRef(null);
   const [selectedConcessionaire, setSelectedConcessionaire] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -1166,6 +1167,7 @@ function App() {
         {/* Étape 4 : Configuration du format de coordonnées */}
         {currentStep === 4 && uploadedPDF && selectedArea && (
           <CoordinateFormatPage
+            ref={coordinateFormatPageRef}
             uploadedPDF={uploadedPDF}
             selectedArea={selectedArea}
             selectedPages={selectedPages}
@@ -1273,24 +1275,28 @@ function App() {
             {/* Bouton Suivant - affiché si conditions validées */}
             {currentStep < steps.length - 1 && (
               (currentStep === 0 && selectedConcessionaire) ||
-              (currentStep === 1 && uploadedPDF) ||
+              (currentStep === 1 && selectedFile) ||
               (currentStep === 2 && selectedPages.length > 0) ||
               (currentStep === 3 && selectedArea) ||
-              (currentStep === 4 && coordinateFormatConfigured)
+              (currentStep === 4 && true) // Lambert II étendu toujours pré-sélectionné
             ) && (
               <button 
                 onClick={() => {
                   // Logique pour passer à l'étape suivante
                   if (currentStep === 0 && selectedConcessionaire) {
                     setCurrentStep(1);
-                  } else if (currentStep === 1 && uploadedPDF) {
-                    setCurrentStep(2);
+                  } else if (currentStep === 1 && selectedFile) {
+                    // Pour l'étape 1, le bouton Suivant déclenche l'upload
+                    handleUpload();
                   } else if (currentStep === 2 && selectedPages.length > 0) {
                     setCurrentStep(3);
                   } else if (currentStep === 3 && selectedArea) {
                     setCurrentStep(4);
-                  } else if (currentStep === 4 && coordinateFormatConfigured) {
-                    setCurrentStep(5);
+                  } else if (currentStep === 4) {
+                    // Déclencher la validation du format depuis CoordinateFormatPage
+                    if (coordinateFormatPageRef.current) {
+                      coordinateFormatPageRef.current.validateFormat();
+                    }
                   }
                 }} 
                 style={{
