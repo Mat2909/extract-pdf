@@ -434,7 +434,7 @@ function App() {
 
       
       {/* Contenu des pages par étapes */}
-      <div className="page-content min-h-[calc(100vh-80px)] pb-32>
+      <div className="page-content min-h-[calc(100vh-80px)] pb-32">
         
         {/* Étape 0 : Sélection du concessionnaire */}
         {currentStep === 0 && (
