@@ -941,15 +941,15 @@ function App() {
                   gap: '6px',
                   width: 'fit-content'
                 }}
-                onMouseOver={(e) => {
-                  e.target.style.backgroundColor = '#1d4ed8';
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#1d4ed8';
                 }}
-                onMouseOut={(e) => {
-                  e.target.style.backgroundColor = '#2563eb';
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#2563eb';
                 }}
               >
-                <span style={{ fontSize: '24px' }}>→</span>
-                <span style={{ fontSize: '10px', lineHeight: '1.1' }}>Suivant</span>
+                <span style={{ fontSize: '24px', pointerEvents: 'none' }}>→</span>
+                <span style={{ fontSize: '10px', lineHeight: '1.1', pointerEvents: 'none' }}>Suivant</span>
               </button>
             )}
             
@@ -984,15 +984,15 @@ function App() {
                   gap: '6px',
                   width: 'fit-content'
                 }}
-                onMouseOver={(e) => {
-                  e.target.style.backgroundColor = '#15803d';
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#15803d';
                 }}
-                onMouseOut={(e) => {
-                  e.target.style.backgroundColor = '#16a34a';
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#16a34a';
                 }}
               >
-                <span style={{ fontSize: '24px' }}>↻</span>
-                <span style={{ fontSize: '10px', lineHeight: '1.1' }}>Nouvelle<br/>extraction</span>
+                <span style={{ fontSize: '24px', pointerEvents: 'none' }}>↻</span>
+                <span style={{ fontSize: '10px', lineHeight: '1.1', pointerEvents: 'none' }}>Nouvelle<br/>extraction</span>
               </button>
             </div>
           </div>
