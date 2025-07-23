@@ -434,7 +434,7 @@ function App() {
 
       
       {/* Contenu des pages par étapes */}
-      <div className="page-content min-h-[calc(100vh-80px)] pb-32">
+      <div className="page-content min-h-[calc(100vh-80px)] pb-48">
         
         {/* Étape 0 : Sélection du concessionnaire */}
         {currentStep === 0 && (
@@ -846,7 +846,7 @@ function App() {
       </div>
 
       {/* Barre de progression fine en bas */}
-      <div className="fixed bottom-2 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-100 py-2 z-50 rounded-t-lg mx-2">
+      <div className="fixed bottom-8 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-100 py-2 z-50 rounded-t-lg mx-2">
         <div className="flex items-center justify-center gap-3 max-w-6xl mx-auto px-4">
           {/* Bouton Nouvelle extraction */}
           <button 
