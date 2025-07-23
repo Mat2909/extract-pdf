@@ -622,80 +622,242 @@ function App() {
         
         {/* Étape 1 : Sélection du PDF */}
         {currentStep === 1 && (
-          <div className="step-page">
-            <div className="text-center max-w-2xl mx-auto">
-              {selectedConcessionaire && (
-                <div className="mb-5 p-2.5 bg-gray-50 rounded-lg border-2" style={{ borderColor: selectedConcessionaire.color }}>
-                  <span className="text-xl mr-2.5">
-                    {selectedConcessionaire.logo}
-                  </span>
-                  <strong style={{ color: selectedConcessionaire.color }}>
-                    Concessionnaire sélectionné : {selectedConcessionaire.name}
-                  </strong>
+          <>
+            <style>
+              {`
+                @keyframes spin {
+                  from { transform: rotate(0deg); }
+                  to { transform: rotate(360deg); }
+                }
+              `}
+            </style>
+            <section style={{ 
+              backgroundColor: '#f9fafb', 
+              fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif',
+              minHeight: 'calc(100vh - 140px)'
+            }}>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '32px 24px',
+                margin: '0 auto',
+                minHeight: 'calc(100vh - 140px)'
+              }}>
+                {/* Logo et titre */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '24px',
+                  fontSize: '24px',
+                  fontWeight: '600',
+                  color: '#111827'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '32px',
+                    height: '32px',
+                    marginRight: '8px',
+                    backgroundColor: '#dc2626',
+                    borderRadius: '8px'
+                  }}>
+                    <svg style={{ width: '20px', height: '20px', color: 'white' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  PDF Extract
                 </div>
-              )}
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Étape 1 : Sélection du fichier PDF</h2>
-              <p className="text-gray-600 mb-5">Choisissez le fichier PDF contenant les coordonnées à extraire</p>
-              
-              <div className="upload-section p-10 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 my-5">
-                <input
-                  type="file"
-                  accept=".pdf"
-                  onChange={handleFileSelect}
-                  disabled={uploading}
-                  className="my-5 p-2.5 border border-gray-300 rounded text-base disabled:opacity-50"
-                />
                 
-                {selectedFile && (
-                  <div className="file-info my-5 p-4 bg-white rounded border border-green-600">
-                    <p><strong>Fichier sélectionné:</strong> {selectedFile.name}</p>
-                    <p><strong>Taille:</strong> {(selectedFile.size / 1024 / 1024).toFixed(2)} MB 
-                      {selectedFile.size > 3 * 1024 * 1024 && (
-                        <span className="text-yellow-600 font-bold"> (Fichier volumineux)</span>
-                      )}
+                {/* Carte de sélection */}
+                <div style={{
+                  width: '100%',
+                  maxWidth: '448px',
+                  backgroundColor: 'white',
+                  borderRadius: '8px',
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+                }}>
+                  <div style={{ padding: '32px' }}>
+                    <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
+                      Sélection du fichier PDF
+                    </h1>
+                    <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '24px', marginTop: '8px' }}>
+                      Choisissez le fichier PDF contenant les coordonnées à extraire
                     </p>
+
+                    {/* Affichage du concessionnaire sélectionné */}
+                    {selectedConcessionaire && (
+                      <div 
+                        style={{
+                          padding: '12px 16px',
+                          borderRadius: '6px',
+                          border: '1px solid',
+                          borderColor: selectedConcessionaire.color,
+                          backgroundColor: '#f9fafb',
+                          marginBottom: '20px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                      >
+                        <span style={{ fontSize: '16px' }}>{selectedConcessionaire.logo}</span>
+                        <span style={{ 
+                          fontWeight: '500', 
+                          fontSize: '14px',
+                          color: selectedConcessionaire.color 
+                        }}>
+                          {selectedConcessionaire.name}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {/* Section upload */}
+                    <div style={{ marginBottom: '20px' }}>
+                      <label htmlFor="pdf-file" style={{ 
+                        display: 'block', 
+                        marginBottom: '8px', 
+                        fontSize: '14px', 
+                        fontWeight: '500', 
+                        color: '#111827' 
+                      }}>
+                        Fichier PDF
+                      </label>
+                      <input
+                        id="pdf-file"
+                        type="file"
+                        accept=".pdf"
+                        onChange={handleFileSelect}
+                        disabled={uploading}
+                        style={{
+                          backgroundColor: '#f9fafb',
+                          border: '1px solid #d1d5db',
+                          color: '#111827',
+                          borderRadius: '8px',
+                          display: 'block',
+                          width: '100%',
+                          padding: '10px',
+                          fontSize: '14px',
+                          boxSizing: 'border-box'
+                        }}
+                      />
+                    </div>
+
+                    {/* Aperçu du fichier sélectionné */}
+                    {selectedFile && (
+                      <div 
+                        style={{
+                          padding: '16px',
+                          borderRadius: '8px',
+                          border: '1px solid #10b981',
+                          backgroundColor: '#f0fdf4',
+                          marginBottom: '20px'
+                        }}
+                      >
+                        <h3 style={{ 
+                          fontWeight: 'bold', 
+                          fontSize: '16px', 
+                          marginBottom: '8px',
+                          color: '#059669' 
+                        }}>
+                          Fichier sélectionné
+                        </h3>
+                        <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '4px' }}>
+                          <strong>Nom :</strong> {selectedFile.name}
+                        </p>
+                        <p style={{ fontSize: '14px', color: '#6b7280' }}>
+                          <strong>Taille :</strong> {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                          {selectedFile.size > 3 * 1024 * 1024 && (
+                            <span style={{ color: '#d97706', fontWeight: 'bold' }}> (Fichier volumineux)</span>
+                          )}
+                        </p>
+                      </div>
+                    )}
+                    
+                    <button
+                      onClick={handleUpload}
+                      disabled={!selectedFile || uploading}
+                      style={{
+                        width: '100%',
+                        color: 'white',
+                        backgroundColor: selectedFile && !uploading ? '#dc2626' : '#d1d5db',
+                        fontWeight: '500',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        padding: '10px 20px',
+                        textAlign: 'center',
+                        border: 'none',
+                        cursor: selectedFile && !uploading ? 'pointer' : 'not-allowed',
+                        opacity: selectedFile && !uploading ? '1' : '0.5',
+                        transition: 'all 0.15s ease-in-out',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px'
+                      }}
+                      onMouseOver={(e) => {
+                        if (selectedFile && !uploading) {
+                          e.target.style.backgroundColor = '#b91c1c';
+                        }
+                      }}
+                      onMouseOut={(e) => {
+                        if (selectedFile && !uploading) {
+                          e.target.style.backgroundColor = '#dc2626';
+                        }
+                      }}
+                    >
+                      {uploading ? (
+                        <>
+                          <svg style={{ 
+                            animation: 'spin 1s linear infinite', 
+                            width: '16px', 
+                            height: '16px', 
+                            color: 'white' 
+                          }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle style={{ opacity: '0.25' }} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path style={{ opacity: '0.75' }} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Upload en cours...
+                        </>
+                      ) : (
+                        selectedFile ? 'Télécharger et continuer' : 'Sélectionnez un fichier PDF'
+                      )}
+                    </button>
+
+                    {/* Messages d'erreur et de succès */}
+                    {message && (
+                      <div style={{
+                        marginTop: '20px',
+                        padding: '12px 16px',
+                        borderRadius: '8px',
+                        backgroundColor: message.includes('succès') ? '#f0fdf4' : '#fef2f2',
+                        border: `1px solid ${message.includes('succès') ? '#10b981' : '#ef4444'}`,
+                        color: message.includes('succès') ? '#059669' : '#dc2626',
+                        fontSize: '14px'
+                      }}>
+                        {message}
+                      </div>
+                    )}
+                    
+                    {errorMessage && (
+                      <div style={{
+                        marginTop: '20px',
+                        padding: '12px 16px',
+                        borderRadius: '8px',
+                        backgroundColor: '#fef2f2',
+                        border: '1px solid #ef4444',
+                        color: '#dc2626',
+                        fontSize: '14px'
+                      }}>
+                        {errorMessage}
+                      </div>
+                    )}
                   </div>
-                )}
-                
-                <div className="flex justify-center items-center gap-4 mt-6">
-                  <button
-                    onClick={() => setCurrentStep(0)}
-                    className="bg-gray-600 hover:bg-gray-700 text-white border-none px-6 py-3 rounded cursor-pointer text-base"
-                  >
-                    ← Précédent
-                  </button>
-                  
-                  <button
-                    onClick={handleUpload}
-                    disabled={!selectedFile || uploading}
-                    className={`border-none px-6 py-3 rounded text-base ${
-                      !selectedFile || uploading 
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                        : 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
-                    }`}
-                  >
-                    {uploading ? 'Upload en cours...' : 'Suivant →'}
-                  </button>
                 </div>
-                
-                {message && (
-                  <div className={`mt-5 p-2.5 rounded ${
-                    message.includes('succès') 
-                      ? 'bg-green-100 text-green-800 border border-green-200' 
-                      : 'bg-red-100 text-red-800 border border-red-200'
-                  }`}>
-                    {message}
-                  </div>
-                )}
-                
-                {errorMessage && (
-                  <div className="mt-5 p-2.5 rounded bg-red-100 text-red-800 border border-red-200">
-                    {errorMessage}
-                  </div>
-                )}
               </div>
-            </div>
-          </div>
+            </section>
+          </>
         )}
         
         {/* Étape 2 : Sélection des pages */}
@@ -888,12 +1050,60 @@ function App() {
         
         {/* Étape 3 : Zone d'extraction */}
         {currentStep === 3 && uploadedPDF && (
-          <div className="step-page">
-            <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-              <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                <h2>Étape 3 : Zone d'extraction</h2>
-                <p>Sélectionnez la zone contenant les coordonnées sur le PDF</p>
-              </div>
+          <>
+            <style>
+              {`
+                @keyframes spin {
+                  from { transform: rotate(0deg); }
+                  to { transform: rotate(360deg); }
+                }
+              `}
+            </style>
+            <section style={{ 
+              backgroundColor: '#f9fafb', 
+              fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif',
+              minHeight: 'calc(100vh - 140px)'
+            }}>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                padding: '32px 24px',
+                margin: '0 auto',
+                minHeight: 'calc(100vh - 140px)'
+              }}>
+                {/* Logo et titre */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '24px',
+                  fontSize: '24px',
+                  fontWeight: '600',
+                  color: '#111827'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '32px',
+                    height: '32px',
+                    marginRight: '8px',
+                    backgroundColor: '#dc2626',
+                    borderRadius: '8px'
+                  }}>
+                    <svg style={{ width: '20px', height: '20px', color: 'white' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  PDF Extract
+                </div>
+
+                <div style={{ maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
+                  <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                    <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', marginBottom: '8px' }}>Étape 3 : Zone d'extraction</h2>
+                    <p style={{ fontSize: '16px', color: '#6b7280' }}>Sélectionnez la zone contenant les coordonnées sur le PDF</p>
+                  </div>
               
               <PDFViewer
                 pdfUrl={uploadedPDF.path}
@@ -943,8 +1153,10 @@ function App() {
                   </div>
                 </div>
               )}
-            </div>
-          </div>
+                </div>
+              </div>
+            </section>
+          </>
         )}
         
         {/* Étape 4 : Configuration du format de coordonnées */}

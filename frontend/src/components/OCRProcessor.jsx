@@ -840,11 +840,60 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete, coordi
   };
 
   return (
-    <div className="ocr-processor">
-      <div className="extraction-info">
-        <h3>🎯 Extraction de coordonnées PDF</h3>
-        <p>Cette application extrait automatiquement les coordonnées depuis vos documents PDF.</p>
-        <p><strong>Format de sortie :</strong> Fichier Excel (.xlsx) avec coordonnées prêtes à utiliser</p>
+    <>
+      <style>
+        {`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}
+      </style>
+      <section style={{ 
+        backgroundColor: '#f9fafb', 
+        fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif',
+        minHeight: 'calc(100vh - 140px)'
+      }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          padding: '32px 24px',
+          margin: '0 auto',
+          minHeight: 'calc(100vh - 140px)'
+        }}>
+          {/* Logo et titre */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: '24px',
+            fontSize: '24px',
+            fontWeight: '600',
+            color: '#111827'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '32px',
+              height: '32px',
+              marginRight: '8px',
+              backgroundColor: '#dc2626',
+              borderRadius: '8px'
+            }}>
+              <svg style={{ width: '20px', height: '20px', color: 'white' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            PDF Extract
+          </div>
+
+          <div className="ocr-processor" style={{ width: '100%', maxWidth: '1200px' }}>
+            <div className="extraction-info">
+              <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', marginBottom: '8px', textAlign: 'center' }}>🎯 Extraction de coordonnées PDF</h3>
+              <p style={{ fontSize: '16px', color: '#6b7280', textAlign: 'center', marginBottom: '8px' }}>Cette application extrait automatiquement les coordonnées depuis vos documents PDF.</p>
+              <p style={{ fontSize: '16px', color: '#6b7280', textAlign: 'center' }}><strong>Format de sortie :</strong> Fichier Excel (.xlsx) avec coordonnées prêtes à utiliser</p>
         
         {selectedPages && selectedPages.length > 0 && (
           <div className="pages-selected-info" style={{
@@ -1055,7 +1104,10 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete, coordi
           </button>
         </div>
       )}
-    </div>
+          </div>
+        </div>
+      </section>
+    </>
   );
 };
 

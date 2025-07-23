@@ -7,8 +7,8 @@ import React, { useState } from 'react';
  */
 function LoginPageSimple({ onLogin }) {
   const [credentials, setCredentials] = useState({
-    username: '',
-    password: ''
+    username: 'Admin',
+    password: 'Admin'
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
