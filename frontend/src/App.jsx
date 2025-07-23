@@ -864,13 +864,87 @@ function App() {
           borderRadius: '8px 8px 0 0'
         }}
       >
-        <div className="flex items-center justify-between max-w-4xl mx-auto px-4">
-          {/* Section gauche avec bouton Nouvelle extraction */}
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center max-w-4xl mx-auto px-4">
+          {/* Bouton Précédent à gauche */}
+          {currentStep > 0 && (
+            <button 
+              onClick={() => {
+                const prevStep = currentStep - 1;
+                setCurrentStep(prevStep);
+                
+                // Réinitialiser certains états selon l'étape précédente
+                if (prevStep === 0) {
+                  setSelectedConcessionaire(null);
+                  setSelectedFile(null);
+                  setMessage('');
+                  setErrorMessage(null);
+                } else if (prevStep === 1) {
+                  setMessage('');
+                } else if (prevStep === 2) {
+                  setSelectedArea(null);
+                } else if (prevStep === 3) {
+                  // Pas de réinitialisation nécessaire
+                } else if (prevStep === 4) {
+                  setCoordinateFormatConfigured(false);
+                  setCoordinateFormat(null);
+                }
+              }} 
+              className="bg-gray-500 hover:bg-gray-600 text-white border-none px-3 py-1.5 rounded text-sm transition-colors mr-4"
+            >
+              ← Précédent
+            </button>
+          )}
+          
+          {/* Barre de progression centrée */}
+          <div className="flex-1 max-w-md">
+            <ProgressBar />
+          </div>
+          
+          {/* Section droite avec boutons */}
+          <div className="flex items-center gap-2 ml-4">
+            {/* Bouton Suivant */}
+            {currentStep < steps.length - 1 && (
+              <button 
+                onClick={() => {
+                  // Logique pour passer à l'étape suivante si conditions remplies
+                  if (currentStep === 0 && selectedConcessionaire) {
+                    setCurrentStep(1);
+                  } else if (currentStep === 1 && uploadedPDF) {
+                    setCurrentStep(2);
+                  } else if (currentStep === 2 && selectedPages.length > 0) {
+                    setCurrentStep(3);
+                  } else if (currentStep === 3 && selectedArea) {
+                    setCurrentStep(4);
+                  } else if (currentStep === 4 && coordinateFormatConfigured) {
+                    setCurrentStep(5);
+                  }
+                }} 
+                disabled={
+                  (currentStep === 0 && !selectedConcessionaire) ||
+                  (currentStep === 1 && !uploadedPDF) ||
+                  (currentStep === 2 && selectedPages.length === 0) ||
+                  (currentStep === 3 && !selectedArea) ||
+                  (currentStep === 4 && !coordinateFormatConfigured)
+                }
+                className={`border-none px-3 py-1.5 rounded text-sm transition-colors ${
+                  (currentStep === 0 && selectedConcessionaire) ||
+                  (currentStep === 1 && uploadedPDF) ||
+                  (currentStep === 2 && selectedPages.length > 0) ||
+                  (currentStep === 3 && selectedArea) ||
+                  (currentStep === 4 && coordinateFormatConfigured)
+                    ? 'bg-green-500 hover:bg-green-600 text-white cursor-pointer'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                Suivant →
+              </button>
+            )}
+            
+            {/* Bouton Nouvelle extraction */}
             <button 
               onClick={resetApp} 
               style={{
-                backgroundColor: '#dc2626',
+                backgroundColor: '#2563eb',
                 color: 'white',
                 border: 'none',
                 padding: '8px 12px',
@@ -883,92 +957,19 @@ function App() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                minWidth: '120px'
+                width: 'fit-content'
               }}
               onMouseOver={(e) => {
-                e.target.style.backgroundColor = '#b91c1c';
+                e.target.style.backgroundColor = '#1d4ed8';
               }}
               onMouseOut={(e) => {
-                e.target.style.backgroundColor = '#dc2626';
+                e.target.style.backgroundColor = '#2563eb';
               }}
             >
               <span style={{ fontSize: '16px' }}>↻</span>
               <span style={{ fontSize: '10px', lineHeight: '1.1' }}>Nouvelle<br/>extraction</span>
             </button>
-            
-            {/* Bouton Précédent */}
-            {currentStep > 0 && (
-              <button 
-                onClick={() => {
-                  const prevStep = currentStep - 1;
-                  setCurrentStep(prevStep);
-                  
-                  // Réinitialiser certains états selon l'étape précédente
-                  if (prevStep === 0) {
-                    setSelectedConcessionaire(null);
-                    setSelectedFile(null);
-                    setMessage('');
-                    setErrorMessage(null);
-                  } else if (prevStep === 1) {
-                    setMessage('');
-                  } else if (prevStep === 2) {
-                    setSelectedArea(null);
-                  } else if (prevStep === 3) {
-                    // Pas de réinitialisation nécessaire
-                  } else if (prevStep === 4) {
-                    setCoordinateFormatConfigured(false);
-                    setCoordinateFormat(null);
-                  }
-                }} 
-                className="bg-gray-500 hover:bg-gray-600 text-white border-none px-3 py-1.5 rounded text-sm transition-colors"
-              >
-                ← Précédent
-              </button>
-            )}
           </div>
-          
-          {/* Barre de progression centrée */}
-          <div className="flex-1 max-w-md mx-4">
-            <ProgressBar />
-          </div>
-          
-          {/* Bouton Suivant à droite */}
-          {currentStep < steps.length - 1 && (
-            <button 
-              onClick={() => {
-                // Logique pour passer à l'étape suivante si conditions remplies
-                if (currentStep === 0 && selectedConcessionaire) {
-                  setCurrentStep(1);
-                } else if (currentStep === 1 && uploadedPDF) {
-                  setCurrentStep(2);
-                } else if (currentStep === 2 && selectedPages.length > 0) {
-                  setCurrentStep(3);
-                } else if (currentStep === 3 && selectedArea) {
-                  setCurrentStep(4);
-                } else if (currentStep === 4 && coordinateFormatConfigured) {
-                  setCurrentStep(5);
-                }
-              }} 
-              disabled={
-                (currentStep === 0 && !selectedConcessionaire) ||
-                (currentStep === 1 && !uploadedPDF) ||
-                (currentStep === 2 && selectedPages.length === 0) ||
-                (currentStep === 3 && !selectedArea) ||
-                (currentStep === 4 && !coordinateFormatConfigured)
-              }
-              className={`border-none px-3 py-1.5 rounded text-sm transition-colors ${
-                (currentStep === 0 && selectedConcessionaire) ||
-                (currentStep === 1 && uploadedPDF) ||
-                (currentStep === 2 && selectedPages.length > 0) ||
-                (currentStep === 3 && selectedArea) ||
-                (currentStep === 4 && coordinateFormatConfigured)
-                  ? 'bg-green-500 hover:bg-green-600 text-white cursor-pointer'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              Suivant →
-            </button>
-          )}
         </div>
       </div>
     </div>
