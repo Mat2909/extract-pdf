@@ -889,9 +889,32 @@ function App() {
                   setCoordinateFormat(null);
                 }
               }} 
-              className="bg-gray-500 hover:bg-gray-600 text-white border-none px-3 py-1.5 rounded text-sm transition-colors mr-4"
+              style={{
+                backgroundColor: '#f87171',
+                color: 'white',
+                border: 'none',
+                padding: '8px 12px',
+                borderRadius: '6px',
+                fontSize: '12px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease-in-out',
+                lineHeight: '1.2',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                width: 'fit-content',
+                marginRight: '16px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#ef4444';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#f87171';
+              }}
             >
-              ← Précédent
+              <span style={{ fontSize: '24px', pointerEvents: 'none' }}>←</span>
+              <span style={{ fontSize: '10px', lineHeight: '1.1', pointerEvents: 'none' }}>Précédent</span>
             </button>
           )}
           
