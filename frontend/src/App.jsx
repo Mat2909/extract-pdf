@@ -565,7 +565,7 @@ function App() {
                     {selectedConcessionaire && (
                       <div 
                         style={{
-                          padding: '16px',
+                          padding: '8px',
                           borderRadius: '8px',
                           border: '2px solid',
                           borderColor: selectedConcessionaire.color,
@@ -574,7 +574,7 @@ function App() {
                           marginBottom: '20px'
                         }}
                       >
-                        <div style={{ fontSize: '32px', marginBottom: '8px' }}>{selectedConcessionaire.logo}</div>
+                        <div style={{ fontSize: '16px', marginBottom: '4px' }}>{selectedConcessionaire.logo}</div>
                         <h3 style={{ 
                           fontWeight: 'bold', 
                           fontSize: '18px', 
@@ -1437,35 +1437,6 @@ function App() {
           </div>
         </div>
 
-        {/* DEBUG PANEL TEMPORAIRE */}
-        <div style={{
-          position: 'fixed',
-          top: '10px',
-          left: '10px',
-          backgroundColor: '#1f2937',
-          color: 'white',
-          padding: '10px',
-          borderRadius: '6px',
-          fontSize: '12px',
-          fontFamily: 'monospace',
-          zIndex: 9999,
-          minWidth: '300px'
-        }}>
-          <div>Step: {currentStep}</div>
-          <div>hasTemporarySelection: {hasTemporarySelection ? 'true' : 'false'}</div>
-          <div>selectedArea: {selectedArea ? 'exists' : 'null'}</div>
-          <div>isOCRProcessing: {isOCRProcessing ? 'true' : 'false'}</div>
-          <div>selectedPages: {selectedPages.length}</div>
-          <div>Button disabled: {
-            (currentStep === 0 && !selectedConcessionaire) ||
-            (currentStep === 1 && !selectedFile) ||
-            (currentStep === 2 && selectedPages.length === 0) ||
-            (currentStep === 3 && !hasTemporarySelection) ||
-            (currentStep >= 5 && (isOCRProcessing || !selectedArea || selectedPages.length === 0)) ||
-            false
-            ? 'true' : 'false'
-          }</div>
-        </div>
       </div>
     </div>
   );
