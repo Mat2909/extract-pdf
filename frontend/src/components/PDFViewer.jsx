@@ -21,7 +21,7 @@ const configurePDFWorker = () => {
 // Configurer le worker au chargement
 configurePDFWorker();
 
-const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepChange, onTotalPagesChange, selectedPages = [], thumbnailMode = false }) => {
+const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepChange, onTotalPagesChange, selectedPages = [], thumbnailMode = false, onTemporarySelectionChange }) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -358,6 +358,14 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
       // Stocker temporairement la sélection au lieu de l'appliquer immédiatement
       setTemporarySelection(relativeSelection);
       console.log('Zone stockée temporairement:', relativeSelection);
+      console.log('🔍 PDFViewer: About to check onTemporarySelectionChange callback:', !!onTemporarySelectionChange);
+      // Notifier le parent qu'une sélection temporaire existe
+      if (onTemporarySelectionChange) {
+        console.log('🟢 PDFViewer: Notifying parent - temporarySelection = true');
+        onTemporarySelectionChange(true);
+      } else {
+        console.log('⚠️ PDFViewer: onTemporarySelectionChange callback is missing!');
+      }
     }
   };
 
@@ -366,12 +374,21 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
     setStartPoint(null);
     setTemporarySelection(null);
     onAreaSelect(null);
+    // Notifier le parent qu'il n'y a plus de sélection temporaire
+    if (onTemporarySelectionChange) {
+      console.log('🔴 PDFViewer: Notifying parent - temporarySelection = false');
+      onTemporarySelectionChange(false);
+    }
   };
 
   const validateZoneSelection = () => {
     if (temporarySelection) {
       onAreaSelect(temporarySelection);
       console.log('Zone validée et transmise au parent:', temporarySelection);
+      // Notifier le parent qu'il n'y a plus de sélection temporaire (la zone est maintenant validée)
+      if (onTemporarySelectionChange) {
+        onTemporarySelectionChange(false);
+      }
       // Passer automatiquement à l'étape 4 (OCR) après validation
       if (onStepChange) {
         onStepChange(4);

@@ -18,8 +18,16 @@ const forceDecimalPoint = (num) => {
   });
 };
 
-const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete, coordinateFormat }) => {
+const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete, coordinateFormat, onProcessingChange }) => {
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Notifier le parent de l'état initial du traitement
+  useEffect(() => {
+    if (onProcessingChange) {
+      console.log('🔄 OCRProcessor: Initial processing state =', isProcessing);
+      onProcessingChange(isProcessing);
+    }
+  }, []);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [correctedText, setCorrectedText] = useState('');
@@ -378,6 +386,9 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete, coordi
 
   const startActualBatchOCR = async () => {
     setIsProcessing(true);
+    if (onProcessingChange) {
+      onProcessingChange(true);
+    }
     setResults([]);
     
     // Variable locale pour stocker les résultats
@@ -440,6 +451,9 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete, coordi
       alert('Erreur lors du traitement OCR: ' + error.message);
     } finally {
       setIsProcessing(false);
+      if (onProcessingChange) {
+        onProcessingChange(false);
+      }
       setIsCancelled(false);
     }
   };
@@ -655,6 +669,9 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete, coordi
     const firstPage = Math.min(...selectedPages);
     console.log(`Test OCR première page sélectionnée (${firstPage}) avec zone:`, selectedArea);
     setIsProcessing(true);
+    if (onProcessingChange) {
+      onProcessingChange(true);
+    }
     setResults([]);
     
     try {
@@ -674,6 +691,9 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete, coordi
       alert('Erreur lors du test OCR: ' + error.message);
     } finally {
       setIsProcessing(false);
+      if (onProcessingChange) {
+        onProcessingChange(false);
+      }
     }
   };
 

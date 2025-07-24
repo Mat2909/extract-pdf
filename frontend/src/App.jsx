@@ -21,6 +21,21 @@ function App() {
   const [totalPDFPages, setTotalPDFPages] = useState(0);
   const [coordinateFormatConfigured, setCoordinateFormatConfigured] = useState(false);
   const [coordinateFormat, setCoordinateFormat] = useState(null);
+  const [hasTemporarySelection, setHasTemporarySelection] = useState(false);
+  const [isOCRProcessing, setIsOCRProcessing] = useState(false);
+
+  // Callback avec debug pour temporarySelection
+  const handleTemporarySelectionChange = (hasSelection) => {
+    console.log('🔄 App.jsx: hasTemporarySelection changed to:', hasSelection);
+    console.log('🔄 App.jsx: Current step:', currentStep);
+    setHasTemporarySelection(hasSelection);
+  };
+
+  // Callback avec debug pour OCR processing
+  const handleOCRProcessingChange = (isProcessing) => {
+    console.log('🔄 App.jsx: isOCRProcessing changed to:', isProcessing);
+    setIsOCRProcessing(isProcessing);
+  };
   
   // Activer le debug panel avec Ctrl+D
   useEffect(() => {
@@ -1062,6 +1077,7 @@ function App() {
                       onTotalPagesChange={setTotalPDFPages}
                       selectedPages={selectedPages}
                       thumbnailMode={true}
+                      onTemporarySelectionChange={handleTemporarySelectionChange}
                     />
                   </div>
                 </div>
@@ -1135,6 +1151,7 @@ function App() {
                 onStepChange={setCurrentStep}
                 onTotalPagesChange={setTotalPDFPages}
                 selectedPages={selectedPages}
+                onTemporarySelectionChange={handleTemporarySelectionChange}
               />
               
               {/* Info zone sélectionnée (sans bouton de validation) */}
@@ -1189,6 +1206,7 @@ function App() {
               onOCRStart={handleOCRStart}
               onExcelGeneration={handleExcelGeneration}
               coordinateFormat={coordinateFormat}
+              onProcessingChange={handleOCRProcessingChange}
             />
           </div>
         )}
@@ -1297,23 +1315,26 @@ function App() {
                   (currentStep === 0 && !selectedConcessionaire) ||
                   (currentStep === 1 && !selectedFile) ||
                   (currentStep === 2 && selectedPages.length === 0) ||
-                  (currentStep === 3 && !selectedArea) ||
-                  false // Étape 4 toujours activée (Lambert II pré-sélectionné)
+                  (currentStep === 3 && !hasTemporarySelection) ||
+                  (currentStep === 4 && false) || // Étape 4 toujours activée (Lambert II pré-sélectionné)
+                  (currentStep >= 5 && (isOCRProcessing || !selectedArea || selectedPages.length === 0))
                 }
                 style={{
                   backgroundColor: 
                     (currentStep === 0 && selectedConcessionaire) ||
                     (currentStep === 1 && selectedFile) ||
                     (currentStep === 2 && selectedPages.length > 0) ||
-                    (currentStep === 3 && selectedArea) ||
-                    (currentStep === 4) // Toujours actif pour l'étape 4
+                    (currentStep === 3 && hasTemporarySelection) ||
+                    (currentStep === 4) || // Toujours actif pour l'étape 4
+                    (currentStep >= 5 && !isOCRProcessing && selectedArea && selectedPages.length > 0)
                     ? '#2563eb' : '#d1d5db',
                   color: 
                     (currentStep === 0 && selectedConcessionaire) ||
                     (currentStep === 1 && selectedFile) ||
                     (currentStep === 2 && selectedPages.length > 0) ||
-                    (currentStep === 3 && selectedArea) ||
-                    (currentStep === 4) // Toujours actif pour l'étape 4
+                    (currentStep === 3 && hasTemporarySelection) ||
+                    (currentStep === 4) || // Toujours actif pour l'étape 4
+                    (currentStep >= 5 && !isOCRProcessing && selectedArea && selectedPages.length > 0)
                     ? 'white' : '#6b7280',
                   border: 'none',
                   padding: '8px 12px',
@@ -1337,8 +1358,9 @@ function App() {
                     (currentStep === 0 && selectedConcessionaire) ||
                     (currentStep === 1 && selectedFile) ||
                     (currentStep === 2 && selectedPages.length > 0) ||
-                    (currentStep === 3 && selectedArea) ||
-                    (currentStep === 4) // Toujours actif pour l'étape 4
+                    (currentStep === 3 && hasTemporarySelection) ||
+                    (currentStep === 4) || // Toujours actif pour l'étape 4
+                    (currentStep >= 5 && !isOCRProcessing && selectedArea && selectedPages.length > 0)
                     ? '1' : '0.6'
                 }}
                 onMouseEnter={(e) => {
@@ -1400,6 +1422,36 @@ function App() {
               </button>
             </div>
           </div>
+        </div>
+
+        {/* DEBUG PANEL TEMPORAIRE */}
+        <div style={{
+          position: 'fixed',
+          top: '10px',
+          right: '10px',
+          backgroundColor: '#1f2937',
+          color: 'white',
+          padding: '10px',
+          borderRadius: '6px',
+          fontSize: '12px',
+          fontFamily: 'monospace',
+          zIndex: 9999,
+          minWidth: '300px'
+        }}>
+          <div>Step: {currentStep}</div>
+          <div>hasTemporarySelection: {hasTemporarySelection ? 'true' : 'false'}</div>
+          <div>selectedArea: {selectedArea ? 'exists' : 'null'}</div>
+          <div>isOCRProcessing: {isOCRProcessing ? 'true' : 'false'}</div>
+          <div>selectedPages: {selectedPages.length}</div>
+          <div>Button disabled: {
+            (currentStep === 0 && !selectedConcessionaire) ||
+            (currentStep === 1 && !selectedFile) ||
+            (currentStep === 2 && selectedPages.length === 0) ||
+            (currentStep === 3 && !hasTemporarySelection) ||
+            (currentStep >= 5 && (isOCRProcessing || !selectedArea || selectedPages.length === 0)) ||
+            false
+            ? 'true' : 'false'
+          }</div>
         </div>
       </div>
     </div>
