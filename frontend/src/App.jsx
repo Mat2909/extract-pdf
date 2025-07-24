@@ -1428,7 +1428,7 @@ function App() {
         <div style={{
           position: 'fixed',
           top: '10px',
-          right: '10px',
+          left: '10px',
           backgroundColor: '#1f2937',
           color: 'white',
           padding: '10px',
