@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import './PDFViewer.css';
 
@@ -21,7 +21,7 @@ const configurePDFWorker = () => {
 // Configurer le worker au chargement
 configurePDFWorker();
 
-const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepChange, onTotalPagesChange, selectedPages = [], thumbnailMode = false, onTemporarySelectionChange }) => {
+const PDFViewer = forwardRef(({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepChange, onTotalPagesChange, selectedPages = [], thumbnailMode = false, onTemporarySelectionChange }, ref) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -41,6 +41,11 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
   const [temporarySelection, setTemporarySelection] = useState(null);
   const [thumbnails, setThumbnails] = useState([]);
   const [thumbnailsLoading, setThumbnailsLoading] = useState(false);
+
+  // Exposer les fonctions pour le bouton "Suivant"
+  useImperativeHandle(ref, () => ({
+    validateZoneSelection: validateZoneSelection
+  }));
 
   useEffect(() => {
     if (pdfUrl) {
@@ -877,6 +882,6 @@ const PDFViewer = ({ pdfUrl, onAreaSelect, onPagesChange, currentStep, onStepCha
       </div>
     </div>
   );
-};
+});
 
 export default PDFViewer;

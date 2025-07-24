@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import './OCRProcessor.css';
 import CoordinateConverter from './CoordinateConverter';
 import CoordinatePreview from './CoordinatePreview';
@@ -18,7 +18,7 @@ const forceDecimalPoint = (num) => {
   });
 };
 
-const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete, coordinateFormat, onProcessingChange }) => {
+const OCRProcessor = forwardRef(({ pdfFile, selectedArea, selectedPages, onComplete, coordinateFormat, onProcessingChange }, ref) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Notifier le parent de l'état initial du traitement
@@ -28,6 +28,12 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete, coordi
       onProcessingChange(isProcessing);
     }
   }, []);
+
+  // Exposer les fonctions pour le bouton "Suivant"
+  useImperativeHandle(ref, () => ({
+    startBatchOCR: startBatchOCR
+  }));
+
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [correctedText, setCorrectedText] = useState('');
@@ -1129,6 +1135,6 @@ const OCRProcessor = ({ pdfFile, selectedArea, selectedPages, onComplete, coordi
       </section>
     </>
   );
-};
+});
 
 export default OCRProcessor;

@@ -6,6 +6,8 @@ import CoordinateFormatPage from './components/CoordinateFormatPage';
 
 function App() {
   const coordinateFormatPageRef = useRef(null);
+  const pdfViewerRef = useRef(null);
+  const ocrProcessorRef = useRef(null);
   const [selectedConcessionaire, setSelectedConcessionaire] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -1144,6 +1146,7 @@ function App() {
                   </div>
               
               <PDFViewer
+                ref={pdfViewerRef}
                 pdfUrl={uploadedPDF.path}
                 onAreaSelect={handleAreaSelect}
                 onPagesChange={handlePagesChange}
@@ -1197,6 +1200,7 @@ function App() {
         {currentStep >= 5 && uploadedPDF && selectedArea && coordinateFormatConfigured && (
           <div className="step-page">
             <OCRProcessor
+              ref={ocrProcessorRef}
               pdfFile={uploadedPDF}
               selectedArea={selectedArea}
               selectedPages={selectedPages}
@@ -1303,15 +1307,20 @@ function App() {
                   } else if (currentStep === 2 && selectedPages.length > 0) {
                     setCurrentStep(3);
                   } else if (currentStep === 3 && hasTemporarySelection) {
-                    setCurrentStep(4);
+                    // Appeler la fonction de validation de zone du PDFViewer
+                    if (pdfViewerRef.current) {
+                      pdfViewerRef.current.validateZoneSelection();
+                    }
                   } else if (currentStep === 4) {
                     // Déclencher la validation du format depuis CoordinateFormatPage
                     if (coordinateFormatPageRef.current) {
                       coordinateFormatPageRef.current.validateFormat();
                     }
                   } else if (currentStep >= 5 && !isOCRProcessing && selectedArea && selectedPages.length > 0) {
-                    // Pour les étapes OCR (5+), passer à l'étape suivante
-                    setCurrentStep(currentStep + 1);
+                    // Appeler la fonction de démarrage OCR du OCRProcessor
+                    if (ocrProcessorRef.current) {
+                      ocrProcessorRef.current.startBatchOCR();
+                    }
                   }
                 }}
                 disabled={
