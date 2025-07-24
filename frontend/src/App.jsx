@@ -1357,8 +1357,9 @@ function App() {
                     (currentStep === 0 && selectedConcessionaire) ||
                     (currentStep === 1 && selectedFile) ||
                     (currentStep === 2 && selectedPages.length > 0) ||
-                    (currentStep === 3 && selectedArea) ||
-                    (currentStep === 4) // Toujours actif pour l'étape 4
+                    (currentStep === 3 && hasTemporarySelection) ||
+                    (currentStep === 4) || // Toujours actif pour l'étape 4
+                    (currentStep >= 5 && !isOCRProcessing && selectedArea && selectedPages.length > 0)
                     ? 'pointer' : 'not-allowed',
                   transition: 'all 0.15s ease-in-out',
                   lineHeight: '1.2',
