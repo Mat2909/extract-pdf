@@ -1272,17 +1272,11 @@ function App() {
           
           {/* Section droite avec boutons */}
           <div className="flex items-center gap-2 ml-4">
-            {/* Bouton Suivant - affiché si conditions validées */}
+            {/* Bouton Suivant - toujours affiché avec états activé/grisé */}
             {currentStep < steps.length - 1 && (
-              (currentStep === 0 && selectedConcessionaire) ||
-              (currentStep === 1 && selectedFile) ||
-              (currentStep === 2 && selectedPages.length > 0) ||
-              (currentStep === 3 && selectedArea) ||
-              (currentStep === 4 && true) // Lambert II étendu toujours pré-sélectionné
-            ) && (
               <button 
                 onClick={() => {
-                  // Logique pour passer à l'étape suivante
+                  // Vérifier si l'action est possible avant d'exécuter
                   if (currentStep === 0 && selectedConcessionaire) {
                     setCurrentStep(1);
                   } else if (currentStep === 1 && selectedFile) {
@@ -1298,28 +1292,64 @@ function App() {
                       coordinateFormatPageRef.current.validateFormat();
                     }
                   }
-                }} 
+                }}
+                disabled={
+                  (currentStep === 0 && !selectedConcessionaire) ||
+                  (currentStep === 1 && !selectedFile) ||
+                  (currentStep === 2 && selectedPages.length === 0) ||
+                  (currentStep === 3 && !selectedArea) ||
+                  false // Étape 4 toujours activée (Lambert II pré-sélectionné)
+                }
                 style={{
-                  backgroundColor: '#2563eb',
-                  color: 'white',
+                  backgroundColor: 
+                    (currentStep === 0 && selectedConcessionaire) ||
+                    (currentStep === 1 && selectedFile) ||
+                    (currentStep === 2 && selectedPages.length > 0) ||
+                    (currentStep === 3 && selectedArea) ||
+                    (currentStep === 4) // Toujours actif pour l'étape 4
+                    ? '#2563eb' : '#d1d5db',
+                  color: 
+                    (currentStep === 0 && selectedConcessionaire) ||
+                    (currentStep === 1 && selectedFile) ||
+                    (currentStep === 2 && selectedPages.length > 0) ||
+                    (currentStep === 3 && selectedArea) ||
+                    (currentStep === 4) // Toujours actif pour l'étape 4
+                    ? 'white' : '#6b7280',
                   border: 'none',
                   padding: '8px 12px',
                   borderRadius: '6px',
                   fontSize: '12px',
                   fontWeight: '500',
-                  cursor: 'pointer',
+                  cursor: 
+                    (currentStep === 0 && selectedConcessionaire) ||
+                    (currentStep === 1 && selectedFile) ||
+                    (currentStep === 2 && selectedPages.length > 0) ||
+                    (currentStep === 3 && selectedArea) ||
+                    (currentStep === 4) // Toujours actif pour l'étape 4
+                    ? 'pointer' : 'not-allowed',
                   transition: 'all 0.15s ease-in-out',
                   lineHeight: '1.2',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  width: 'fit-content'
+                  width: 'fit-content',
+                  opacity: 
+                    (currentStep === 0 && selectedConcessionaire) ||
+                    (currentStep === 1 && selectedFile) ||
+                    (currentStep === 2 && selectedPages.length > 0) ||
+                    (currentStep === 3 && selectedArea) ||
+                    (currentStep === 4) // Toujours actif pour l'étape 4
+                    ? '1' : '0.6'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#1d4ed8';
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = '#1d4ed8';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#2563eb';
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = '#2563eb';
+                  }
                 }}
               >
                 <span style={{ fontSize: '24px', pointerEvents: 'none' }}>→</span>
